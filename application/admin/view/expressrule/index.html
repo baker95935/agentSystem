@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>运费规则列表</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div id="performance-top">
+        <h5>运费列表</h5>
+    </div>
+    <ul id="logistics-tab" class="definewidth">
+        <li><a href="{:url('Expresstemplete/index')}">运费模板设置</a></li>
+        <li><a href="{:url('Expressrule/index')}" class="logistics-tab-bottom">运费设置</a></li>
+    </ul>
+    <div id="cost-news" class="definewidth">
+        <button type="button" class="btn btn-success" id="addnew">添加运费规则</button>
+    </div>
+    <table class="table table-bordered table-hover definewidth m10" id="cost-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>运费（元）</th>
+            <th>使用所需费用（元）</th>
+            <th>区域模式</th>
+            <th>区域选择</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        {foreach name="dictionaryList" item="item"}
+    	<tr>
+            <td>{$item.id}</td>
+            <td>{$item.name}</td>
+            <td>{$item.first_price}</td>
+            <td>{$item.cost}</td>
+            <td>{$item.is_inside == 1 ? '区域之内' : '区域之外'}</td>
+            <td>{$item.provinces}</td>
+            <td>
+                <a href="javascript:redirect('{:url('Expressrule/edit','id='.$item['id'])}');">编辑</a>
+	        	<a href="javascript:;" class="del_rule" data-id='{$item.id}'>删除</a>
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    <div class="inline pull-right page">
+    {$dictionaryList->render()}
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+    // 跳转
+    function redirect(url){
+        window.location.href = url;
+    }
+
+    $(function () {
+
+        // 删除
+        $('.del_rule').click(function(){
+            var _id = $(this).data('id');
+
+            layer.confirm("确认删除？",{btn:['确定','取消']},function(){
+                $.ajax({
+                    url:'{:url("Expressrule/del")}',
+                    data:{did:_id},
+                    success:function(e){
+                        if(e.error){
+                            layer.alert(e.error.msg);
+                        }else{
+                            // layer.alert(e.msg);
+                            window.location.reload();
+                        }
+                    }
+                });
+            },function(index){ layer.close(index); });
+        });
+
+        // 添加
+        $('#addnew').click(function(){
+            redirect('{:url("Expressrule/create")}');
+        });
+    });
+</script>

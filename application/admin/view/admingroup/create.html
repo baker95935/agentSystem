@@ -1,0 +1,93 @@
+{include file='header'/}
+<form action="{:url('/admin/Admingroup/save/')}" method="post" class="definewidth m20">
+    <table id="agentorders" class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <td width="10%" class="tableleft">组名称</td>
+            <td><input type="text" placeholder="请输入组名称" value="{present name="data.name"}{$data.name}{/present}" name="name"/></td>
+        </tr>
+        
+        <tr>
+            <td class="tableleft">是否超级管理员</td>
+            <td> 
+            	<label class="radio">
+	                <input type="radio" name="super" value="1" {notpresent name="data.super"} checked {/notpresent} {present name="data.super"} {if condition="$data.super eq 1 "} checked  {/if} {/present}  />是</label>
+	            <label class="radio"><input type="radio" name="super" value="2" {present name="data.super"} {if condition="$data.super eq 2 "} checked  {/if} {/present}  />否
+            	</label>
+            </td>
+        </tr>
+        
+        <tr>
+        	<td class="tableleft">备注</td>
+        	<td>
+        		<input type="text" placeholder="请输入备注信息"  value="{present name="data.remark"}{$data.remark}{/present}" name="remark"/>
+        	</td>
+    	</tr>
+    
+        <tr id="rights">
+            <td class="tableleft">权限</td>
+            <td>
+                <ul>
+					{foreach name="menuList" item="item"}                
+                	<li><label class='checkbox inline'><input type='checkbox' name='type[]' value='{$item.id}' {present name="data.typeAry"} {if condition="in_array($item.id,$data.typeAry)"} checked="checked"  {/if} {/present}   />{$item.name}</label>
+	                	<ul>
+	                		{foreach name="item.secondList" item="kk"}
+			                <li>&nbsp;&nbsp;&nbsp;&nbsp;<label class='checkbox inline'><input type='checkbox' name='node[]' value='{$kk.id}' {present name="data.nodeAry"} {if condition="in_array($kk.id,$data.nodeAry)"} checked="checked"  {/if} {/present}   />{$kk.name}</label>
+		                	{/foreach}
+		                </ul>
+	                </li>
+	                {/foreach}
+                </ul> 
+            </td>
+        </tr>
+ 
+        <tr>
+            <td class="tableleft"></td>
+            <td>
+            	<input type="hidden" id="id" name="id" value="{present name="data.id"}{$data.id}{/present}" >
+                <button type="submit" class="btn btn-primary" type="button">保存</button> 
+                &nbsp;&nbsp;
+                <a href="{:url('/admin/admingroup/index')}" class="btn btn-success" >返回</a>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
+<script>
+    $(function () {
+    	
+    	
+    	//选中上级默认全选下级
+        $(':checkbox[name="type[]"]').click(function () {
+            $(':checkbox', $(this).closest('li')).prop('checked', this.checked);
+        });
+        
+    	//选中下级，默认选中上级
+    	$(':checkbox[name="node[]"]').click(function () {
+    		var isChecked = $(this).is(":checked"); 
+    	 
+    		if(isChecked==true) {
+           		$(this).parent().parent().parent().parent().find(':checkbox[name="type[]"]').prop('checked',true);
+    		}else {
+    			$(this).parent().parent().parent().parent().find(':checkbox[name="type[]"]').prop('checked',false);
+    	   	}
+        });
+    	
+        //默认的
+        var supers={$defaultRight};
+        if(supers==1) {
+        	$('#rights').hide();
+        }
+        
+        //切换权限列表
+        $(':radio[name="super"]').click(function(){
+        	var supers=$("input[name='super']:checked").val();
+        	if(supers==2) {
+        		$('#rights').show();
+        	} else {
+        		$('#rights').hide();
+        	}
+	 	});
+
+    });
+</script>

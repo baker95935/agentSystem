@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>微信支付</title>
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+
+	<body>
+		<div id="WechatPayLayout">
+			<p><span>订单编号：</span>111111231546454</p>
+			
+			<article>
+				<aside>一二三四五六七八九十</aside>
+				<ul>
+					<li>金额：￥<span class="money">10000.00</span>元</li>
+					<li>数量：<span>10000</span>个</li>
+				</ul>
+			</article>
+			<div>
+				支付总金额：<p>￥<span class="money">10000.00</span></p>元
+			</div>
+			<button class="commonButton">立即支付</button>
+		</div>
+	</body>
+</html>

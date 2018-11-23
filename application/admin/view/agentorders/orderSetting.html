@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="performance-top">
+    <h5>订单设置</h5>
+</div>
+<form action="{:url('/admin/Agentorders/saveOrderSetting/')}" method="post" class="definewidth">
+    <div id="performance-top"><h6>基本信息</h6></div>
+    <table class="table table-bordered table-hover definewidth m10 reward_clear">
+        <tr>
+            <th class="th10 tr">默认收货时间</th>
+            <td class="tl">
+                <input type="text" name="auto_confirm_time" id="auto_confirm_time" value="{$settingInfo.auto_confirm_time}">
+                <span class="ml10">天</span>
+                <h7>(确认发货后，自动确认收货时间)</h7>
+            </td>
+        </tr>
+        <tr>
+            <th class="tr">发货方</th>
+            <td class="tl">
+                <input type="checkbox" name="consignment_info[]" value="1"  {if condition="$settingInfo.consignment_info eq 1 || $settingInfo.consignment_info eq 3"} checked="checked" {/if}>公司
+                <input type="checkbox" name="consignment_info[]" value="2" {if condition="$settingInfo.consignment_info eq 2 || $settingInfo.consignment_info eq 3"} checked="checked" {/if}>上级代理
+                <br>
+                <h7>(发货方：这是发货方，默认情况下公司和代理商全部勾选，如果只勾选公司则所有订单只能由公司发货，如果只勾选代理商则所有订单只能由代理商发货)</h7>
+            </td>
+        </tr>
+        <tr>
+            <th class="tr">时间范围</th>
+            <td class="tl">
+                <input type="text" name="time_span" id="time_span" value="{$settingInfo.time_span}">
+                <span  class="ml10">天</span>
+                <h7>(发货方控制范围，系统默认6天内，可以设定为公司或代理商发货，超过该时间范围只能是公司发货)</h7>
+            </td>
+        </tr>
+        <tr>
+            <th class="tr">退货地址</th>
+            <td colspan="5"  class="tl">
+                <input maxlength="120" style="width:64%;" type="text" name="return_goods_address" id="return_goods_address" value="{present name="settingInfo.return_goods_address"}{$settingInfo.return_goods_address}{/present}">
+                <span  class="ml10"></span>
+                <h7>(代理把退货的商品，邮寄到此处)</h7>
+            </td>
+        </tr>
+        <input type="hidden" name="settingInfoId" value="{$settingInfo.id}">
+    </table>
+
+<!-- <div id="performance-top"><h6>运费设置</h6></div>
+<table class="table table-bordered table-hover definewidth m10 reward_clear">
+    <tr>
+        <th class="th10">身份</th>
+        <th>订单额度（元）</th>
+        <th>运费（元）</th>
+    </tr>
+    {*if condition="empty($freightList)"*}
+	 	{*foreach name="listLevel" item="item"*}
+ 	<tr>
+        <th>{*$item.name*}</th>
+        <td class="tl"><input type="text" name="order_amount_{*$item.id*}" id="order_amount_{*$item.id*}" value="{*$item.order_amount*}"></td>
+        <td class="tl"><input type="text" name="freight_{*$item.id*}" id="freight_{*$item.id*}" value=""></td>
+    </tr>
+	 	{*/foreach*}
+ 	{*else /*}
+	 	{*foreach name="freightList" item="item"*}
+ 	<tr>
+        <th>{*$item.role|get_reward_levelname*}</th>
+        <td class="tl"><input type="text" name="order_amount_{*$item.role*}" id="order_amount_{*$item.role*}" value="{*$item.order_amount*}" ></td>
+        <td class="tl"><input type="text" name="freight_{*$item.role*}" id="freight_{*$item.role*}" value="{*$item.freight*}"></td>
+    </tr>
+ 	<input type="hidden" name="id_{*$item.role*}" value="{*$item.id*}">
+	 	{*/foreach*}
+ 	{*/if*}
+</table> -->
+    <div id="performance-top" class=" button-center">
+        <button type="submit" class="btn btn-primary m10" type="button">保存</button>
+    </div>
+</form>
+</body>
+</html>

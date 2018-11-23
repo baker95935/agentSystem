@@ -1,0 +1,251 @@
+{include file='index@common/header'/}
+	<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/Css/mobileSelect.css">
+	<style type="text/css">
+		html,
+		body {
+			background-color: #F5F5F5;
+		}
+		.none {display: none;} #orderDetailContent .order{margin-bottom: .4rem;}
+		#orderDetailContent.already .order.address p{margin: 0 0 .5rem 0;}
+	</style>
+	<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/Js/mobileSelect.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+	<div id="orderDetailContent" class="already myOrder">
+		<div>
+			<div class="number wordColor order-status">
+						<div><span>订单编号：</span>{$orderDetail.order_number}</div>
+						{if condition="$type eq 2"}<div>大礼包订单</div>{/if}
+			</div>
+			<div class="takeInfo wordColor">
+				<p><span>收货人：</span>{if condition="$type eq 2"}{$orderDetail.consignee_name}{else /}{$orderDetail.consignee.consignee_name}{/if}</p>
+				<p class="pMargin"><span>联系电话：</span>{if condition="$type eq 2"}{$orderDetail.consignee_phone}{else /}{$orderDetail.consignee.consignee_phone}{/if}</p>
+				<p><span>收货地址：</span>{if condition="$type eq 2"}{$orderDetail.consignee_province|get_address_name_by_id}{$orderDetail.consignee_city|get_address_name_by_id}{$orderDetail.consignee_area|get_address_name_by_id}{$orderDetail.consignee_address}{else /} {$orderDetail.consignee.province|get_address_name_by_id}{$orderDetail.consignee.city|get_address_name_by_id}{$orderDetail.consignee.area|get_address_name_by_id}{$orderDetail.consignee.address}{/if}</p>
+			</div>
+			<div class="agencyInfo wordColor">
+				<p><span>代理商ID：</span>{$orderDetail.agents.agent_id}</p>
+				<p class="pMargin"><span>昵称：</span>{$orderDetail.agents.nickname}</p>
+				<p><span>微信号：</span>{$orderDetail.agents.wechat}</p>
+				<p class="pMargin"><span>联系方式：</span>{$orderDetail.agents.phone}</p>
+			</div>
+
+			{if condition="$type eq 1 && !empty($orderDetail.remark)"}
+				<div class="wordColor order-status remarks">
+				<p class="pMargin"><span>备注：</span>{$orderDetail.remark}</p>
+				</div>
+			{/if}
+			
+			{if condition="$type eq 2 && !empty($orderDetail.order_remark)"}
+				<div class="wordColor order-status remarks">
+				<p class="pMargin"><span>备注：</span>{$orderDetail.order_remark}</p>
+				</div>
+			{/if}
+			
+			{if condition="$type eq 2 && !empty($orderDetail.remark)"}
+				<div class="number wordColor order-status">
+				<p class="pMargin"><span>买家留言：</span>{$orderDetail.remark}</p>
+				</div>
+			{/if}
+			{if condition="$type eq 1 && !empty($orderDetail.agent_remark)"}
+				<div class="number wordColor order-status">
+				<p class="pMargin"><span>买家留言：</span>{$orderDetail.agent_remark}</p>
+				</div>
+			{/if}
+
+			<ol>
+			{if condition="$type eq 2"}
+				<li>
+			  		<a href="">
+			  			<img src="{$orderDetail.gift.pic}" alt="" />
+			  			<div>
+				  			<p class="proName">{$orderDetail.gift.name}</p>
+				  			<p class="other">
+				  			<span class="goods-price"><span class="yen">￥</span>{$orderDetail.gift.price}</span>
+				  			<span class="sale">X{$orderDetail.pnumber}</span>
+				  			</p>
+			  			</div>
+			  		</a>
+			  	</li>
+			{else /}
+				{foreach name="productList" item="item"}
+					<li>
+			  			<a href="">
+			  				<img src="{$item.product.product_img}" alt="" />
+			  				<div>
+			  					<p class="proName">{$item.pname}</p>
+			  					<p class="other">
+			  						<span class="goods-price"><span class="yen">￥</span>{$item.pprice}</span>
+			  						<span class="sale">X{$item.pnumber}</span>
+			  					</p>
+			  				</div>
+			  			</a>
+			  		</li>
+			  	{/foreach}
+		  	{/if}
+			</ol>
+			{if condition="$type eq 1"}{if condition="$orderDetail.trans_expenses gt 0"}<p class="total"><span>运费：</span><span class="goods-price"><span class="yen">￥{$orderDetail.trans_expenses}</span></span></p>{/if}{/if}
+			<div class="number wordColor dataTime">
+				<span>下单时间：{$orderDetail.ctime|date='m-d H:i:s',###}</span>
+				<span>支付时间：{if condition="empty($orderDetail.pay_time)"}{$orderDetail.ctime|date='m-d H:i:s',###}{else /}{$orderDetail.pay_time|date='m-d H:i:s',###}{/if}</span>
+			</div>
+				<div class="takeInfo wordColor text-right">
+					<p><span>商品金额：</span>￥{$orderDetail.ptotal_price}</p>
+					<p class="pMargin"><span>运费：</span>￥{$orderDetail.trans_expenses}</p>
+					<p><span>代理折扣：</span>￥{$orderDetail.agent_total_price}</p>
+				</div>
+			<p class="total"><span>实际金额：</span><span class="goods-price"><span class="yen">￥</span>{if condition="$type eq 2"}{$orderDetail.order_price}{else /}{$orderDetail.order_amount_pay}{/if}</span></p>
+		</div>
+
+		<div class="order">
+			<div class="caption">配送方式</div>
+			{if condition="$type eq 2"}
+				<p>物流公司：{$orderDetail.express_name}</p>
+				<p>快递单号：{$orderDetail.express_number}</p>
+				<p>备注:{$orderDetail.express_remark}</p>
+			{else /}
+				<p>物流公司：{$orderDetail.delivery.express_name}</p>
+				<p>快递单号：{$orderDetail.delivery.express_number}</p>
+				<p>备注:{$orderDetail.delivery.remark}</p>
+			{/if}
+		</div>
+		<div class="footer">
+			{if condition="$type eq 2"}
+			<button onclick="confirmOrder('{$orderDetail.order_number}',2)">确认收货</button>
+			{else /}
+			<button onclick="confirmOrder('{$orderDetail.order_number}')">确认收货</button>
+			{/if}
+		</div>
+	
+		
+		{if empty($orderDetail.returnInfo) && $type==1} 
+			{if condition="$orderDetail.order_status eq 3 && $returnGoods eq 1"}
+			<div class="order address"><a name="position"></a>
+				<div class="caption">退货配送方式</div>
+				<p>邮寄地址：{$settingInfo.return_goods_address}</p>
+				<p><input type="text" id="express_trigger" name="express_name"  class="placeholder_99" placeholder="物流公司" /></p>
+				<input type="hidden" name="express_code" id="express_code">
+				<p><input type="text" id="express_number" name="express_number" class="placeholder_99" placeholder="运单单号"/></p>
+				<p><input type="text" id="remark" name="remark" class="placeholder_99" placeholder="备注说明"/></p>
+				<button type="button" class="orderButton" onclick="check();">申请退货</button>
+			</div>
+	 
+			<input type="hidden" name="order_number" id="order_number" value="{$orderDetail.order_number}">
+			</form>
+			{/if}
+		{else /}
+				<div class="number wordColor" style="height:auto;line-height:1.8;">
+					<div class="pMargin">
+						<span>
+								{if condition="$orderDetail.returnInfo.auth_status eq 1"}
+									 退货审核中 
+								{elseif condition="$orderDetail.returnInfo.auth_status eq 2"}
+									 同意退货
+								{elseif condition="$orderDetail.returnInfo.auth_status eq 3"}
+									 拒绝退货
+								{/if}
+						</span>
+						{if condition="!empty($orderDetail.returnInfo.reason)"}
+						<p><span>理由：</span>{$orderDetail.returnInfo.reason}</p>
+						{/if}
+					</div>
+				</div>
+		{/if}
+			</div>
+	<div>
+		<div style="height:2.5rem;"></div>
+		{include file='index@common/footer_button'}
+	</div>
+<script type="text/javascript">
+
+	//订单收货
+	function confirmOrder(id,type=1)
+	{
+		layer.msg('你确定确认收货吗', {
+			  time: 0 //不自动关闭
+			  ,btn: ['确定', '取消']
+			  ,yes: function(index){
+			    layer.close(index);
+
+			    $.ajax({
+					url:'{:url("/index/Order/changeOrderStatus")}',
+					data:{order_number:id,order_status:4,type:type},
+					type:'post',
+					success:function(data){
+						if(data){
+							window.location.href='{:url("/index/Order/myOrders")}';
+						}else{
+							layer.alert('操作失败，请重试');
+							return false;
+						}
+					}
+				});
+			  }
+		});
+	}
+	
+	
+	//为空的数据校验
+	function check()
+	{
+		var express_code=$('#express_code').val();
+		var express_number=$('#express_number').val();
+		var order_number=$('#order_number').val();
+		var remark=$('#remark').val();
+		var type={$type};
+
+		if(express_code==''){
+			layer.alert('请选择物流公司');
+			return false;
+		}
+
+		if(express_number=='')
+		{
+			layer.alert('请输入运单单号');
+			return false;
+		}
+
+	   $.ajax({
+			url:'{:url("/index/Order/applyOrderReturnGoods")}',
+			data:{
+					order_number:order_number,
+					express_code:express_code,
+					express_number:express_number,
+					remark:remark,
+					type:type,
+				},
+			type:'post',
+			success:function(e){
+				if(e){
+					layer.alert('申请成功');
+					location.reload();
+				}else{
+					layer.alert('操作失败，请重试');
+					return false;
+				}
+			}
+		});
+
+	}
+	
+	var returnGoods={$returnGoods};
+	if(returnGoods) {
+		var mobileSelect = new MobileSelect({
+		    trigger: '#express_trigger',
+		    title: '单项选择', 
+		    wheels: [
+		                {data:{$expressComList}}
+		            ],
+		    position:[2], //初始化定位
+			callback:function(indexArr, data){
+				mobileSelect.position=[indexArr];
+	        	$('#express_code').val(data[0].id);
+	        	$('#express_trigger').val(data[0].value);
+	    	} 
+		});
+	}
+
+</script>

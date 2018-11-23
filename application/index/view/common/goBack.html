@@ -1,0 +1,14 @@
+			<script>
+				window.onload=function(){
+					var u = navigator.userAgent;
+		            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+		            if(isiOS){
+		            	document.querySelector("div.goBack").style.display="none";
+		            }
+				}	
+			</script>
+			<div class="footer goBack">
+				<a href="{:get_returnurl_by_actionname(request()->action())}">返&nbsp;&nbsp;回</a>
+			</div>
+	</body>
+</html>

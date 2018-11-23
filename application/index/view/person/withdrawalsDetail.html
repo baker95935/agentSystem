@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="tixianDetailLayout">
+			<div><span>提现金额：</span>￥{$info.money} 元</div>
+			<ul>
+				<li><span>申请时间：</span>{$info.create_ctime}</li>
+				<li><span>状态：</span>{$audit_lang[$info->getData('audit')]}</li>
+				<!-- <li><span>提现账户：</span></li> -->
+				{eq name='$info->getData("type")' value='1'}
+				<li><span>支付宝账号：</span>{$info.account}</li>
+				{/eq}
+				{eq name='$info->getData("type")' value='2'}
+				<li><span>账户名称：</span>{$info.account_name}</li>
+				<li><span>开户行：</span>{$info.account_bank}</li>
+				<li><span>银行账号：</span>{$info.account}</li>
+				{/eq}
+				{eq name='$info->getData("type")' value='3'}
+				<li><span>微信支付账号：</span>{$info.account}</li>
+				{/eq}
+			</ul>
+		</div>
+	</body>
+</html>

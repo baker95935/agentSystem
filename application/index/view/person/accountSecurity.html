@@ -1,0 +1,39 @@
+{include file='index@common/header'}
+	<style type="text/css">
+		html,body{background: #F5F5F5;}
+	</style>
+</head>
+<body>
+	<div id="accountSecurity">
+		<div>
+		   	<div class="perInformation" onclick='next(1);'>
+		   		<p>手机号</p>
+		   		<p>{$Think.session.user.phone}</p>
+		   	</div>
+		</div>
+		<div>
+		   	<div class="perInformation" onclick='next(2);'>
+		   		<p>登录密码</p>
+		   		<p></p>
+		   	</div>
+		</div>
+		<div>
+		   	<div class="perInformation" onclick='next(3);'>
+		   		<p>资金账户</p>
+		   		<p></p>
+		   	</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		// 跳转
+		function next(e){
+			if(e == 1){
+				window.location.href = "{:url('Person/modifyPhone')}";
+			}else if(e == 2){
+				window.location.href = "{:url('Person/modifyPassword')}";
+			}else if(e == 3){
+				window.location.href = "{:url('Person/financialAccount')}";
+			}
+		}
+	</script>
+{include file='index@common/footer_button'}

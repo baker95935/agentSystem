@@ -1,0 +1,68 @@
+{include file='index@common/header'}
+	<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+	</style>
+</head>
+<body>
+	<div id="agencyIncomeLayout" class="">
+		<ol class="top">
+			<li>
+				<div class="backArrowRight">
+					<p>招商奖励总额： <span>￥{$data.total} </span>元</p>
+					<a href="javascript:void(0);" id="dateTime">{$month}</a>
+				</div>
+			</li>
+			<li>
+				<div>
+					<span>￥{$data.before}元</span>
+					<span class="color_66">上月累计招商奖励</span>
+				</div>
+				<div class="line_left">
+					<span>￥{$data.now}元</span>
+					<span class="color_66">本月累计招商奖励</span>
+				</div>
+			</li>
+		</ol>
+		{empty name='list'}
+		<!-- 暂无数据 -->
+		{else/}
+		{volist name='list' id='vo'}
+		<div class="logContent">
+			<p>
+				<span>奖励金额：￥{$vo.profit}</span>
+			</p>
+			<ul>
+				<li>订单编号：{$vo.order_number}</li>
+				<li>下单日期：{$vo.create_time}</li>
+			</ul>
+		</div>
+		{/volist}
+		{/empty}
+		{notempty name='stockChargeList'}
+		{volist name='stockChargeList' id='vo'}
+			<div class="logContent">
+			<p>
+				<span>奖励金额：￥{$vo.profit}</span>
+			</p>
+			<ul>
+				<li>编号：{$vo.relation_id}</li>
+				<li>下单日期：{$vo.create_time}</li>
+			</ul>
+		</div>
+		{/volist}
+		{/notempty}
+	</div>
+	{include file='index@common/goBack'}
+<script type="text/javascript" src="/static/Js/g2.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/Js/data-set.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/Js/myCalendar.js" charset="utf-8"></script>
+<script type="text/javascript">
+	// 日期
+	document.getElementById('dateTime').onclick=function(){
+		new myCalendar('dateTime',function(yearResult,monthResult){
+    		window.location.href = '/index/Person/inviteReward/month/'+yearResult+'-'+monthResult;
+		});
+	}
+</script>

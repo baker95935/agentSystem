@@ -1,0 +1,46 @@
+{include file='header'/}
+<div id="performance-top">
+                <h5>用户组管理</h5>
+            </div>
+<form class="form-inline definewidth" action="index.html" method="get">  
+    用户组名称：
+    <input type="text" name="name" id="name"class="abc input-default width-auto" placeholder="" value="">&nbsp;&nbsp;  
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+    <button type="button" class="btn btn-success" id="addnew">新增</button>
+</form>
+<table class="table table-bordered table-hover definewidth m10" >
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>用户组名称</th>
+        <th>是否超级管理员</th>
+        <th>备注</th>
+        <th>操作</th>
+    </tr>
+    </thead> 
+    {foreach name="groupList" item="item"}
+	     <tr>
+            <td>{$item.id}</td>
+            <td>{$item.name}</td>
+            <td>{$item.super|get_admin_status}</td>
+            <td>{$item.remark}</td>
+            <td>
+               <a href="{:url('/admin/Admingroup/create/id/'.$item->id)} ">编辑</a>  
+	           <a onclick="return  confirm('确定删除吗，操作不可逆')" href="{:url('/admin/Admingroup/delete/id/'.$item->id)} ">删除</a>
+            </td>
+        </tr>
+      {/foreach}
+</table>
+</body>
+</html>
+
+<script>
+    $(function () {
+        
+		$('#addnew').click(function(){
+				window.location.href="{:url('/admin/Admingroup/create')}";
+		 });
+
+    });
+
+</script>

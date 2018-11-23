@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>微商代理-代理商管理系统</title>
+	<meta charset="UTF-8">
+   <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery-2.2.3.min.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        body{
+           background: url(/static/Images/bg-login.jpg);
+
+        }
+
+        .container div{
+            max-width: 300px;
+            padding: 19px 29px 29px;
+            margin: 0 auto 20px;
+           /* background-color: #fff;*/
+           background: url(/static/Images/bg-login.jpg);
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+        }
+        .container h2{text-align: center;color:#fff; }
+        .container input[type="text"]{
+            margin-top: 20px;
+        }
+        .container input[type="text"],
+        .container input[type="password"] {
+            font-size: 16px;
+            height: auto;
+            margin-bottom: 15px;
+            padding: 7px 9px;
+        }
+        .container p{
+            text-align: right;
+        }
+    </style>  
+</head>
+<body>
+
+<div class="container mt100">
+    <h2>代理商管理系统</h2>
+    <div class="form-signin" >
+           
+            <input type="text" name="username" id="username" class="input-block-level" placeholder="请输入管理员账号">
+            <input type="password" name="password" id="password" class="input-block-level" placeholder="请输入管理员密码">
+           
+            <p><button class="btn btn-large btn-primary"  id="submit">登录</button></p>
+        </div>  
+
+</div>
+<script>
+        $(function(){
+           
+            $("#submit").click(function(){
+               var username=$("#username").val();
+               var password=$("#password").val();
+                if(username&&password){
+                   $.ajax({
+                       url:"{:url('/admin/Login/login/')}",
+                       type:"POST",
+                       data:{username:username,password:password},
+                       dataType:'json',
+                       success:function(e){
+                        var jsonData = JSON.parse(e); 
+                        if(jsonData.code==1){
+                            window.location.href=jsonData.url;
+                        }else{
+                            layer.alert(jsonData.msg);
+                        }
+                         
+                       },
+                       error:function(e){
+                       
+                           layer.alert('登录失败，请重新登录')
+                          
+                           
+                       }
+                   });
+               }else{
+                   
+                   if(!username&&!password){
+                    layer.alert("请输入管理员账号和密码");
+                     return;
+                   }else if(!username) {
+                    layer.alert("请输入管理员账号");
+                    return;
+                   }else if(!password){
+                    layer.alert("请输入登录密码" );
+                    return;
+                   }
+               }
+            });
+        });
+       </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{include file='index@common/header'}
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+	</style>
+</head>
+<body>
+
+	<div id="PerInfoListContent">
+	   <div class="listInfo" ><a href="javascript:redirect('{:url('Personalinfo/personalInfo')}');"  >
+	   	<i class="perData"></i>
+	   	个人资料
+	   </a></div>
+	   <div class="listInfo" ><a href="javascript:redirect('{:url('Person/accountSecurity')}');"  >
+	   	<i class="account"></i>
+	   	账户安全
+	   </a></div>
+	</div>
+	<button class="commonButton" onclick='redirect("{:url("Index/logout")}");'>退出账号</button>
+{include file='index@common/goBack'}

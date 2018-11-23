@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="agencyIncomeLayout" class="rewardDetail">
+			<div class="reward">
+				<p>业绩奖励： <span>￥{$info.performance_profit}</span> 元</p>
+				<a href="javascript:void(0);" id="dateTime">{$info.year}-{$info.month}</a>
+			</div>
+			<div class="ratio">
+				<p>业绩奖励系数：{$data.ratio/100}</p>
+				<p>本月业绩增长系数：{$info.increate_ratio/100}</p>
+			</div>
+			<ol class="top">
+				<li>
+					本月业绩奖励基数：￥{$info.current_performance_base} 元
+				</li>
+				<li>
+					<div>
+						<span>￥{$data.invite}元</span>
+						<span class="color_66">本月推荐奖励</span>
+					</div>
+					<div class="line_left">
+						<span>￥{$data.agent}元</span>
+						<span class="color_66">本月代理收入</span>
+					</div>
+				</li>
+			</ol>
+			<div class="last">上月业绩奖励基数：￥{$info.last_performance_base} 元</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="/static/Js/g2.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/static/Js/data-set.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/static/Js/myCalendar.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		// 日期
+		// document.getElementById('dateTime').onclick=function(){
+		// 	new myCalendar('dateTime');
+		// }
+	</script>
+</html>

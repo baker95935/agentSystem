@@ -1,0 +1,72 @@
+{include file='header'/}
+<form method="post" action="{:url('/admin/Agentreward/agencySave')}">
+ 
+<div id="performance-top">
+	<h5>代理奖励</h5>
+	<div id="reward-layout">
+			<p>设置</p>
+			<div class="reward-layout">
+			    <input type="hidden" name="cid" value="{$configInfo.id}">
+				<input type="checkbox" id="toggle-button" name="valid_agency_reward" {present name="configInfo.valid_agency_reward"} {if condition="$configInfo.valid_agency_reward eq 1 "} checked="checked"  {/if} {/present}  >
+				<label for="toggle-button" class="button-label">
+			    	<span class="button-circle"></span>
+			    	<span class="text  on">开</span>  
+			    	<span class="text off">关</span>  
+	    		</label>
+			</div>
+		</div>
+</div>
+ 
+ 
+<table id="agentorders" class="table table-condensed table-bordered table-hover definewidth m10 padding-normal">
+    <thead>
+    <tr>
+        <th>角色</th>
+        <th>奖励比例%</th>
+        <th>库存额度</th>
+        <th>首次拿货比例%</th>
+        <th>首次最低拿货金额</th>
+        <th>最低库存额度</th>
+    </tr>
+    </thead>
+ 
+    
+	     {foreach name="listLevel" item="item"}
+	    <tr>
+		    <td>
+		    	{$item->name}
+		    	<input type="hidden" name="role{$item.id}" value="{$item.id}">
+		    </td>
+		    <td>
+		    	<input type="text" class="span2" required pattern="^(\d?\d(\.\d*)?|100)$"  title="必须在1和100之间" name="ratio{$item.id}" value="{present name="item['ratio']"}{$item.ratio}{/present}" placeholder="请输入数字">
+		    </td>
+		    <td>
+				<input type="text" class="span2"  required pattern="^[0-9]+(.[0-9]{2})?$"  title="请输入数字" name="pre_deposit{$item.id}" value="{present name="item['pre_deposit']"}{$item.pre_deposit}{/present}" placeholder="请输入数字">
+		    </td>
+		   	<td>
+		    	<input type="text"  class="span2" required pattern="^(\d?\d(\.\d*)?|100)$"  title="必须在1和100之间"  name="first_goods_number{$item.id}" value="{present name="item['first_goods_number']"}{$item.first_goods_number}{/present}" placeholder="请输入数字">
+		    </td>
+		    <td>
+				<input type="text"  class="span2"   name="first_goods_money{$item.id}" value="{present name="item['first_goods_money']"}{$item.first_goods_money}{/present}" placeholder="请输入数字">
+		    </td>
+		   	<td>
+				<input type="text"  class="span2" required pattern="^[0-9]+(.[0-9]{2})?$"  title="请输入数字"  name="lowest_limit{$item.id}" value="{present name="item['lowest_limit']"}{$item.lowest_limit}{/present}" placeholder="请输入数字">
+		    </td>
+	    </tr>
+	    	<input type="hidden" name="id{$item.id}"  value="{present name="item['agency_id']"}{$item.agency_id}{/present}">
+	    {/foreach}
+ 
+    
+        <tr>
+	    <td colspan="6">
+	    	<div align="center">
+	    	<button type="submit" class="btn btn-primary" >保存</button>
+	    	</div>
+	    </td>
+    </tr>
+    </form>
+</table>
+ 
+</body>
+</html>
+ 

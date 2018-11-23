@@ -1,0 +1,61 @@
+{include file='header'/}
+<form action="{:url('/admin/Adminuser/save/')}" method="post" class="definewidth m20">
+<table id="agentorders" class="table table-bordered table-hover definewidth m10">
+ <div class="control-group">
+    <tr>
+        <td width="10%" class="tableleft">用户名</td>
+        <td><input type="text"  class="control-group controls" data-rules="{required:true}" placeholder="请输入用户名" value="{present name="data.username"}{$data.username}{/present}" name="username"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">密码</td>
+        <td><input type="password" placeholder="请输入密码" data-rules="{required:true}"   name="password"/>{present name="data.password"}(不改密码不用填写) {/present}</td>
+    </tr>
+    <tr>
+        <td class="tableleft">真实姓名</td>
+        <td><input type="text" placeholder="请输入真实姓名" data-rules="{required:true}" value="{present name="data.realname"}{$data.realname}{/present}" name="realname"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">邮箱</td>
+        <td><input type="text" placeholder="请输入邮箱" value="{present name="data.email"}{$data.email}{/present}" name="email"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">状态</td>
+        <td>
+        	<label class="radio">
+			<input type="radio" name="status" value="1" {notpresent name="data.status"} checked {/notpresent} {present name="data.status"} {if condition="$data.status eq 1 "} checked  {/if} {/present}  /> 启用</label>
+            <label class="radio"><input type="radio" name="status" value="2" {present name="data.status"} {if condition="$data.status eq 2 "} checked  {/if} {/present}   /> 禁用
+        	</label>
+        </td>
+    </tr>
+    <tr>
+        <td class="tableleft">用户组</td>
+        <td>
+	        <select name="group" >
+		        {foreach name="groupList" item="item"}
+					<option value="{$item.id}" {present name="data.group"} {if condition="$data.group eq $item.id "} selected="selected" {/if}{/present}>{$item.name}</option>
+		        {/foreach}
+	        </select>
+        </td>
+    </tr>
+    <tr>
+        <td class="tableleft"></td>
+        <td>
+        	<input type="hidden" name="id" id="id" value="{present name="data.id"}{$data.id}{/present}">
+            <button type="submit" class="btn btn-primary" type="button">保存</button>
+             &nbsp;&nbsp;
+             <a href="{:url('/admin/adminuser/index')}" class="btn btn-success" >返回</a>
+        </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>
+ 
+<script>
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+
+    });
+</script>

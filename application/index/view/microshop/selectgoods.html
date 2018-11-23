@@ -1,0 +1,267 @@
+{include file="index@common/header"}
+	<link rel="stylesheet" type="text/css" href="/static/Css/my-shop.css" />
+</head>
+<body style="background-color:#fff;">
+	<div id="myShop" class="productListListLayout">
+		<div id="top">
+			<div class="ProTop" id="search_btn">
+				<div class="search">
+					<i class="icon_search"></i>
+					<input type="text" name='search' value='{$search}' id="tvKeyword" placeholder="所搜商品名称" />
+					<button class='clear' {empty name="search"}style='display:none;'{/empty}></button>
+				</div>
+				<div class="search_btn">
+					<button type='button' class='btn_search'>搜索</button>
+				</div>
+			</div>
+			<ol class="proCondition">
+				<li class="go">
+					<a href="{:url('Product/category','from='.$type)}">产品分类</a>
+				</li>
+				<li>
+					{if condition='$order_sort eq "su"'}
+					<a href="{:url('Microshop/selectgoods','type='.$type.'&search='.$search.'&order=sd')}" class='changeSort'>销量</a>
+					<img src="/static/Images/arrow_top.png" />
+					{elseif condition='$order_sort eq "sd"'}
+					<a href="{:url('Microshop/selectgoods','type='.$type.'&search='.$search.'&order=su')}" class='changeSort'>销量</a>
+					<img src="/static/Images/arrow_down.png" />
+					{else/}
+					<a href="{:url('Microshop/selectgoods','type='.$type.'&search='.$search.'&order=su')}" class='changeSort'>销量</a>
+					<img src="/static/Images/arrow.png" />
+					{/if}
+				</li>
+				<li style="border:0;">
+					{if condition='$order_sort eq "pu"'}
+					<a href="{:url('Microshop/selectgoods','type='.$type.'&search='.$search.'&order=pd')}" class='changeSort'>价格</a>
+					<img src="/static/Images/arrow_top.png" />
+					{elseif condition='$order_sort eq "pd"'}
+					<a href="{:url('Microshop/selectgoods','type='.$type.'&search='.$search.'&order=pu')}" class='changeSort'>价格</a>
+					<img src="/static/Images/arrow_down.png" />
+					{else/}
+					<a href="{:url('Microshop/selectgoods','type='.$type.'&search='.$search.'&order=pu')}" class='changeSort'>价格</a>
+					<img src="/static/Images/arrow.png" />
+					{/if}
+				</li>
+				<input type='hidden' value='{$order_sort}' class='sortVal' />
+				<!-- <input type='hidden' value='{$cid}' class='categoryVal' /> -->
+			</ol>
+		</div>
+		<div class="ProListContent">
+			<ul>
+				{volist name='list' id='vo'}
+				<li>
+					<div class="isCheck">
+						<input type="checkbox" value="{eq name='$type' value='1'}{$vo.id}{else/}{$vo.sid}{/eq}" id="pro_{eq name='$type' value='1'}{$vo.id}{else/}{$vo.sid}{/eq}" {if condition='$type eq 1'}{if condition='in_array($vo.id,$onsale)'}checked='true' {/if}{/if}/>
+						<label for="pro_{eq name='$type' value='1'}{$vo.id}{else/}{$vo.sid}{/eq}"></label>
+					</div>
+					<a href="javascript:;">
+						<div class="proImg">
+							<div>
+								<img src="{eq name='$type' value='1'}{$vo.product_img}{else/}{$vo.product.product_img}{/eq}" />
+							</div>
+							<!-- <div class="layout">
+								<p>已售完</p>
+							</div> -->
+						</div>
+						<aside>
+							<p class="proNames">
+								<span class="proFlag" style="display:none;">首单商品</span>{eq name='$type' value='1'}{$vo.product_name}{else/}{$vo.product.product_name}{/eq}
+							</p>
+							<div class="proSale">
+								<span class="goods-price"><span class="yen">￥</span>{eq name='$type' value='1'}{$vo.sales_price}{else/}{$vo.product.sales_price}{/eq}</span>
+								<span class="sale">销量：{eq name='$type' value='1'}<span>{$vo.sales_volume+$vo.false_volume}</span>{else/}<span>{$vo.product.sales_volume+$vo.product.false_volume}</span>{/eq}</span>
+							</div>
+						</aside>
+					</a>
+				</li>
+				{/volist}
+			</ul>
+		</div>
+		<div class="footer">
+			<div>
+				<div class="selectBox">
+					<input type="hidden" value="{eq name='type' value='1'}{:implode(',',$onsale)}{/eq}" class="ids" />
+					<!-- <div class="isCheck">
+						<input type="checkbox" id="pro_c"/>
+						<label for="pro_c"></label>
+						当前
+					</div> -->
+					<div class="isCheck isAll">
+						<input type="checkbox" id="pro_a"/>
+						<label for="pro_a"></label>
+						全部
+					</div>
+				</div>
+				<div>
+					{eq name='$type' value='1'}
+					<button type="button" class="add">入库</button>
+					<button type="button" class="a_and_u">上架</button>
+					{/eq}
+					{eq name='$type' value='2'}
+					<button type="button" class="down">下架</button>
+					<button type="button" class="del">删除</button>
+					{/eq}
+					{eq name='$type' value='3'}
+					<button type="button" class="up">上架</button>
+					<button type="button" class="del">删除</button>
+					{/eq}
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+<script type="text/javascript">
+
+	// 搜索
+	function search(){
+		var _url = '{:url("Microshop/selectgoods","type=$type",false)}';
+		var _key = $('#tvKeyword').val();// 查询
+		var _sort = $('.sortVal').val();// 排序
+		if(_key){
+			_url += '/search/' + _key;
+		}
+		if(_sort){
+			_url += '/order/' + _sort;
+		}
+		window.location.href = _url;
+	}
+
+	// 请求发送
+	function sendAjax(u,t,v){
+		$.ajax({
+			url:u,
+			data:{type:t,val:v},
+			success:function(e){
+				if(e.error){
+					msgAlert(e.error.msg);
+				}else{
+					msgTipUrl(e.msg,'{:url("Microshop/shopgoods")}');
+				}
+			}
+		});
+	}
+
+	$(function(){
+		var allListNum = '{:count($list)}';// 总数
+
+		// 单选
+		$(".ProListContent input[type='checkbox']").on('click',function(){
+			var flag = $(this).prop('checked');
+			var _ids = $('.ids').val();
+			var _arr = [];
+			if(!flag){ //一个不选中，则不全选
+				$(".isAll>input[type='checkbox']").prop('checked',flag);
+				if(_ids){
+					_arr = _ids.split(',');
+					if(_arr.indexOf($(this).val()) != -1){
+						_arr.splice($.inArray($(this).val(),_arr),1);
+						$('.ids').val(_arr.join(','));
+					}
+				}
+			}else{
+				if(_ids){
+					_arr = _ids.split(',');
+					if(_arr.indexOf($(this).val()) == -1){
+						_arr.push($(this).val());
+						$('.ids').val(_arr.join(','));
+					}
+				}else{
+					$('.ids').val($(this).val());
+				}
+			}
+			var isChecksArr = $(".ProListContent .isCheck :checkbox:checked").length;
+			if(isChecksArr == allListNum){ //选中长度等于产品列表的长度，则全选（此处2须后期用后台数据）
+				$(".isAll>input[type='checkbox']").prop('checked',true);
+			}
+		});
+
+		// 全选
+		$(".isAll>input[type='checkbox']").on('click',function(){
+			var flagAll  = $(this).prop('checked');
+			var isChecks = $(".ProListContent .isCheck :checkbox");
+			isChecks.prop('checked',flagAll);
+			if(!flagAll){
+				$('.ids').val('');
+			}else{
+				var _arr = [];
+				isChecks.each(function(index, el) {
+					_arr.push($(el).val());
+				});
+				$('.ids').val(_arr.join(','));
+			}
+		});
+
+		// 搜索
+		$('#tvKeyword').keyup(function(){
+			var _val = $(this).val();
+			if(_val){
+				$('.clear').show();
+			}else{
+				$('.clear').hide();
+			}
+		});
+
+		$(".btn_search").click(function(){
+			search();
+		});
+
+		// 清空
+		$('.clear').click(function(){
+			$('#tvKeyword').val('');
+			$(this).hide();
+		});
+
+		{eq name='$type' value='1'}
+		// 入库
+		$('.add').click(function(){
+			var pids = $('.ids').val();
+			if(pids){
+				sendAjax('{:url("Microshop/addGoods")}',1,pids);
+			}else{
+				msgTip('请选择商品');
+			}
+		});
+
+		// 上架
+		$('.a_and_u').click(function(){
+			var pids = $('.ids').val();
+			if(pids){
+				sendAjax('{:url("Microshop/addGoods")}',2,pids);
+			}else{
+				msgTip('请选择商品');
+			}
+		});
+		{else/}
+		// 删除
+		$('.del').click(function(){
+			var pids = $('.ids').val();
+			if(pids){
+				sendAjax('{:url("Microshop/modStatus")}',3,pids);
+			}else{
+				msgTip('请选择商品');
+			}
+		});
+
+		// 下架
+		$('.down').click(function(){
+			var pids = $('.ids').val();
+			if(pids){
+				sendAjax('{:url("Microshop/modStatus")}',2,pids);
+			}else{
+				msgTip('请选择商品');
+			}
+		});
+
+		// 上架
+		$('.up').click(function(){
+			var pids = $('.ids').val();
+			if(pids){
+				sendAjax('{:url("Microshop/modStatus")}',1,pids);
+			}else{
+				msgTip('请选择商品');
+			}
+		});
+		{/eq}
+	});
+</script>

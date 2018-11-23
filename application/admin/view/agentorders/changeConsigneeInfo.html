@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>修改收货人地址</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+
+</head>
+<body>
+ <!-- <form action="{:url('/admin/Agentorders/changeConsigneeInfoSave/')}" method="post"> -->
+<table class="table table-bordered table-hover common_input common_select m10">
+	<tr>
+        <th >收货人姓名：</th>
+        <td class="tl">
+            <input type="text" name="consignee_name" id="consignee_name" value="{present name="consigneeInfo.consignee_name"}{$consigneeInfo.consignee_name}{/present}"></td></tr>
+	<tr>
+        <th >收货人手机：</th>
+        <td class="tl">
+            <input type="text" name="consignee_phone" id="consignee_phone" value="{present name="consigneeInfo.consignee_phone"}{$consigneeInfo.consignee_phone}{/present}"></td></tr>
+    <tr><th style="vertical-align: middle;">收货地址：</th>
+        <td class="tl">  
+            <select name="province" id="province">
+                <option value="{notpresent name="consigneeInfo.province"}0{/notpresent} {present name="consigneeInfo.province"}{if condition="$consigneeInfo.province eq ''"} selected="selected"{/if}{/present}">省</option>
+                {foreach name='provinces' item='item'}
+                <option value='{$item.id}' {present name='consigneeInfo.province'}{if condition='$item.id eq $consigneeInfo.province'} selected='selected'{/if}{/present}>{$item.name}</option>
+                {/foreach}
+            </select>
+            <select name="city" id="city">
+                 <option value="{notpresent name="city_info"}0{/notpresent} {present name="city_info"}{$city_info.id}{/present}">{if condition="$city_info neq ''"}{$city_info.name} {else/}市{/if}</option>
+            </select>
+            <select name="area" id="area">
+                <option value="{notpresent name="area_info"}0{/notpresent} {present name="area_info"} {$area_info.id}{/present}"> {if condition="$area_info neq ''"}{$area_info.name} {else/}区/县{/if}</option>
+            </select>
+            
+	</td></tr>
+	<tr>
+        <th class="tableleft">详细地址：</th>
+        <td class="tl">
+            <input type="text" style="width:95%" class="input-xxlarge" name="address" id="address" value="{present name="consigneeInfo.id"}{$consigneeInfo.address}{/present}" ></td></tr>
+
+</table>
+<div class="layui-layer-btn layui-layer-btn-">     
+        <a class="layui-layer-btn0">保存</a>
+        <a class="layui-layer-btn1">关闭</a>          
+ </div>
+	<input type="hidden" name="consignee_id" id="consignee_id" value="{present name="consigneeInfo.id"}{$consigneeInfo.id}{/present}">
+	<input type="hidden" name="order_number" id="order_number" value="{present name="consigneeInfo.order_number"}{$consigneeInfo.order_number}{/present}">
+<!-- </form> -->
+</body>
+</html>
+<script>
+    $(function () {
+		var index = parent.layer.getFrameIndex(window.name); 
+        var orderId=parent.document.getElementById("orderId").value;    
+      
+        $.ajax({
+                    type : "post",
+                    url : '/admin/Agentorders/initGetConsigneeaddress' ,
+                    dataType : 'json',
+                    data: {id:orderId},
+                    success : function(e) {
+                        var jsonData = JSON.parse(e); 
+                        $("#consignee_name").val(jsonData.consignee_name);
+                        $("#consignee_phone").val(jsonData.consignee_phone);
+                        $("#address").val(jsonData.address);
+                        $("#consignee_id").val(jsonData.id);
+
+                        getAddressList(jsonData.province,$('select[name=city]'));
+
+                        getAddressList(jsonData.city,$('select[name=area]'));
+                        
+                        $("#province").find("option[value='"+jsonData.province+"']").attr("selected",true).trigger('change');
+                        $("#city").find("option[value='"+jsonData.city+"']").attr("selected",true).trigger('change');
+                        $("#area").find("option[value='"+jsonData.area+"']").attr("selected",true);
+                    }
+           });
+        $('.layui-layer-btn1').click(function(){
+           parent.layer.close(index);
+        });
+        $('.layui-layer-btn0').click(function(){
+                $.ajax({
+                    type:"post",
+                    url:'/admin/Agentorders/changeConsigneeInfoSave/',
+                    dataType:'json',
+                    data:{consignee_id:$("#consignee_id").val(),
+                          consignee_name:$("#consignee_name").val(),
+                          consignee_phone: $("#consignee_phone").val(),
+                          address: $("#address").val(),
+                          province:$("#province").val(),
+                          order_number:orderId,
+                          city:$("#city").val(),
+                          area:$("#area").val()
+                          },
+                    success:function(e){
+                        
+                       if(e){
+                        layer.alert('修改成功',function(){
+                            window.parent.location.reload();
+                            parent.layer.close(index);
+                                      
+                        });
+                       }else{
+                        layer.alert('修改失败！');
+                       }
+                    },
+                    error:function(e){
+                        layer.alert('修改失败！');
+                    }
+                });
+        });
+		
+		   // 级联省
+        $('select[name=province]').change(function(){
+            var p_id = $(this).val();
+            var data = getAddressList(p_id,$('select[name=city]'));
+          //  $('select[name=area]').html('<option>请选择</option>');
+        });
+
+        // 级联市
+        $('select[name=city]').change(function(){
+            var c_id = $(this).val();
+            var data = getAddressList(c_id,$('select[name=area]'));
+        });
+
+        // 获取下级城市列表并替换
+        function getAddressList(id,obj)
+        {
+            $.ajax({
+                url:"{:url('/admin/Agents/getAddress/')}",
+                type:'post',
+                data:{pid:id},
+                dataType:'json',
+                success:function(e){
+                    var _html = '';
+                    for (var i = 0; i < e.length; i++) {
+                        _html += '<option value="'+e[i]['id']+'">'+e[i]['name']+'</option>';
+                    };
+                    obj.html(_html);
+                }
+            });
+        }
+
+
+    });
+	
+</script>

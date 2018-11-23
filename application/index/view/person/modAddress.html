@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<link rel="stylesheet" type="text/css" href="/static/Css/areachose.css"/>
+	    <script type="text/javascript" src="/static/Js/jquery-2.1.0.min.js" charset="utf-8"></script>
+	    <script type="text/javascript" src="/static/Js/areachose.js" charset="utf-8"></script>
+	    <style type="text/css">
+			body{background-color: #F5F5F5;}
+			button{border: 0;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="addressContent" class="recompose">
+			<div class="content">
+				<div>收货人</div>
+				<div><input type="text" name="name" value="{$info.name}" placeholder="收货人姓名" class="placeholder_66" /></div>
+			</div>
+			<div class="content">
+				<div>联系电话</div>
+				<div><input type="text" name="phone" value="{$info.phone}" placeholder="手机号码" class="placeholder_66" /></div>
+			</div>
+			<div class="content">
+				<div>所在地区</div>
+				<div>
+					<div class="div_address">
+						<span id="location_p">{:get_address_name_by_id($info.province)}</span>
+						<span id="location_c">{:get_address_name_by_id($info.city)}</span>
+						<span id="location_a">{:get_address_name_by_id($info.area)}</span>
+					</div>
+				</div>
+			</div>
+			<div class="detailAddress">
+				<textarea name="address" id="reasonContent" placeholder="详细地址">{$info.address}</textarea>
+				<input type='hidden' name='id' value='{$info.id}' />
+			</div>
+			<button>确认</button>
+		</div>
+	</body>
+	<script type="text/javascript">
+		$(function(){
+
+			// 城市选择
+			$(".div_address").chosearea({
+				shengid:'location_p',
+				shiid:'location_c',
+				xianid:'location_a'
+			});
+
+			// 提交
+			$('button').click(function(){
+				var _tel_reg = /^1\d{10}$/;
+				var _name = $('input[name=name]').val();
+				var _tel = $('input[name=phone]').val();
+				var _p = $('#location_p').text();
+				var _c = $('#location_c').text();
+				var _a = $('#location_a').text();
+				var _add = $('textarea[name=address]').val();
+				var _id = $('input[name=id]').val();
+				if(!_name){
+					mobileAlert('请输入收货人');
+					return false;
+				};
+				if (!_tel_reg.test(_tel)) {
+					mobileAlert('请输入有效号码');
+					return false;
+				};
+				if (!_p || !_c || !_a) {
+					mobileAlert('请选择地区');
+					return false;
+				};
+				if (!_add) {
+					mobileAlert('请输入详细地址');
+					return false;
+				};
+				$.ajax({
+					url:'{:url("Person/saveModAdd")}',
+					type:'post',
+					data:{name:_name,phone:_tel,p:_p,c:_c,a:_a,add:_add,id:_id},
+					success:function(e){
+						if (e.error) {
+							mobileAlert(e.error.msg);
+							return false;
+						} else{
+							window.location.href = '{:url("Person/addressManage")}';
+						};
+					}
+				});
+			});
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

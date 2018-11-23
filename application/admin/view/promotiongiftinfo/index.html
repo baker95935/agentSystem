@@ -1,0 +1,57 @@
+{include file='header'/}
+<div id="performance-top">
+                <h5>大礼包</h5>
+            </div>
+<form id="agentorders" class="form-inline definewidth search_table" action="{:url('/admin/Promotiongiftinfo/index')}" method="get">    
+    礼包名称：
+    <input type="text" name="name" id="name"class="abc input-default search_input" placeholder="" value="">
+礼包类型：<select name="type" id="type" class="search_input">
+  	<option value="0">全部</option>
+  	{foreach name="listLevel" item="item"}
+  	<option value="{$item.id}">{$item.name}</option>
+  	{/foreach}
+  	</select>
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+    <button type="button" class="btn btn-success" id="addnew">新增礼包</button>
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>礼包名称</th>
+        <th>类型</th>
+        <th>礼包金额</th>
+        <th>礼包数量</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    {foreach name="giftList" item="item"}
+	     <tr>
+            <td>{$item.id}</td>
+            <td>{$item.name}</td>
+            <td>{$item->level->name}</td>
+            <td>￥{$item.price}元</td>
+            <td>{$item.number}</td>
+            <td>
+                <a  href="{:url('/admin/Promotiongiftinfo/edit/id/'.$item->id)} ">编辑</a>  
+	        	<a onclick="return  confirm('确定删除吗，操作不可逆')" href="{:url('/admin/Promotiongiftinfo/delete/id/'.$item->id)} ">删除</a>            
+            </td>
+        </tr>	
+     {/foreach}
+</table>
+<div class="inline pull-right page">
+{$giftList->render()}
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+        
+    	$('#addnew').click(function(){
+			window.location.href="{:url('/admin/Promotiongiftinfo/create')}";
+	 	});
+
+    });
+
+	 
+</script>

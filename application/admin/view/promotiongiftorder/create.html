@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/ckform.js"></script>
+    <script type="text/javascript" src="/static/Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<form action="{:url('/admin/Promotiongiftorder/save/')}" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td class="tableleft">选择礼包</td>
+        <td>
+        	<select name="gift_id" id="gift_id">
+        	{foreach name="giftList" item="item"}
+        	<option value="{$item.id}">{$item.name}</option>
+        	{/foreach}
+        	</select>
+        </td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">礼包数量</td>
+        <td><input type="text" placeholder="请输入礼包数量" id="pnumber"  name="pnumber"/></td>
+    </tr>
+    
+    <tr>
+        <td width="10%" class="tableleft">收货人姓名</td>
+        <td><input type="text" placeholder="请输入收货人姓名"   name="consignee_name"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">收货人手机</td>
+        <td><input type="text" placeholder="收货人手机"   name="consignee_phone"/> </td>
+    </tr>
+    <tr>
+        <td class="tableleft">收货人地区</td>
+       	<td>
+            <span>省</span>
+            <select name="consignee_province">
+                <option value="0">请选择</option>
+                {foreach name='provinces' item='item'}
+                <option value='{$item.id}'>{$item.name}</option>
+                {/foreach}
+            </select>
+            <span>市</span>
+            <select name="consignee_city">
+                <option value="0" >请选择</option>
+            </select>
+            <span>区/县</span>
+            <select name="consignee_area">
+                <option value="0" >请选择</option>
+            </select>
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="tableleft">收货地址</td>
+  			 <td><input type="text" placeholder="收货地址"   name="consignee_address"/> 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="tableleft">代理商ID</td>
+        <td>
+  			<input type="text" placeholder="代理商ID"   name="agent_id"/> 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="tableleft"></td>
+        <td>
+            <button type="submit" class="btn btn-primary" type="button">保存</button>
+             &nbsp;&nbsp;
+             <button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+        </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>
+<script>
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+		
+		
+		   // 级联省
+        $('select[name=consignee_province]').change(function(){
+            var p_id = $(this).val();
+            var data = getAddressList(p_id,$('select[name=consignee_city]'));
+            $('select[name=consignee_area]').html('<option>请选择</option>');
+        });
+
+        // 级联市
+        $('select[name=consignee_city]').change(function(){
+            var c_id = $(this).val();
+            var data = getAddressList(c_id,$('select[name=consignee_area]'));
+        });
+
+        // 获取下级城市列表并替换
+        function getAddressList(id,obj)
+        {
+            $.ajax({
+                url:"{:url('/admin/Agents/getAddress/')}",
+                type:'post',
+                data:{pid:id},
+                dataType:'json',
+                success:function(e){
+                    var _html = '<option>请选择</option>';
+                    for (var i = 0; i < e.length; i++) {
+                        _html += '<option value="'+e[i]['id']+'">'+e[i]['name']+'</option>';
+                    };
+                    obj.html(_html);
+                }
+            });
+        }
+
+
+    });
+</script>

@@ -1,0 +1,265 @@
+{include file='index@common/header'}
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+	</style>
+</head>
+<body>
+	<div id="teamPerformanceLayout" class="myProfit">
+		<div class="teamTitle">
+			<div class="right_arrow" onclick='redirect("{:url("Person/profitLog")}");'>
+				<div class="profit">
+					<p>交易总额：<span>￥{$data.sales_total}</span></p>
+					<p>累计收益：<span>￥{$data.profit_total}</span></p>
+				</div>
+				<div class="profit" style="margin-right: 20px;">
+					<p>订单量：<span>{$data.sales_order_total}</span>单</p>
+					<p style="margin-right:0;">升级人次：<span style="width:46px;">{$data.update_time}</span>次</p>
+				</div>
+			</div>
+
+		</div>
+		<div class="teamChart">
+		   <section class="amount">日销售额：<span style="float: right;">￥{$data.day_money_total}</span></section>
+		   <ul class="chart">
+		   		<li>
+		   			<div id="mountSale"></div>
+		   		</li>
+		   		<li>
+		   			<div id="mountOrder"></div>
+		   		</li>
+		   </ul>
+		</div>
+		<ul class="status">
+			<li class="title"><h2>直销情况</h2></li>
+			<li>
+				<div>
+					<span>￥{$data.before_direct_money}</span>
+					<span>上月直销金额</span>
+				</div>
+				<div class="line_left">
+					<span>￥{$data.now_direct_money}</span>
+					<span>本月直销金额</span>
+				</div>
+			</li>
+			<li>
+				<div>
+					<span>{$data.before_direct_order}单</span>
+					<span>上月累计订单量</span>
+				</div>
+				<div class="line_left">
+					<span>{$data.now_direct_order}单</span>
+					<span>本月累计订单量</span>
+				</div>
+			</li>
+		</ul>
+		<ul class="status">
+			<li class="title"><h2>间接销售情况</h2></li>
+			<li>
+				<div>
+					<span>￥{$data.before_indirect_money}</span>
+					<span>上月间接销售金额</span>
+				</div>
+				<div class="line_left">
+					<span>￥{$data.now_indirect_money}</span>
+					<span>本月间接销售金额</span>
+				</div>
+			</li>
+			<li>
+				<div>
+					<span>{$data.before_indirect_order}单</span>
+					<span>上月累计订单量</span>
+				</div>
+				<div class="line_left">
+					<span>{$data.now_indirect_order}单</span>
+					<span>本月累计订单量</span>
+				</div>
+			</li>
+		</ul>
+		<ul class="status">
+			<li class="title"><h2>下级升级情况</h2></li>
+			<li>
+				<div>
+					<span>￥{$data.before_update_money}</span>
+					<span>上月交易金额</span>
+				</div>
+				<div class="line_left">
+					<span>￥{$data.now_update_money}</span>
+					<span>本月交易金额</span>
+				</div>
+			</li>
+			<li>
+				<div>
+					<span>{$data.before_update_time}次</span>
+					<span>上月升级人次</span>
+				</div>
+				<div class="line_left">
+					<span>{$data.now_update_time}次</span>
+					<span>本月升级人次</span>
+				</div>
+			</li>
+		</ul>
+		<ul class="status last">
+			<li class="title"><h2>下级充值情况</h2></li>
+			<li>
+				<div>
+					<span>￥{$data.before_stock_money}</span>
+					<span>上月充值金额</span>
+				</div>
+				<div class="line_left">
+					<span>￥{$data.now_stock_money}</span>
+					<span>本月充值金额</span>
+				</div>
+			</li>
+			<li>
+				<div>
+					<span>{$data.before_stock_time}次</span>
+					<span>上月充值人次</span>
+				</div>
+				<div class="line_left">
+					<span>{$data.now_stock_time}次</span>
+					<span>本月充值人次</span>
+				</div>
+			</li>
+		</ul>
+	</div>
+	{include file='index@common/goBack'}
+<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+<script type="text/javascript" src="/static/Js/g2.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/Js/data-set.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+	// 跳转
+	function redirect(url){
+		window.location.href = url;
+	}
+</script>
+<script type="text/javascript">
+	const { DataView } = DataSet;
+	const data1 = {$data.money_percent};
+	const data2 = {$data.order_percent};
+	var num_1=-20,num_2=-20;
+	if (data1.length == 0 && data2.length==0) {
+				document.querySelectorAll(".teamChart")[0].style.display="none";
+	}
+	if(data1.length==1){
+		num_1=-80;
+	}
+	if(data2.length==1){
+		num_2=-80;
+	}
+	const dv = new DataView();
+	dv.source(data1).transform({
+	    type: 'percent',
+	    field: 'count',//data 中的key
+	    dimension: 'item',//data 中的key
+	    as: 'percent'
+	});
+	const chart = new G2.Chart({
+	    container: 'mountSale',
+	    forceFit: true,
+	    height:230,
+	    padding:[10,10,65,10],
+	});
+	chart.source(dv, {
+	    percent: {
+			formatter: val => {
+	        	val = (val * 100).toFixed(2) + '%';
+	        	return val;
+			}
+	    }
+	});
+	chart.coord('theta');
+	chart.tooltip({
+	    showTitle: false,
+	    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+	});
+	chart.intervalStack()
+    .position('percent')
+    .color('item', [ '#69bbf5','#a8a2fc'])
+    .label('percent', {
+      offset:num_1,
+      // autoRotate: false,
+      textStyle: {
+        rotate: 0,
+        textAlign: 'center',
+        shadowBlur: 2,
+        shadowColor: 'rgba(0, 0, 0, .45)'
+      }
+    })
+    .tooltip('item*percent', (item, percent) => {
+    	percent = (percent * 100).toFixed(2) + '%';
+    	return {
+        	name: item,
+        	value: percent
+    	};
+    })
+    .style({
+    	lineWidth: 1,
+    	stroke: '#fff'
+    });
+    chart.legend({ //底部标注
+    	offsetX:-10,
+    	offsetY:50,
+		position:'left',
+		marker: 'square' // 设置图例 marker 的显示样式
+	});
+	chart.render();
+</script>
+<script type="text/javascript">
+	const dv2= new DataView();
+	dv2.source(data2).transform({
+	    type: 'percent',
+	    field: 'count',//data 中的key
+	    dimension: 'item',//data 中的key
+	    as: 'percent'
+	});
+	const orderChart= new G2.Chart({
+	    container: 'mountOrder',
+	    forceFit: true,
+	    height:230,
+	    padding:[10,10,65,10],
+	});
+	orderChart.source(dv2, {
+	    percent: {
+	    	formatter: val => {
+	        	val = (val * 100) + '%';
+	        	return val;
+	    	}
+	    }
+	});
+	orderChart.coord('theta');
+	orderChart.tooltip({
+	    showTitle: false,
+	    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+	});
+	orderChart.intervalStack()
+    .position('percent')
+    .color('item', [ '#69bbf5','#a8a2fc'])
+    .label('percent', {
+      offset:num_2,
+      // autoRotate: false,
+      textStyle: {
+        rotate: 0,
+        textAlign: 'center',
+        shadowBlur: 2,
+        shadowColor: 'rgba(0, 0, 0, .45)'
+      }
+    })
+    .tooltip('item*percent', (item, percent) => {
+    	percent = percent * 100 + '%';
+    	return {
+	        name: item,
+	        value: percent
+    	};
+    })
+    .style({
+    	lineWidth: 1,
+    	stroke: '#fff'
+    });
+    orderChart.legend({ //底部标注
+    	offsetX:-10,
+    	offsetY:50,
+		position:'left',
+		marker: 'square' // 设置图例 marker 的显示样式
+	});
+	orderChart.render();
+</script>

@@ -1,0 +1,117 @@
+ {include file='promotiongift/header'/}
+ <style>#giftOrderLayout .footer>p{margin-right:1rem;}.footer>p,.footer>p>span:first-child{border:0;}</style>
+			<div id="giftOrderLayout">	
+				
+				<div class="address">
+					<div>
+					<a href="{:url('/index/Person/addressManage/',input('param.'))}">
+						<p><span>收货人：{$addressInfo.name}</span><span>{$addressInfo.phone}</span></p>
+						<p><i></i>收货地址：{$addressInfo.province}{$addressInfo.city}{$addressInfo.area}{$addressInfo.address}</p>
+					</a>
+					</div>
+				</div>
+				<div class="divide"></div>
+			  	<ul>
+			  		<li>
+			  			<a href="">
+			  				<img src="{$giftInfo.pic}" alt="" />
+			  				<div>
+			  					<p class="proName">{$giftInfo.name}</p>
+			  					<span class="level bronze">{$giftInfo.type|get_reward_levelname}大礼包</span>
+			  					<p class="other">
+			  						<span class="goods-price"><span class="yen">￥</span>{$giftInfo.price}</span>
+			  						<span class="sale">X1</span>		 
+			  					</p>
+			  				</div>
+			  			</a>
+			  		</li>
+			  	</ul>
+			  	<form id="giftbuy" action='{:url("Promotiongift/saveOrder")}' method='POST'>
+			  	
+				<input type="hidden" name="addressId" id="addressId" value="{$addressInfo.id}">
+				<input type="hidden" name="giftId" id="giftId" value="{$giftInfo.id}"> 
+				<h6>支付方式</h6>
+		  	<ul id="payContent">
+		  	<li>
+				<label name="paystyle" class="" for="paystyle" uid="paystyle"></label><input id="paystyle" name="paystyleVal"   type="radio" value="1">线下支付
+			</li>
+			<li>
+				<label id="paystyle_label" name="paystyle_w" class="" for="paystyle_w"></label><input id="paystyle_w" name="paystyleVal"   type="radio" checked value="2">微信支付
+			</li>
+				{if condition="$stockPay eq 1"}
+						<li>
+							<label  name="paystyle_k" for="paystyle_k" ></label>
+							<input type="radio" name="paystyleVal" value="3" id="paystyle_k">库存支付
+						</li>
+					{/if}
+		  	</ul>
+		  	<h6>买家留言</h6>
+		  	<div class="textarea">
+		  		<textarea name="remark" id="remark" cols="30" rows="10"></textarea>
+		  	</div>
+			  	<div class="footer">
+			  		<ol class="tip">
+						<li>
+							<p>
+								实际金额：<span class="goods-price"><span class="yen">￥</span>{$giftInfo.price}</span>
+							</p>
+						</li>
+						<li style="display:none;"></li>
+					</ol> 
+					<button type="button">提交订单</button>
+				</div>
+			</div>
+			</form>
+	</body>
+</html>
+<script type="text/javascript">
+$(function(){
+	var flag=sessionStorage.getItem('flag');
+	
+	if(flag == null){
+		$("#payContent label[name='paystyle_w']").attr('class','checked');
+		$("#payContent input[id='paystyle_w']").attr("checked",true);
+	}
+	
+	$('#payContent input:radio[name="paystyleVal"]').each(function(){
+		var _id = $(this).attr('id');
+		if(_id === flag){
+			$("#payContent label[name='"+_id+"']").attr('class','checked');
+			$("#payContent input[id='"+_id+"']").attr("checked",true);
+		}
+	})	
+	$("#payContent label").on('click',function(){
+		$("label").attr('class','');$('input').removeAttr('checked');
+		$(this).attr('class','checked');
+		var id=$(this).attr('name');
+		$("#payContent input[id='"+id+"']").attr('checked',true);
+				
+	});
+	
+	
+});
+$('button').on('click',function(){
+	$('#payContent input:radio[name="paystyleVal"]').each(function(){
+		if($(this).is(":checked")){
+			sessionStorage.setItem('flag',$(this).attr('id'));
+		}
+	})		
+	var addressId = $('#addressId').val();
+	var giftId = $('#giftId').val();
+	var remark=$('#remark').val();
+	var paystyle=$("input[name='paystyle']:checked").val();
+ 
+	if(!addressId){
+		mobileTip('请添加收货信息');
+		return false;
+	}
+	
+	if(!giftId){
+		mobileTip('请选择礼包');
+		return false;
+	}
+	
+	giftbuy.submit();
+});
+</script>
+<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>

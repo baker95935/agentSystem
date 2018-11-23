@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>编辑运费规则</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+	<link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+	<link rel="stylesheet" type="text/css" href='/static/Css/iconfont/iconfont.css'/>
+	<link rel="stylesheet" type="text/css" href='/static/Css/swiper.min.css'/>
+	<link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+	<script type="text/javascript" src="/static/Js/jquery.js"></script>
+	<script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+	<script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+	<style type="text/css">
+		body {
+			padding-bottom: 40px;
+		}
+		.none{display: none;}
+		.hidden-content{ text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: inline-block; vertical-align: top; max-width: 82%; }
+	</style>
+</head>
+<body>
+	<div id="performance-top">
+		<h5>添加运费规则</h5>
+	</div>
+	<form class="definewidth" id="cost-regular">
+		<div class="rows">
+			<label>运费规则名称</label>
+			<div class="input">
+				<input type="text" name="name" value="" id="name" />
+			</div>
+		</div>
+		<div class="rows">
+			<label>计价方式</label>
+			<div class="input-radio">
+				<label><input type="radio" name="type" value="1" id="type1" checked="checked" onclick="chktype(1);">按件数&nbsp;</label>
+				<label><input type="radio" name="type" value="2" id="type2" onclick="chktype(2);">按重量&nbsp;</label>
+			</div>
+		</div>
+		<!--计价方式切换-->
+		<div class="rows">
+			<label>快递件数设置(<span class='unit'>件</span>)</label>
+			<div class="input">
+				<span class="input_bx"><span class='firstnum'>首件件数</span>：<input type="text" name="FirstNum" value="1" id="FirstNum" onkeyup="clearNoNum(this,1);"></span>
+				<span class="input_bx"><span class='continuenum'>续件件数</span>：<input type="text" name="ContinueNum" value="1" id="ContinueNum" onkeyup="clearNoNum(this,1);"></span>
+				<span class="input_bx"><span class="freenum">按件免邮</span>：<input type="text" name="FreeNum" value="0" id="FreeNum" onkeyup="clearNoNum(this,1);"></span>
+			</div>
+		</div>
+		<div class="rows">
+			<label>快递配送费用(元)</label>
+			<div class="input">
+				<span class="input_bx"><span class="price">首件费用</span>：<input type="text" name="price" value="0" id="price" onkeyup="clearNoNum(this,2);"></span>
+				<span class="input_bx"><span class="continueprice">续件费用</span>：<input type="text" name="ContinuePrice" value="0" id="ContinuePrice" onkeyup="clearNoNum(this,2);">&nbsp;(0表示无运费)</span>
+			</div>
+		</div>
+		<!--计价方式切换-->
+		<div class="rows">
+			<label>选择此快递所需金额(元)</label>
+			<div class="input"><input type="text" name="cost" value="0" id="cost">&nbsp;(0表示无限制)</div>
+		</div>
+		<div class="rows">
+			<label>区域模式</label>
+			<div class="input-radio">
+				<label class="input"><input type="radio" name="include" value="1" checked="checked">区域之内</label>
+				<label class="input"><input type="radio" name="include" value="0">区域之外</label>
+			</div>
+		</div>
+		<div class="rows">
+			<label>区域选择</label>
+			<div class="input">
+				<button type="button" class="btn cityChoice" flag='true'>选择</button>
+				<div class="area-boxContent">
+					<div class="header">
+						<div class="searchBox">
+							<span>关键字搜索 :</span>
+							<input class="searchVal" placeholder="请输入关键字">
+							<button type="button" class="btn search">搜索</button>
+						</div>
+						<div class="confirmBtn">
+							<button type="button" class="btn makeSure">确定</button>
+						</div>
+					</div>
+					<div class="footer">
+						<div class="left">
+							<div class="all-select">
+								<input type="checkbox" id="allSelect"/>
+								<label for="allSelect">全选</label>
+							</div>
+							<ul id="province">
+								{volist name='provinceList' id='province'}
+								<li{eq name='i' value='1'} class="current"{/eq}>
+									<div class="provinceBox">
+										<input type="checkbox" value='{$province.id}' id="p_{$province.id}"/>
+										<label for="p_{$province.id}"></label>
+										<span>{$province.name}</span>
+									</div>
+									<i class="iconfont icon-youshuangjiantou"></i>
+								</li>
+								{/volist}
+							</ul>
+						</div>
+						<div class="right" id="city_area">
+							<div class="cityBox">
+								<!-- Swiper -->
+								<div class="swiper-container">
+									{foreach name='cityList' id='city' key='c_province_id'}
+									<div class="swiper-wrapper city_province_{$c_province_id}" data-id="{$c_province_id}">
+										<div class="swiper-slide">
+										{volist name='city' id='c' mod='8'}
+											<div class="provinceBox city_id_{$c.id}">
+												<input type="checkbox" value='{$c.id}' id="c_{$c.id}"/>
+												<label for="c_{$c.id}"></label>
+												<span>{$c.name}</span>
+											</div>
+										{eq name="mod" value="7"}
+										</div>
+										<div class="swiper-slide">
+										{/eq}
+										{/volist}
+										</div>
+									</div>
+									{/foreach}
+									<div class="swiper-button-next"></div>
+                                    <div class="swiper-button-prev"></div>
+								</div>
+							</div>
+							<ol class="town-div">
+								{foreach name='areaList' id='area' key='a_city_id'}
+								<li class='area_city_{$a_city_id}' data-id="{$a_city_id}">
+									{volist name='area' id='a' key='area_id'}
+									<div class="provinceBox area_id_{$a.id}">
+										<input type="checkbox" value='{$a.id}' id="a_{$a.id}" />
+										<label for="a_{$a.id}">{$a.name}</label>
+									</div>
+									{/volist}
+								</li>
+								{/foreach}
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="selected-areaBox rows" style="display: none;">
+			<label>已选</label>
+			<div class="areaBox">
+				<div>
+					省：
+					<span class="selected-province hidden-content" data-province_num="0"></span>
+					<label class="showMore moreProvince" style="display: none;">↓更多</label>
+					<label class="showMore hidden-btn hiddenProvince" style="display: none;">↑隐藏</label>
+				</div>
+				<div>
+					市：
+					<span class="selected-city hidden-content" data-city_num="0"></span>
+					<label class="showMore moreCity" style="display: none;">↓更多</label>
+					<label class="showMore hidden-btn hiddenCity" style="display: none;">↑隐藏</label>
+				</div>
+				<div>
+					区/县/镇：
+					<span class="selected-area hidden-content" data-area_num="0"></span>
+					<label class="showMore moreArea" style="display: none;">↓更多</label>
+					<label class="showMore hidden-btn hiddenArea" style="display: none;">↑隐藏</label>
+				</div>
+			</div>
+		</div>
+		<div class="rows">
+			<label>
+				<input type="hidden" name="checked_province" value="" />
+				<input type="hidden" name="checked_city" value="" />
+				<input type="hidden" name="checked_area" value="" />
+			</label>
+			<div class="input">
+				<button type="button" class="btn btn-primary">提交</button>
+				<button type="button" class="btn btn-success" id="addnew">取消</button>
+			</div>
+		</div>
+	</form>
+</body>
+<script type="text/javascript" src="/static/Js/swiper.min.js"></script>
+<script type="text/javascript">
+	// 中文，英文，多小数点过滤
+	function clearNoNum(obj,type){
+		if( type == 1 ){			//纯数字
+			obj.value = obj.value.replace(/[^\d.]/g,""); //清除"数字"和"."以外的字符
+			obj.value = obj.value.replace(/\./g,"");
+		}else if(type == 2){		//纯数字+2位小数
+			obj.value = obj.value.replace(/[^\d.]/g,""); //清除"数字"和"."以外的字符
+			obj.value = obj.value.replace(/^\./g,""); //验证第一个字符是数字而不是
+			obj.value = obj.value.replace(/\.{2,}/g,"."); //只保留第一个. 清除多余的
+			obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+			obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3'); //只能输入两个小数
+		}else if(type == 4){        //纯数字+4位小数
+			obj.value = obj.value.replace(/[^\d.]/g,""); //清除"数字"和"."以外的字符
+			obj.value = obj.value.replace(/^\./g,""); //验证第一个字符是数字而不是
+			obj.value = obj.value.replace(/\.{2,}/g,"."); //只保留第一个. 清除多余的
+			obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+			obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d\d\d).*$/,'$1$2.$3'); //只能输入四个小数
+		}
+	}
+
+	// 计价方式切换
+	function chktype(i){
+		i = parseInt(i);
+		switch(i){
+			case 1:
+				$('.unit').text("件");
+				$('.firstnum').text("首件件数");
+				$('.firstnum').next().attr("onkeyup","clearNoNum(this,1)");
+				$('.continuenum').text("续件件数");
+				$('.continuenum').next().attr("onkeyup","clearNoNum(this,1)");
+				$('.price').text("首件费用");
+				$('.continueprice').text("续件费用");
+				$('.freenum').next().attr("onkeyup","clearNoNum(this,1)");
+				$('.freenum').text("按件免邮");
+				$('#type1').attr("checked",true);
+				$('#type2').removeAttr("checked");
+				break;
+			case 2:
+				$('.unit').text("千克");
+				$('.firstnum').text("首重重量");
+				$('.firstnum').next().attr("onkeyup","clearNoNum(this,2)");
+				$('.continuenum').text("续重重量");
+				$('.continuenum').next().attr("onkeyup","clearNoNum(this,2)");
+				$('.price').text("首重费用");
+				$('.continueprice').text("续重费用");
+				$('.freenum').next().attr("onkeyup","clearNoNum(this,2)");
+				$('.freenum').text("续重免邮");
+				$('#type2').attr("checked",true);
+				$('#type1').removeAttr("checked");
+				break;
+		}
+	}
+
+	// 跳转
+	function redirect(url){
+		window.location.href = url;
+	}
+
+	// 组合地址(省|市|区)字符串
+	function combineAddressStr(){
+		let _str_p_id = [],_str_p_name = [],_str_c_id = [],_str_c_name = [],_str_a_id = [],_str_a_name = [];// 各级ID数组和名称数组
+		// 区级
+		let aChecked = $('.town-div :checkbox:checked');
+		aChecked.each(function(index, el) {
+			if (-1 == $.inArray(parseInt($(el).val()),_str_a_id)) {
+				_str_a_id.push($(el).val());
+				_str_a_name.push($(el).siblings('label').text());
+			}
+			// 找上级市
+			let _up_c_id = $(el).parent().parent('li').data('id');// 上级市ID
+			if(-1 == $.inArray(parseInt(_up_c_id), _str_c_id)){
+				_str_c_id.push(_up_c_id);
+				_str_c_name.push($('#c_'+_up_c_id).siblings('span').text());
+			}
+			// 找上上级省
+			let _up_p_id = $('.city_id_'+_up_c_id).parent().parent().data('id');// 省ID
+			if(-1 == $.inArray(parseInt(_up_p_id), _str_p_id)){
+				_str_p_id.push(_up_p_id);
+				_str_p_name.push($('#p_'+_up_p_id).siblings('span').text());
+			}
+		});
+		// 市级
+		let cChecked = $('.cityBox :checkbox:checked');
+		cChecked.each(function(index, el) {
+			if(-1 == $.inArray(parseInt($(el).val()),_str_c_id)){
+				_str_c_id.push($(el).val());
+				_str_c_name.push($('#c_'+$(el).val()).siblings('span').text());
+			}
+			// 找上级省
+			let _up_p = $('.city_id_'+$(el).val()).parent().parent().data('id');// 省ID
+			if(-1 == $.inArray(parseInt(_up_p), _str_p_id)){
+				_str_p_id.push(_up_p);
+				_str_p_name.push($('#p_'+_up_p).siblings('span').text());
+			}
+		});
+		// 省级
+		let pChecked = $('#province :checkbox:checked');
+		pChecked.each(function(index, el) {
+			if(-1 == $.inArray(parseInt($(el).val()),_str_p_id)){
+				_str_p_id.push($(el).val());
+				_str_p_name.push($('#p_'+$(el).val()).siblings('span').text());
+			}
+		});
+		// 赋值
+		if(_str_p_name.length > 15){
+			$('.selected-province').addClass('hidden-content');
+			$('.selected-province').next().show();
+			$('.selected-province').next().next().hide();
+		}
+		$('.selected-province').html(_str_p_name.join('，'));
+		if (_str_c_name.length > 15) {
+			$('.selected-city').addClass('hidden-content');
+			$('.selected-city').next().show();
+			$('.selected-city').next().next().hide();
+		}
+		$('.selected-city').html(_str_c_name.join('，'));
+		if (_str_a_name.length > 15) {
+			$('.selected-area').addClass('hidden-content');
+			$('.selected-area').next().show();
+			$('.selected-area').next().next().hide();
+		}
+		$('.selected-area').html(_str_a_name.join('，'));
+		$('input[name=checked_province]').val(_str_p_id.join(','));
+		$('input[name=checked_city]').val(_str_c_id.join(','));
+		$('input[name=checked_area]').val(_str_a_id.join(','));
+	}
+
+	// 左右切换市级
+	var swiper = new Swiper('.swiper-container', {
+    	navigation: {
+	        nextEl: '.swiper-button-next',
+	        prevEl: '.swiper-button-prev',
+    	},
+    });
+
+	$(function () {
+
+		//地区默认显示
+		let pro_id = $('#province>li').eq(0).find('input[type="checkbox"]').val();
+
+		// 提交
+		$('.btn-primary').click(function(){
+			var _name = $('input[name=name]').val();
+			var _choice = $('.cityChoice').attr('flag');
+			if(_name == ''){
+				layer.open({
+                    content:'规则名称不能为空'
+                });
+                return false;
+			}
+			if ('true' == _choice) {
+				layer.open({
+                    content:'请确认选择的区域'
+                });
+                return false;
+			}
+			$.ajax({
+				url:'{:url("Expressrule/save")}',
+				type:'post',
+				data:$('#cost-regular').serialize(),
+				success:function(e){
+					if (e.error) {
+                        layer.open({
+                            content:e.error.msg
+                        });
+                    } else {
+                        layer.open({
+                            content:e.msg
+                            ,btn: ['确定']
+                            ,yes: function(index){
+                                layer.close(index);
+                                redirect('{:url("Expressrule/index")}');
+                            }
+                        });
+                    }
+				}
+			});
+		});
+
+		$('.city_province_'+pro_id).show().siblings('.swiper-wrapper').hide().removeClass('swiper-wrapper');
+		let c_id = $('.city_province_'+pro_id+' :checkbox').val();
+
+		//区县默认显示
+		$('.town-div li').hide().eq(0).show();
+
+		//全选
+		$('#allSelect').on('click',function(){
+            let checkVal=$(this).prop('checked');
+            $('#province :checkbox').prop('checked',checkVal);
+            $('.right :checkbox').prop('checked',checkVal);
+        });
+
+        //省选择
+        $('#province :checkbox').on('click',function(){
+            let idStr = $(this).attr('id')
+            let _id   = idStr.substring(idStr.indexOf('_')+1)
+            let proCheck = $(this).prop('checked');
+            $('.city_province_'+_id+' :checkbox').prop('checked',proCheck);
+            $('.city_province_'+_id+' :checkbox').each(function(){
+                $('.area_city_'+$(this).val()+' :checkbox').prop('checked',proCheck);
+            });
+        });
+
+        //省切换
+        $('#province .provinceBox').on('click',function(){
+        	let idStr = $(this).find('input').attr('id');
+            let _id   = idStr.substring(idStr.indexOf('_')+1)
+        	$('#province>li').removeClass('current');
+        	$(this).parent().addClass('current');// 焦点
+        	$('.city_province_'+_id).addClass('swiper-wrapper').show().siblings('.swiper-wrapper').hide().removeClass('swiper-wrapper');
+        	let city_id=$('.city_province_'+_id+' :checkbox').val();
+        	$('.town-div li').hide();
+        	$('.area_city_'+city_id).show();
+        });
+
+        //市选择
+        $('.cityBox :checkbox').on('change',function(){
+            let _id = $(this).val(); // 区县id
+            let province = $(this).parent().parent().parent().attr('data-id');
+            //某省下所有市的长度
+            let city_length = $('.city_province_'+province+' :checkbox').length;
+            //某省下所有选中市的长度
+            let check_city_Length = $(".city_province_"+province+" input[type='checkbox']:checked").length;
+            if(city_length === check_city_Length){
+            	$('#p_'+province).prop('checked',true);
+            }else{
+            	$('#p_'+province).prop('checked',false);
+            }
+            $('.area_city_'+_id+' :checkbox').prop('checked',$(this).prop('checked'));
+        });
+
+        //区县切换
+        $('.cityBox span').on('click',function(){
+        	let _id = $(this).siblings('input').val(); // 区县id
+        	$('.town-div>li').hide();
+            $('.area_city_'+_id).show();
+        });
+
+        //区县选择
+        $('.town-div :checkbox').on('click',function(){
+            let town_id = $(this).val();
+            let city_id = $(this).parent().parent().attr('data-id');
+            //某市下所有区县的长度
+            let town_length = $('.area_city_'+city_id+' :checkbox').length;
+            //某市下所有选中区县的长度
+            let check_town_Length = $(".area_city_"+city_id+" input[type='checkbox']:checked").length;
+            if(town_length === check_town_Length){
+            	$('.city_id_'+city_id+'>:checkbox').prop('checked',true);
+            }else{
+            	$('.city_id_'+city_id+'>:checkbox').prop('checked',false);
+                let province_id=$('.city_id_'+city_id).parent().parent().attr('data-id')
+                $('#p_'+province_id).prop('checked',false);
+                $('#allSelect').prop('checked',false);
+            }
+        });
+
+		// 取消
+		$('#addnew').click(function(){
+			redirect('{:url("Expressrule/index")}');
+		});
+
+		// '选择'按钮
+		$('.cityChoice').click(function(){
+			let _flag = $(this).attr('flag');
+			if(_flag == 'true'){
+				$(this).attr('flag','false');
+				$('.area-boxContent').hide();
+				$('.selected-areaBox').show();
+			}else{
+				$(this).attr('flag','true');
+				$('.area-boxContent').show();
+				$('.selected-areaBox').hide();
+			}
+		});
+
+		// '确定'按钮
+		$('.makeSure').click(function(){
+			$('.cityChoice').attr('flag','false');
+			$('.area-boxContent').hide();
+			$('.selected-areaBox').show();
+			/* 分级组合城市中文字符串 */
+			combineAddressStr();
+		});
+
+		// '搜索'按钮
+		$('.search').click(function(event) {
+			let _val = $('.searchVal').val();
+			if (_val != '') {
+				$.ajax({
+					url: '{:url("Expressrule/ajaxSearchCity")}',
+					data: {key: _val},
+					success:function(e){
+						if(e.error){
+							layer.open({
+	                            content:e.error.msg
+	                        });
+						}else{
+							$('#province>li').removeClass('current');
+							$('#p_'+e.p).parent().parent().addClass('current');// 焦点
+				        	$('.city_province_'+e.p).addClass('swiper-wrapper').show().siblings('.swiper-wrapper').hide().removeClass('swiper-wrapper');
+							$('.town-div li').hide();
+			        		$('.area_city_'+e.c).show();
+						}
+					}
+				});
+			}else{
+				/* 焦点恢复为默认值 */
+				$('#province>li').removeClass('current').eq(0).addClass('current');
+				let _init_p = $('#province>li').eq(0).find('input[type="checkbox"]').val();
+				$('.city_province_'+_init_p).addClass('swiper-wrapper').show().siblings('.swiper-wrapper').hide().removeClass('swiper-wrapper');
+				$('.town-div li').hide().eq(0).show();
+			}
+		});
+
+		// '更多'按钮
+		$('.moreProvince,.moreCity,.moreArea').click(function(){
+			$(this).prev('span').removeClass('hidden-content');
+			$(this).hide();
+			$(this).next('label').show();
+		});
+
+		// '隐藏'按钮
+		$('.hidden-btn').click(function(){
+			$(this).prev().prev('span').addClass('hidden-content');
+			$(this).prev('label').show();
+			$(this).hide();
+		});
+	});
+</script>
+</html>

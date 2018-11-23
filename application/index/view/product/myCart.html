@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+		<style type="text/css">
+			body{background-color: #F5F5F5;}.footer>p,.footer>p>span:first-child{border:0;}
+			#cartContent{margin-bottom: 2.5rem;}
+		</style>
+		<script type="text/javascript">
+		var docEl = document.documentElement;
+		function getSize() { // 获取屏幕的宽度
+			var screenWidth = docEl.clientWidth;
+			docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+		}
+		getSize();// 页面加载完执行一次
+		window.onresize = function() {
+			getSize();
+		}
+		</script>
+	</head>
+	<body>
+		<div id="cartContent">
+			<ul>
+			{notpresent name='list'}
+				暂无商品
+			{else/}
+			{volist name='list' id="vo"}
+				<li class='remove_{$vo.cid}'>
+					<div class="checkedIcon" style="width:6%;">
+						<label name="pro_{$vo.cid}" for="pro_{$vo.cid}"></label>
+						<input type="checkbox" value='{$vo.cid}' id="pro_{$vo.cid}" />
+					</div>
+					<div style="width:40%;"><img src="{$vo.product_img}" alt="" /></div>
+					<div class="explain" style="width:54%;">
+						<p class="product-name">{$vo.product_name}</p>
+						<p class="goods-price"><span class="yen">￥</span>{$vo.sales_price}</p>
+						<div class="btn">
+							<p>
+								<span class="sign minus" data-cid='{$vo.cid}'></span>
+								<input type="text" value="{$vo.num}" class="number" id="number_{$vo.cid}" data-cid='{$vo.cid}' onkeyup='value=value.replace(/[^0-9]/ig,"")' />
+								<input type='hidden' value='{$vo.inventory}' class='stock_{$vo.cid}' />
+								<input type='hidden' value='{$vo.pid}' class='pid_{$vo.cid}' />
+								<input type='hidden' value='{$vo.is_Purchase_a}' class='purchase_{$vo.cid}' />
+								<input type='hidden' value='{$vo.sales_price}' class='price_{$vo.cid}' />
+								<span class="sign add" data-cid='{$vo.cid}'></span>
+							</p>
+							<button class='del' data-cid='{$vo.cid}'></button>
+						</div>
+					</div>
+				</li>
+			{/volist}
+			{/notpresent}
+			</ul>
+			<div class="footer">
+				<p class="pro_all"><label name="pro_all" for="pro_all">全选</label>
+				<input type="checkbox" id="pro_all" style="visibility: hidden;"/></p>
+				<p>
+					总计：<span class="goods-price total"><span class="yen">￥</span>0.00</span>
+				</p>
+				<form action='{:url("Product/preOrder")}' method='post'>
+					<input type='hidden' name='cids' />
+				</form>
+				<button class='sure'>确定</button>
+			</div>
+		</div>
+	</body>
+	<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+
+		// 计算总价
+		function totalMoney(){
+			var _list = $('.checkedIcon>input[uid="checked"]');
+			var _total = 0.00;// 当前商品总价
+			_list.each(function(){
+				var _cid = $(this).val();
+				var _num = parseInt($('#number_'+_cid).val());// 选购数量
+				var _price = parseFloat($('.price_'+_cid).val());// 产品价格
+				_total += (_price*_num);// 计合
+			});
+			$('.total').html('<span class="yen">￥</span>'+_total.toFixed(2));
+		}
+
+		// 变更产品数量
+		function modGoodsNum(_pid,_num){
+			$.post('{:url("Product/modCartGoods")}',{pid:_pid,num:_num});
+		}
+
+		$(function(){
+			
+			var role_tip={$role_tip};
+			if(role_tip==1) {
+				layer.alert('您的身份已变更，请重新登录，以免对您的收益造成损失', function(){
+					window.location.href='{:url("index/personalinfo/personalinfolist")}';
+				});
+				return false;
+			}
+
+			$('.product-name').each(function(){
+				var proName=$(this).text().length;
+				if(proName>22){
+					$(this).parent().parent().css('height','auto');
+				}else{
+					$(this).css('height','38px');
+				}
+			})
+			// 数量增加
+			$('.add').click(function(){
+				var _cid = $(this).data('cid');
+				var _val = parseInt($('#number_'+_cid).val());// 选购数量
+				var _all = parseInt($('.stock_'+_cid).val());// 总库存
+				var _pid = parseInt($('.pid_'+_cid).val());// 商品
+				var _purchase = parseInt($('.purchase_'+_cid).val());//限购的
+				
+				if(_purchase==1) {
+					mobileAlert('限购产品不能增加数量');
+					return false;
+				}
+				
+				if (_val >= _all) {
+					mobileAlert('当前库存总量:'+_all);
+					_val = _all;
+					$('#number_'+_cid).val(_val);
+				} else{
+					_val++;
+					$('#number_'+_cid).val(_val);
+				};
+				totalMoney();
+				modGoodsNum(_pid,_val);
+			});
+
+			// 数量减少
+			$('.minus').click(function(){
+				var _cid = $(this).data('cid');
+				var _val = parseInt($('#number_'+_cid).val());// 选购数量
+				var _all = parseInt($('.stock_'+_cid).val());// 总库存
+				var _pid = parseInt($('.pid_'+_cid).val());// 商品
+				if (_val > _all) {
+					mobileAlert('当前库存总量:'+_all);
+					_val = _all;
+					$('#number_'+_cid).val(_all);
+				} else if(_val <= 1) {
+					_val = 1;
+					$('#number_'+_cid).val(_val);
+				} else {
+					_val--;
+					$('#number_'+_cid).val(_val);
+				};
+				totalMoney();
+				modGoodsNum(_pid,_val);
+			});
+
+			// 失焦
+			$('.number').blur(function(){
+				var _cid = $(this).data('cid');
+				var _val = parseInt($(this).val());// 选购数量
+				var _all = parseInt($('.stock_'+_cid).val());// 总库存
+				var _pid = parseInt($('.pid_'+_cid).val());// 商品
+				if(_val > _all){
+					mobileAlert('当前库存总量:'+_all);
+					_val = _all;
+					$(this).val(_val);
+				}else if(_val < 1){
+					mobileAlert('数量最低选购1');
+					_val = 1;
+					$(this).val(_val);
+				};
+				totalMoney();
+				modGoodsNum(_pid,_val);
+			});
+
+			// 删除
+			$('.del').click(function(){
+				var _cid = $(this).data('cid');
+				$.ajax({
+					url:'{:url("Product/delCartGoods")}',
+					data:{cid:_cid},
+					success:function(e){
+						if (e.error) {
+							mobileAlert(e.error.msg);
+						} else{
+							mobileTip(e.msg);
+							$('.remove_'+_cid).remove();
+							totalMoney();
+						};
+					}
+				});
+			});
+
+			// 多选
+			$(".checkedIcon>label").click(function(){
+				var flag = $(this).attr('class');
+				var id = $(this).attr('name');
+				if(flag != 'checked'){
+					$(this).prop('class','checked');
+					$("#"+id).attr('uid','checked');
+					$("#"+id).prop('checked',true);
+				}else{
+					$(this).prop('class','');
+					$("#"+id).attr('uid','');
+					$("#"+id).prop('checked',false);
+				};
+				totalMoney();
+			});
+
+			// 全选
+			$('.pro_all>label').click(function(){
+				$(this).prop('class','checked');
+				var all = $("#pro_all").prop("checked");
+				if(all==false){
+					$('.pro_all>label').prop('class','checked');
+					$(".checkedIcon>input").prop('checked',true);
+					$(".checkedIcon>input").attr('uid','checked');
+					$(".checkedIcon>label").prop('class','checked');
+				}else{
+					$('.pro_all>label').prop('class','');
+					$(".checkedIcon>input").prop('checked',false);
+					$(".checkedIcon>input").attr('uid','');
+					$(".checkedIcon>label").prop('class','');
+				};
+				totalMoney();
+			});
+
+			// 确定
+			$('.sure').click(function(){
+				var _list = $('.checkedIcon>input[uid="checked"]');
+				var _data = [];
+				_list.each(function(){
+					var _cid = $(this).val();
+					_data.push(_cid);
+				});
+				if(_data.length < 1){
+					mobileAlert('请选择要购买的商品');
+					return false;
+				}else{
+					$('input[name=cids]').val(_data);
+					$('form').submit();
+				}
+			});
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

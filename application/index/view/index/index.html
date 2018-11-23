@@ -1,0 +1,75 @@
+{include file='index@common/header'}
+<style>.teamPerformance,.myPerformance{display: none;}.team{padding-top: 2.2rem;}</style>
+</head>
+<body>
+	<div id="home">
+		<div class="header"></div>
+		<div class="layout">
+			<div class="menu">
+				<div class="title">
+					<div class="portrait">
+						<a href="javascript:;">
+							<img src="{$Think.session.user.head_img}" />
+						</a>
+					</div>
+					<p class="name">{$Think.session.user.nickname}</p>
+					<p>{$Think.session.user.role|get_reward_levelname}</p>
+				</div>
+				<div class="category">
+					<p>
+						<a href="javascript:{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Person/invite')}'){/if}{else/}redirect('{:url('Person/invite')}'){/present};"><i class="h_shop"></i>邀请代理</a>
+					</p>
+					<p class="vertical"></p>
+					<p>
+						<a href="javascript:redirect('{:url('Order/lowerOrders')}');"><i class="h_business"></i>下级订单</a>
+					</p>
+					<p class="vertical"></p>
+					<p>
+						<a href="javascript:redirect('{:url('Order/myOrders')}');"><i class="h_order"></i>我的订单</a>
+					</p>
+					<p class="vertical"></p>
+					<p>
+						<a href="javascript:{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Personalinfo/accredit')}'){/if}{else/}redirect('{:url('Personalinfo/accredit')}'){/present};"><i class="h_code"></i>授权证书</a>
+					</p>
+				</div>
+			</div>
+			<div id="module">
+				<h2 class="teamTitle"><span></span>团队管理</h2>
+				<div class="team">
+					<div class="teamPerformance">
+						<a href="javascript:{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Index/teamPerformance')}'){/if}{else/}redirect('{:url('Index/teamPerformance')}'){/present};">
+							<div class="detail">
+								<p class="title">团队业绩</p>
+								<p>{$data.team}<span>元</span></p>
+							</div>
+						</a>
+					</div>
+					<div class="myPerformance">
+						<a href="javascript:{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Index/myAchievement')}'){/if}{else/}redirect('{:url('Index/myAchievement')}'){/present};">
+							<div class="detail">
+								<p class="title">我的业绩</p>
+								<p>{$data.me}<span>元</span></p>
+							</div>
+						</a>
+					</div>
+					<div class="teamStructure">
+						<a href="javascript:{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Personteam/agencyTeam')}'){/if}{else/}redirect('{:url('Personteam/agencyTeam')}'){/present};">
+							<div class="detail">
+								<p class="title">团队结构</p>
+								<p>直属/推荐/{$outsider|get_reward_levelname}</p>
+								<p>{$data.lower}/{$data.invite}/{$data.member}人</p>
+							</div>
+						</a>
+					</div>
+					<div class="myReward">
+						<a href="javascript:{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Person/myIncome')}'){/if}{else/}redirect('{:url('Person/myIncome')}'){/present};">
+							<div class="detail">
+								<p class="title">我的奖励</p>
+								<p>{$data.reward}<span>元</span></p>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		{include file='index@common/footer_button'}

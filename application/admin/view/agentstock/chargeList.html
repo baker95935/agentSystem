@@ -1,0 +1,165 @@
+{include file='header'/}
+
+    <div id="performance-top">
+                <h5>充值记录</h5>
+            </div>
+<form class="form-inline definewidth" action="{:url('/admin/Agentstock/chargeList')}" method="get">
+<table class="table-condensed table-hover definewidth m20 search_table">
+<tr>
+  <td class="td_r">代理商ID：</td>
+  <td><input type="text" name="agent_id" id="agent_id" class="abc input-default" placeholder="代理商ID" value="{if condition='$agent_id gt 0'}{$agent_id}{/if}"></td>
+  <td class="td_r">代理商姓名：</td>
+  <td><input type="text" name="name" id="name" class="abc input-default" placeholder="代理商姓名" value="{if condition='$name gt 0'}{$name}{/if}"></td>
+  <td class="td_r">联系方式：</td>
+  <td><input type="text" name="contact" id="contact" class="abc input-default" placeholder="联系方式" value="{if condition='$contact gt 0'}{$contact}{/if}"></td>
+  <td class="td_r"> 角色：</td>
+  <td><select name="role" id="role" class="search_input">
+    <option value="0">全部</option>
+    {foreach name="roleList" item="item"}
+    	<option value="{$item.id}" {if condition="$role eq $item.id"} selected="selected" {/if} >{$item.name}</option>
+    {/foreach}
+    </select>
+
+</tr>
+    <tr>
+        </td>
+        <td class="td_r">审核状态：</td>
+       <td>
+     <select name="status" id="status" class="search_input">
+       <option value="0">全部</option>
+       {foreach name="chargeStatus" key="key" item="item"}
+         <option value="{$key}"  {if condition="$key eq $status"} selected="selected" {/if} >{$item}</option>
+       {/foreach}
+     </select>
+     </td>
+      <td class="td_r">审核日期：</td>
+      <td><input type="text" name="audit_stime" placeholder="开始时间" class="datepicker" id="audit_stime" value="{if condition='$audit_stime gt 0'}{$audit_stime}{/if}"></td>
+      <td class="td_c">~</td>
+      <td><input type="text"  class="datepicker" placeholder="结束时间" name="audit_etime" id="audit_etime" value="{if condition='$audit_etime gt 0'}{$audit_etime}{/if}"></td>
+     </td>
+     <td colspan="2"></td>
+
+</tr>
+<tr>
+        <td class="td_r">申请日期：</td>
+        <td><input type="text" name="apply_stime" placeholder="开始时间" class="datepicker" id="apply_stime" value="{if condition='$apply_stime gt 0'}{$apply_stime}{/if}"></td>
+        <td class="td_c">~</td>
+        <td><input type="text" placeholder="结束时间" class="datepicker" name="apply_etime" id="apply_etime" value="{if condition='$apply_etime gt 0'}{$apply_etime}{/if}"></td>
+        </td>
+         <td colspan="4">
+        <button type="submit" class="btn btn-primary ml20">查询</button>&nbsp;&nbsp;
+        <button type="button" class="btn btn-success" id="excel">导出</button>
+        </td>
+</tr>
+    </form>
+</table>
+<br>
+<div id="myScroll">
+  <div style="height:10px;"></div>
+</div>
+<div id="myScrollContent">
+<table class="table table-bordered table-hover">
+    <thead>
+    <tr>
+        <th><div>代理商ID</div></th>
+        <th><div>姓名</div></th>
+        <th><div>联系方式</div></th>
+        <th><div>角色</div></th>
+        <th><div>审核状态</div></th>
+        <th><div>充值金额</div></th>
+        <th><div>账户类型</div></th>
+        <th><div>申请日期</div></th>
+        <th><div>审核日期</div></th>
+        <th><div>备注</div></th>
+        <th><div>操作</div></th>
+    </tr>
+    </thead>
+    {foreach name="chargeList" item="item"}
+	     <tr>
+            <td>{$item->agents->agent_id}</td>
+            <td>{$item->agents->name}</td>
+            <td>手机号：{$item->agents->phone}<br/>微信号：{$item->agents->wechat}</td>
+            <td>{$item.rolename}</td>
+            <td>{eq name='$item->getData("account_type")' value='1'}{eq name='$item->getData("status")' value='1'}未支付{else/}已支付{/eq}{else/}{$item.status}{/eq}</td>
+            <td>￥{$item.money}</td>
+            <td>{$item.account_type}</td>
+            <td>{$item.create_time}</td>
+            <td>{$item.audit_time|date='Y-m-d H:i:s',###}</td>
+            <td>{$item.remark}</td>
+            <td>
+              {neq name="$item->getData('account_type')" value='1'}
+            	{if condition="$item->getData('status') eq 1"}
+            	<button type="button" onclick="auditCharge({$item.id},'accept')">充值</button>
+            	<button type="button" onclick="auditCharge({$item.id},'refuse')">驳回</button>
+              {else /}
+              {$item.status}
+              {/if}
+              {/neq}
+            </td>
+        </tr>
+     {/foreach}
+</table>
+</div>
+<div class="inline pull-right page">
+{$chargeList->render()}
+</div>
+</body>
+</html>
+
+<script type="text/javascript" src="/static/Js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="/static/Js/bootstrap-datepicker.zh-CN.min.js"></script>
+<script type="text/javascript" src="/static/Js/artDialog/artDialog.js"></script>
+<script>
+$('.datepicker').datepicker({
+    autoclose: true,          //自动关闭
+    calendarWeeks: false,     //是否显示今年是第几周
+    clearBtn: true,           //显示清除按钮
+    daysOfWeekDisabled: [],   //星期几不可选
+    endDate: Infinity,        //日历结束日期
+    forceParse: true,         //是否强制转换不符合格式的字符串
+    format: 'yyyy-mm-dd',     //日期格式
+    keyboardNavigation: true, //是否显示箭头导航
+    language: 'zh-CN',        //语言
+});
+
+
+
+    $(function () {
+        if (window.ActiveXObject || "ActiveXObject" in window){
+          $("#myScrollContent th>div").css("width","100px");
+        }
+        $("#myScroll").scroll(function(){
+         $("#myScrollContent").scrollLeft($(this).scrollLeft());
+      });
+      $("#myScrollContent").scroll(function(){
+           $("#myScroll").scrollLeft($(this).scrollLeft());
+      });
+    	$('#excel').click(function(){
+			window.location.href="{:url('/admin/Agentstock/excelChargeList/agent_id/'.$agent_id.'/name/'.$name.'/contact/'.$contact.'/role/'.$role.'/status/'.$status.'/audit_stime/'.$audit_stime.'/audit_etime/'.$audit_etime.'/apply_stime/'.$apply_stime.'/apply_etime/'.$apply_etime)}";
+	 	});
+
+    });
+
+    function auditCharge(id,status)
+    {
+    	  var yes = confirm("确定执行此操作吗，不可逆?");
+          if(yes && id && status)
+          {
+              $.ajax( {
+                  type : "post",
+                  url : '/admin/Agentstock/auditCharge' ,
+                  dataType : 'json',
+                  data: {id:id,status:status},
+                  success : function(data) {
+                      if (data==1){
+                          alert("操作成功！");
+                          location.reload();
+                      }else {
+                       	alert("执行失败，请重试");
+                      }
+                  },
+              });
+          }
+    }
+
+</script>

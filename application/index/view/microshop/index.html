@@ -1,0 +1,62 @@
+{include file='index@common/header'}
+	<link rel="stylesheet" type="text/css" href="/static/Css/my-shop.css">
+	<style type="text/css">
+		.none{display: none;}
+	</style>
+</head>
+<body style="background-color: #fff;">
+	<div id="PersonalInfoContent" class="store-list">
+		<article id="top">
+			<div class="ProTop" id="search_btn">
+				<div class="search">
+					<i class="icon_search"></i>
+					<input type="text" name="search" value="{$search}" id="tvKeyword" placeholder="请输入搜索关键字">
+					<button class="clear {empty name="search"}none{/empty}"></button>
+				</div>
+				<div class="search_btn">
+					<button type="button" class="btn_search">搜索</button>
+				</div>
+			</div>
+		</article>
+		<aside></aside>
+		{volist name='list' id='vo'}
+	    <div onclick="redirect('{:url("Microshop/common_shop","id=".$vo.a_id."&pv=1")}')">
+		   	<div class="perInformation">
+		   		<img src="{$vo.agent.head_img}" class="PerInfo_portrait" />
+		   		<ul>
+		   			<li><span>{empty name='$vo.shop_name'}{empty name='$vo.agent.nickname'}{$vo.agent.phone}{else/}{$vo.agent.nickname}{/empty}{else/}{$vo.shop_name}{/empty}</span></li>
+		   			<li><span>商品数量：{$vo.count}</span><span>访问量：{$vo.pv}</span></li>
+		   		</ul>
+		   	</div>
+	    </div>
+	    {/volist}
+	</div>
+	{include file='index@common/footer_button'}
+<script type="text/javascript" src="/static/Js/jquery.js"></script>
+<script type="text/javascript" src="/static/Js/html2canvas.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+	$(function(){
+
+		// 搜索
+		$('.btn_search').click(function(){
+			var _val = $('input[name=search]').val();
+			window.location.href = '{:url("Microshop/index","",false)}' + '/search/' + _val;
+		});
+
+		// 清空
+		$('.clear').click(function(){
+			$('input[name=search]').val('');
+			$(this).hide();
+		});
+
+		// 输入文字
+		$('#tvKeyword').keyup(function(event) {
+			var _val = $(this).val();
+			if(_val){
+				$('.clear').show();
+			}else{
+				$('.clear').hide();
+			}
+		});
+	});
+</script>

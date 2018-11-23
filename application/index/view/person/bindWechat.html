@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+		<style type="text/css">
+			body{background-color: #F5F5F5;}
+			button{border: 0;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="AlipayContent">
+			<div>
+				<input type="text" name="account" value='{$info.account}' class="placeholder_99" id="account" placeholder="输入微信支付账号" />
+			</div>
+			<button class="commonButton">确认</button>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var is_from_choice = {$choice};
+		$(function(){
+			$('button').click(function(){
+				var _account = $('#account').val();
+				if($.trim(_account) == ''){
+					mobileTip('账号不能为空');
+					return false;
+				}
+				$.ajax({
+					url:'{:url("Person/saveFinancialAccount","tid=3")}',
+					data:{account:_account},
+					type:'post',
+					success:function(e){
+						if(e.error){
+							mobileAlert(e.error.msg);
+						}else{
+							if(is_from_choice == 1){
+								window.location.href = '{:url("Person/appWithdrawals","type=3")}';
+							}else if(is_from_choice == 2){
+								window.location.href = '{:url("Person/recharge","type=3")}';
+							}else{
+								window.location.href = '{:url("Person/financialAccount")}';
+							};
+						};
+					}
+				});
+			});
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

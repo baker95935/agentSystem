@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>授权证书</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+
+	<body>
+
+		<aside style="opacity: 0;">
+			<div id="accreditContent">
+				{foreach $accreditdata as $k=>$v}
+				<div class="container">
+					<div class="title"></div>
+					<ul class="identity">
+
+						<li>兹授权：<span>{$v.name}</span></li>
+						<li>身份证：<span>{$v.id_card}</span></li>
+						<li>微信号：<span>{$v.wechat}</span></li>
+
+					</ul>
+					<p>获得北京共拓科技有限公司旗下森林舞会品牌的经营销 售权和售后服务权，我公司承诺为其提供优质产品。  </p>
+					<h6>备注：</h6>
+					<ul class="text">
+						<li>1、本授权书以正本为有效文本，影印、涂改、转让均无效。</li>
+						<li>2、对取消授权或授权过期后仍继续销售北京共拓科技有限公司旗下森林舞会系列产品，本公司不承担任何法律及经济责任，并追究其法律责任。</li>
+						<li>3、未经公司单独授权在微商以外的电子商务平台渠道销售的，公司有权取消代理资格，并处代理费十倍的罚款。</li>
+						<li>4、北京共拓科技有限公司拥有此授权书的最终解释权。</li>
+					</ul>
+					<div class="date">授权时间 <span>{$v.create_year}</span>年<span>{$v.create_month}</span>月<span>{$v.create_day}</span>日至 <span>{$v.end_year}</span>年<span>{$v.end_month}</span>月<span>{$v.end_day}</span> 日</div>
+					<aside>授权企业（盖章）：北京共拓科技有限公司</aside>
+				</div>
+				{/foreach}
+			</div>
+		</aside>
+		<article>
+			<img id="bg" src=""/>
+		</article>
+	</body>
+	<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/Js/html2canvas.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$(function() {
+				html2canvas(document.getElementById("accreditContent")).then(function(canvas){
+			    var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  
+			    // console.log(image);
+			    $("#bg").attr('src',image);
+			    $("#accreditContent").hide();
+			});
+		});
+	</script>
+
+</html>

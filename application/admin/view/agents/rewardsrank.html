@@ -1,0 +1,134 @@
+{include file='agents/common_rank_header'}
+    <form class="form-inline definewidth m20" method="get">
+        <table class="search_table" >
+            <tr>
+                <td class="td_r">代理商ID：</td>
+                <td>
+                    <input type="text" name="a_id" value="{present name='search.a_id'}{$search.a_id}{/present}" class="abc input-default search_input" />
+                </td>
+                <td class="td_r td_pl">代理商姓名：</td>
+                <td>
+                    <input type="text" name="name" value="{present name='search.name'}{$search.name}{/present}" class="abc input-default search_input" />
+                </td>
+                <td class="td_r td_pl"> 联系方式：</td>
+                <td>
+                    <input type="text" name="phone" value="{present name='search.phone'}{$search.phone}{/present}" class="abc input-default search_input" />
+                </td>
+                <td class="td_r td_pl">角色：</td>
+                <td>
+                    <select name='role' class="search_input">
+                        <option value='-1'{notpresent name='search.role'} selected{/notpresent}>全　部</option>
+{foreach name="role_lang" item="role_lang_v" key="role_lang_k"}
+                        <option value='{$role_lang_k}'{present name='search.role'}{if condition='$role_lang_k eq $search.role'} selected{/if}{/present}>{$role_lang_v}</option>
+{/foreach}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="td_r"> 申请时间：</td>
+                <td>
+                    <input type="text" name="begin" value="{present name='search.begin'}{$search.begin}{/present}" class="search_input abc input-default datepicker" />
+                </td>
+                <td class="td_c">~</td>
+                <td>
+                    <input type="text" name="end" value="{present name='search.end'}{$search.end}{/present}" class="search_input abc input-default datepicker" />
+                </td>
+                <td colspan=6 class="td_l td_pl">
+                    <button type="button" class="btn btn-primary search">查询</button>&nbsp;&nbsp;
+                    <button type="button" class="btn btn-success export">导出</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <table class="table table-bordered table-hover definewidth m10">
+        <thead>
+            <tr>
+                <th class="tc">排名</th>
+                <th class="tc">代理商ID</th>
+                <th class="tc">姓名（昵称）</th>
+                <th class="tc">联系方式</th>
+                <th class="tc">身份</th>
+                <th class="tc">总奖励金额</th>
+            </tr>
+        </thead>
+{empty name='list'}
+        <tr>
+            <td colspan='6'>暂无数据</td>
+        </tr>
+{else/}
+    {foreach name="list" item="vo"}
+        <tr>
+            <td class="tc infourl">{$vo.reward_rank}</td>
+            <td class="tl infourl">{$vo.a_id}</td>
+            <td class="tl infourl">{$vo->agents->name}（{$vo->agents->nickname}）</td>
+            <td class="infourl">{$vo->agents->phone}</td>
+            <td class="infourl">{$vo->agents->generation}代<br/>{$role_lang[$vo->agents->role]}</td>
+            <td class="tc infourl">{$vo.rewards_money}</td>
+        </tr>
+    {/foreach}
+{/empty}
+    </table>
+    <div class="inline pull-right page">
+    {$list->render()}
+    </div>
+    <input type="hidden" id="agentId" />
+</body>
+<script type="text/javascript">
+    $('.datepicker').datepicker({
+        autoclose: true,          //自动关闭
+        calendarWeeks: false,     //是否显示今年是第几周
+        clearBtn: true,           //显示清除按钮
+        daysOfWeekDisabled: [],   //星期几不可选
+        endDate: Infinity,        //日历结束日期
+        forceParse: true,         //是否强制转换不符合格式的字符串
+        format: 'yyyy-mm-dd',     //日期格式
+        keyboardNavigation: true, //是否显示箭头导航
+        language: 'zh-CN',        //语言
+        minViewMode: 0,
+        orientation: "auto",      //方向
+        rtl: false,
+        startDate: -Infinity,     //日历开始日期
+        startView: 0,             //开始显示
+        todayBtn: false,          //今天按钮
+        todayHighlight: true,     //今天高亮
+        weekStart: 0              //星期几是开始
+    });
+</script>
+<script type="text/javascript">
+    $(function () {
+
+        // 查询
+        $('.search').click(function(){
+            var _start = $('input[name=begin]').val();
+            var _end  = $('input[name=end]').val();
+            if(_start && _end){
+                _start = new Date(_start.replace("-", "/").replace("-", "/"));
+                _end = new Date(_end.replace("-", "/").replace("-", "/"));
+                if(_start>_end){
+
+                    layer.alert('结束时间必须晚于开始时间！');
+                    return false;
+                }
+            }
+            $('form').attr('action',"{:url('/admin/Agents/agentsRank','type='.$type)}").submit();
+        });
+
+        // 导出
+        $('.export').click(function(){
+            var _start = $('input[name=begin]').val();
+            var _end  = $('input[name=end]').val();
+            if(_start && _end){
+                _start = new Date(_start.replace("-", "/").replace("-", "/"));
+                _end = new Date(_end.replace("-", "/").replace("-", "/"));
+                if(_start>_end){
+
+                    layer.alert('结束时间必须晚于开始时间！');
+                    return false;
+                }
+            }
+            $('form').attr('action',"{:url('/admin/Agents/exportRank','type='.$type)}").submit();
+        });
+
+    });
+</script>
+</html>

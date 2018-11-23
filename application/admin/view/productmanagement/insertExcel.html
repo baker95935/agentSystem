@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/ckform.js"></script>
+    <script type="text/javascript" src="/static/Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="performance-top">
+    <h5>产品管理</h5>
+</div>
+<ul class="nav nav-tabs" style="margin-left:20px;">
+    <li><a href="{:url('/admin/Productmanagement/index/')}">出售中</a></li>
+    <li><a href="{:url('/admin/Productmanagement/repertory/')}">库存</a></li>
+    <li><a href="{:url('/admin/Productmanagement/create/')}">添加</a></li>
+    <li class="active"><a href="javascript:void(0);">批量导入</a></li>
+</ul>
+
+<form enctype="multipart/form-data" id="frm_import" class="form-inline definewidth m20 search_table" action="{:url('/admin/Productmanagement/insertExcel')}" method="post">
+    <div class="flex_container">
+        <div class="search_one_item" style="width:100%">
+            <span style="float:left;margin:0 10px;">批量导入产品：<input type=file name="excelfile" style="width:150px;" id="excelfile" />&nbsp;</span>
+            <span style="float:left;margin:0 10px"><input style="margin-top:0;width: 100px;height: 30px;" type=button class="WSY_button" onclick="importMember();" value="导入文件"></span>
+            <span style="float:left;margin:0 10px"><input style="margin-top:0;width: 100px;height: 30px;" type=button class="WSY_button" id="download" value="下载模板文件"></span>
+            <span style="float:left;margin:7px 10px;color:red">（请先使用下载WPS表格 来编辑模板文件）</span>
+        </div>
+    </div>
+
+
+</form>
+
+
+
+</body>
+</html>
+<script>
+    function importMember(){
+
+        if(!confirm("确定导入吗？")){
+            return false;
+        }
+
+        var f_content = document.getElementById("excelfile").value;
+        var fileext=f_content.substring(f_content.lastIndexOf("."),f_content.length)
+        fileext=fileext.toLowerCase()
+        if (f_content == ""){
+            alert("请选择文件后再导入！");
+            return false;
+        }
+        if (fileext!='.xlsx')
+        {
+            alert("对不起，导入数据格式必须是xls格式文件哦，请您调整格式后重新上传，谢谢 ！");
+            return false;
+        }
+        document.getElementById("frm_import").submit();
+    }
+
+//    function download(){
+//        document.location= "/excel/product_template.xls";
+//    }
+
+</script>
+<script>
+    $(function () {
+        $('#download').click(function () {
+            window.location.href="{:url('/admin/Productmanagement/download')}"
+        })
+    });
+</script>

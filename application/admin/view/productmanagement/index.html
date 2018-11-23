@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+     <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+        select{width:160px;}
+
+    </style>
+</head>
+<body>
+     <div id="performance-top">
+        <h5>{$menu_name}</h5>
+    </div>
+<ul class="nav nav-tabs" style="margin-left:20px;">
+   
+    <li {if condition='$state eq 1'} class="active"  {else/}  {/if} >
+        <a href="{:url('/admin/Productmanagement/index/p_state/1')}">销售中</a>
+    </li>
+    <li {if condition='$state eq 0'}class="active" {else/}  {/if}>
+      <a href="{:url('/admin/Productmanagement/index/p_state/0')}">库存</a></li>
+    <li><a href="{:url('/admin/Productmanagement/create/')}">添加</a></li>
+     
+    <li>
+        <a href="{:url('/admin/Productmanagement/insertExcel/')}">批量导入</a>
+    </li>
+</ul>
+<form class="form-inline definewidth m20" action="{:url('/admin/Productmanagement/index')}" method="post">
+    <table class="search_table" >
+        <tr>
+            <td class="td_r">产品编号：</td>
+            <td  class="td_r td_pl">
+                <input type="text" name="id" id="id" class="abc input-default" placeholder="" value="">
+            </td>
+            <td  class="td_r td_pl">
+                产品名称：
+            </td>
+            <td  class="td_r">
+                <input type="text" name="product_name" id="product_name" class="abc input-default" placeholder="" value="{if condition='$product_name gt 0'}{$product_name}{/if}">
+            </td>
+            <td  class="td_r td_pl">
+                分组：
+            </td>
+            <td  class="td_r">
+                <input type="text" name="grouping_name" id="grouping_name" class="abc input-default" placeholder="" value="{if condition='$grouping_name gt 0'}{$grouping_name}{/if}">
+            </td>
+            <td  class="td_r td_pl">
+                产品标签：
+            </td>
+            <td  class="td_r">
+                <input type="text" name="label_name" id="label_name" class="abc input-default" placeholder="" value="{if condition='$label_name gt 0'}{$label_name}{/if}">
+            </td>
+        </tr>
+        <tr>
+            <td class="td_r">类目名称：</td>
+            <td  class="td_l td_pl" colspan="4">
+                <select  name="type_id" id="type_id" onchange='showProduct(this,"s_id")' >
+                    <option selected = "selected">请选择</option>
+                    {foreach name="categoryList" item="item"}
+                    <option value="{$item.id}">{$item.category_name}</option>
+                    {/foreach}
+
+                </select>
+                <select  name="s_id" id="s_id" onchange='showProduct(this,"t_id")'  disabled="disabled">
+                </select>
+                <select name="t_id" id="t_id" onchange='showProduct(this,"f_id")'   disabled="disabled">
+                </select>
+                <select name="f_id" id="f_id" onchange='showProduct(this,"end")'  disabled="disabled">
+                </select>
+            </td>
+            <td  class="td_l td_pl" colspan="3">
+                <input type="hidden" name="one_id" id="one_id" value="{if condition='$one_id gt 0'}{$one_id}{/if}">
+                <input type="hidden" name="two_id" id="two_id" value="{if condition='$two_id gt 0'}{$two_id}{/if}">
+                <input type="hidden" name="three_id" id="three_id" value="{if condition='$three_id gt 0'}{$three_id}{/if}">
+                <input type="hidden" name="four_id" id="four_id" value="{if condition='$four_id gt 0'}{$four_id}{/if}">
+                <input type="hidden" name='p_state' id="p_state" value='{$state}'/>
+                <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp;
+                <button type="button" class="btn btn-success" id="excel">批量导出</button>&nbsp;&nbsp;
+                <button type="button" class="btn btn-danger" id="delall" onclick="alldelate()">批量删除</button>&nbsp;&nbsp;
+            </td>
+        </tr>
+    </table>
+       
+</form>
+<table class="table table-bordered table-hover definewidth m10" >
+    <thead>
+        <tr>
+            <th width="1%"><input type="checkbox" id="selectall" onclick="selectall()"></th>
+            <th>产品编号</th>
+            <th>产品名称</th>
+            <th>产品类目</th>
+            <th>产品分组</th>
+            <th>价格</th>
+            <th>销量</th>
+            <th>库存</th>
+            <th>图片</th>
+            <th>标签</th>
+            <th>{if condition='$state eq 1'}上架时间{else/}创建时间{/if}</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    {foreach name="managementlist" item="item" }
+         <tr>
+
+            <th width="1%"><input type="checkbox" class="checkbox"   name="ids" value="{$item.id}"></th>
+             <td>{$item.id}</td>
+            <td>{$item.product_name}</td>
+            <td>
+                {$item.category_name}
+            </td>
+             <td>
+                 {foreach name="item.grouping_list" item="value"}
+                    {$value.grouping_name}/
+                 {/foreach}
+             </td>
+             <td class="tl">
+                 <p>售价:{$item.sales_price}</p>
+                 成本价:{$item.cost_price}
+             </td>
+             <td>{$item.mix_volume}</td>
+             <td>{$item.inventory}</td>
+             <td>
+                 <volist name="item.category_img" id="img" >
+                     <img style="height:50px;" src="{$item.product_img}">
+                 </volist>
+             </td>
+             <td>
+                 {foreach name="item.label_list" item="kk"}
+                 {$kk.product_name}/
+                 {/foreach}
+             </td>
+            <td>
+                {if condition='$item.state eq 1'}
+                {$item.putaway_time|date="Y-m-d H:i:s",###}
+                {else/}
+                {$item.create_time}
+                {/if}
+            </td>
+
+            <td>
+                <a href="{:url('/admin/Productmanagement/createEdit/id/'.$item->id)}">编辑</a>
+               
+                <a onclick="p_up_down({$item->id},{$item->state})" href="javascript:void(0);">
+                
+                {if condition='$item->state eq 1'} 下架{else/}上架{/if}
+                </a>
+                {if condition='$item->state eq 0'}
+                <a onclick="pdelete({$item->id})" href="javascript:void(0);">删除</a>    
+                {/if}           
+                <a href="javascript:void(0);" id="code" onclick="openCode({$item->id})">产品二维码</a>
+            </td>
+
+        </tr>
+    {/foreach}
+    </table>
+  <div class="inline pull-right page">
+    {$managementlist->render()}
+  </div>
+</body>
+</html>
+
+<script>
+    var state = 1;
+    $(function () {
+
+        $('#excel').click(function(){
+             window.location.href="{:url('/admin/Productmanagement/excelProductList/product_name/'.$product_name.'/grouping_name/'.$grouping_name.'/label_name/'.$label_name.'/one_id/'.$one_id.'/two_id/'.$two_id.'/three_id/'.$three_id.'/four_id/'.$four_id)}?state="+ state;
+
+        });
+        $('#addnew').click(function(){
+				window.location.href="{:url('/admin/Productmanagement/create/')}";
+		 });
+        
+
+    });
+    function showProduct(obj,nid) {
+       var id=obj.id;
+       var idvalue=$('#'+obj.id).val();
+       switch(id){
+           case 'type_id':
+                    $('#one_id').val(idvalue);
+                    $("#s_id").attr('disabled','disabled');
+                    $("#s_id").empty();
+                    $("#t_id").attr('disabled','disabled');
+                    $("#t_id").empty();
+                    $("#f_id").attr('disabled','disabled');
+                    $("#f_id").empty();
+                    break;
+           case 's_id': 
+                    $('#two_id').val(idvalue);
+                    $("#t_id").attr('disabled','disabled');
+                    $("#t_id").empty();
+                    $("#f_id").attr('disabled','disabled');
+                    $("#f_id").empty();
+                    break;
+           case 't_id': 
+                    $('#three_id').val(idvalue);
+                    $("#f_id").attr('disabled','disabled');
+                    $("#f_id").empty();
+                    break;
+           case 'f_id': $('#four_id').val(idvalue);break;
+       }
+        $.ajax({
+            type:"post",
+            url:"/admin/Productcategory/getCategory/",
+            data:{cid:idvalue},
+            success:function(e){
+                var jsonData = JSON.parse(e); 
+                if(e){
+                   
+                    var strHtml='<option value="请选择" >请选择</option>';
+                    $.each(jsonData,function(index,val){
+                        strHtml+='<option value="'+val.id+'" >'+val.category_name+'</option>';
+                    });
+                    if(nid!='end'){
+                        $("#"+nid).empty().html(strHtml);
+                        $("#"+nid).removeAttr('disabled');
+                    }
+                    
+                }else{
+                    if(nid!='end'){
+                        $("#"+nid).empty();
+                        $("#"+nid).attr('disabled','disabled');
+                    }
+                }
+            }
+        });
+    }
+    function openCode(id){
+        $.ajax({
+            type:"GET",
+            url:"/admin/Productmanagement/producCode",
+            data:{"id":id},
+            success:function(data){
+                layer.open({
+                  type:1,
+                  title: false,
+                  closeBtn:2,
+                  shadeClose: true,
+                  skin: 'yourclass',
+                  content:data
+                });
+                console.log("success"+id);
+            }
+        });
+    }
+    /*全选*/
+    function selectall(){
+
+        var all_box = $("#selectall").is(':checked')
+        if( all_box ){
+            $(".checkbox").prop("checked",true);
+        }else{
+            $(".checkbox").prop("checked",false);
+        }
+    }
+    //批量删除
+    function alldelate(){
+        var id=$('input:checkbox[name^=ids]:checked').map(function(){
+
+            return $(this).val();
+        }).get().join(",");
+        if(!id)
+        {
+            layer.alert('请选择要删除的产品');
+        }
+        else
+        {
+           
+            layer.confirm('是否要删除该产品?',{btn:['确定','取消']},function(){
+                     $.ajax( {
+                    type : "post",
+                    url : '/admin/Productmanagement/delete' ,
+                    dataType : 'json',
+                    data: {id:id,},
+                    success : function(data) {
+                        if (data.status='ok'){
+                            layer.alert('删除成功',function(){
+                                window.location.reload();
+                                    });
+                            
+                        }else {
+                               layer.alert('删除失败');
+                        }
+                    },
+                });
+            },function(index){
+                $("#selectall").attr("checked", false);
+                $(".checkbox").prop("checked",false);
+                layer.close(index); 
+            });
+        }
+    }
+    //上架下架操作
+    function p_up_down(pid,pstate){
+        $.ajax({
+            type:"post",
+            dataType : 'json',
+            url:"/admin/Productmanagement/set_up_down",
+            data:{"id":pid,"state":pstate},
+            success:function(e){
+                var jsonData = JSON.parse(e); 
+                if(jsonData.code){
+                    layer.alert(jsonData.msg,function(){
+                        window.location.href=jsonData.url;
+                    });
+                }else{
+                    layer.alert(jsonData.msg,function(){
+                        window.location.href=jsonData.url;
+                    });
+                }
+            },
+            error:function(e){
+               layer.alert(e);
+            }
+        });
+
+    }
+    //删除操作
+    function pdelete(pid){
+        layer.confirm('是否要删除该产品?',{btn:['确定','取消']},function(){
+                     $.ajax( {
+                    type : "GET",
+                    url : '/admin/Productmanagement/delete/id/' ,
+                    dataType : 'json',
+                    data: {id:pid},
+                    success : function(e) {
+                        var jsonData = JSON.parse(e); 
+                        if (jsonData.code){
+                            layer.alert(jsonData.msg,function(){
+                                window.location.href=jsonData.url;
+                            });
+                            
+                        }else {
+                               layer.alert(jsonData.msg);
+                        }
+                    },
+                });
+            },function(index){
+                layer.close(index); 
+            });
+    }
+</script>
+

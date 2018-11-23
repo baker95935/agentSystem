@@ -1,0 +1,84 @@
+{include file='agents/common_rank_header'}
+    <form class="form-inline definewidth m20" method="get">
+        <table class="search_table" >
+            <tr>
+                <td class="td_r">代理商ID：</td>
+                <td>
+                    <input type="text" name="a_id" value="{present name='search.a_id'}{$search.a_id}{/present}" class="abc input-default search_input" />
+                </td>
+                <td class="td_r td_pl">代理商姓名：</td>
+                <td>
+                    <input type="text" name="name" value="{present name='search.name'}{$search.name}{/present}" class="abc input-default search_input" />
+                </td>
+                <td class="td_r td_pl"> 联系方式：</td>
+                <td>
+                    <input type="text" name="phone" value="{present name='search.phone'}{$search.phone}{/present}" class="abc input-default search_input" />
+                </td>
+                <td class="td_r td_pl">角色：</td>
+                <td>
+                    <select name='role' class="search_input">
+                        <option value='-1'{notpresent name='search.role'} selected{/notpresent}>全　部</option>
+}
+{foreach name="role_lang" item="role_lang_v" key="role_lang_k"}
+                        <option value='{$role_lang_k}'{present name='search.role'}{if condition='$role_lang_k eq $search.role'} selected{/if}{/present}>{$role_lang_v}</option>
+{/foreach}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan=6 class="td_l td_pl">
+                    <button type="button" class="btn btn-primary search">查询</button>&nbsp;&nbsp;
+                    <button type="button" class="btn btn-success export">导出</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <table class="table table-bordered table-hover definewidth m10">
+        <thead>
+            <tr>
+                <th class="tc">排名</th>
+                <th class="tc">代理商ID</th>
+                <th class="tc">姓名（昵称）</th>
+                <th class="tc">联系方式</th>
+                <th class="tc">身份</th>
+                <th class="tc">代理人数</th>
+            </tr>
+        </thead>
+{empty name='list'}
+        <tr>
+            <td colspan='6'>暂无数据</td>
+        </tr>
+{else/}
+    {foreach name="list" item="vo"}
+        <tr>
+            <td class="tc infourl">{$vo.team_rank}</td>
+            <td class="tl infourl">{$vo.a_id}</td>
+            <td class="tl infourl">{$vo->agents->name}（{$vo->agents->nickname}）</td>
+            <td class="infourl">{$vo->agents->phone}</td>
+            <td class="infourl">{$vo->agents->generation}代<br/>{$role_lang[$vo->agents->role]}</td>
+            <td class="tc infourl">{$vo.team_num}</td>
+        </tr>
+    {/foreach}
+{/empty}
+    </table>
+    <div class="inline pull-right page">
+    {$list->render()}
+    </div>
+    <input type="hidden" id="agentId" />
+</body>
+<script type="text/javascript">
+    $(function () {
+
+        // 查询
+        $('.search').click(function(){
+            $('form').attr('action',"{:url('/admin/Agents/agentsRank','type='.$type)}").submit();
+        });
+
+        // 导出
+        $('.export').click(function(){
+            $('form').attr('action',"{:url('/admin/Agents/exportRank','type='.$type)}").submit();
+        });
+
+    });
+</script>
+</html>

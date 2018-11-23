@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id="performance-top">
+                <h5>名称字典</h5>
+            </div>
+<form id="agentorders" class="form-inline definewidth" action="{:url('/admin/Basicnamedictionary/index')}" method="get">    
+    名称：
+    <input type="text" name="name" id="name"class="abc input-default search_input" placeholder="" value="">
+    &nbsp;&nbsp;  
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+    <button type="button" class="btn btn-success" id="addnew">新增名称</button>
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>名称</th>
+        <th>值</th>
+        <th>创建时间</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    {foreach name="dictionaryList" item="item"}
+	     <tr>
+            <td>{$item.id}</td>
+            <td>{$item.name}</td>
+            <td>{$item.value}</td>
+            <td>{$item.create_time}</td>
+            <td>
+                <a  href="{:url('/admin/Basicnamedictionary/create/id/'.$item->id)} ">编辑</a>  
+	        	<a onclick="return  confirm('确定删除吗，操作不可逆')" href="{:url('/admin/Basicnamedictionary/delete/id/'.$item->id)} ">删除</a>            
+            </td>
+        </tr>	
+     {/foreach}
+</table>
+<div class="inline pull-right page">
+{$dictionaryList->render()}
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+        
+    	$('#addnew').click(function(){
+			window.location.href="{:url('/admin/Basicnamedictionary/create')}";
+	 	});
+
+    });
+
+	 
+</script>

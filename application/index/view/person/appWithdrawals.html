@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+			.last>label{border: 0;font-size: .75rem;padding-left: .75rem;}
+			#tiXianLayout .content_div input{height: 2rem;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="tiXianLayout">
+			<p>可提现金额：<span>￥{$profit}</span>元</p>
+			<div class="content_div">
+				<div style="padding-bottom: 2px; ">
+					<input type="text" name="money" class="placeholder_99" id="account" placeholder="输入提现金额" />
+				</div>
+				<div style="border-bottom: 1px solid #F5F5F5;">
+					<a href="{:url('Person/financialChoice')}" class="backArrowRight">{$type_lang[$type]}</a>
+				</div>
+				{neq name='$type' value='3'}
+				<div class="last">
+					{present name="account.account"}
+					<label>{$account.account}</label>
+					{/present}
+				</div>
+				{/neq}
+			</div>
+			<button class="commonButton">申请提现</button>
+		</div>
+	</body>
+	<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+	<script type="text/javascript">
+		$(function(){
+			var _all = parseFloat('{$profit}');
+
+			$('.commonButton').click(function(){
+				let _val = parseFloat($('#account').val());
+				if(_val > _all){
+					mobileTip('不能超过可提现金额');
+					return false;
+				}else if(_val <= 0 || isNaN(_val)){
+					mobileTip('请填写提现金额');
+					return false;
+				};
+				$.ajax({
+					url:'{:url("Person/saveAppWithdrawals")}',
+					type:'post',
+					data:{num:_val,type:{$type}},
+					success:function(e){
+						if (e.error) {
+							mobileAlert(e.error.msg);
+						} else {
+							window.location.href = '{:url("Person/withdrawalsApp")}';
+						};
+					}
+				});
+			});
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

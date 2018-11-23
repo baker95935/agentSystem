@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>标记发货</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+</head>
+<body>
+<table class="table table-bordered table-hover common_input m10">
+	<tr>
+        <td class="tableleft">物流公司：</td>
+        <td class="tl">
+           <select name="express_code" id="express_code" >
+		   </select>   
+         </td>
+         </tr>
+	<tr>
+        <td class="tableleft">运单编号：</td>
+        <td class="tl">
+            <input type="text" name="express_number" id="express_number" placeholder="请输入运单编号" value="{present name="orderInfo.express_number"}{$orderInfo.express_number}{/present}"  ></td></tr>
+	<tr>
+        <td class="tableleft">备注信息：</td>
+        <td class="tl">
+            <textarea name="express_remark" id="express_remark">{present name="orderInfo.express_remark"}{$orderInfo.express_remark}{/present}</textarea></td></tr>
+</table>
+<div class="layui-layer-btn layui-layer-btn-">     
+        <a class="layui-layer-btn0">保存</a>
+        <a class="layui-layer-btn1">关闭</a>          
+ </div>
+	
+<!-- </form> -->
+</body>
+</html>
+ <script>
+ $(function () {   
+        var index = parent.layer.getFrameIndex(window.name); 
+        var orderId=parent.document.getElementById("orderId").value;    
+        $('.layui-layer-btn1').click(function(){
+           parent.layer.close(index);
+        });
+        $('.layui-layer-btn0').click(function(){
+        
+            var expressCode=$('#express_code').val();
+            var expressNumber=$('#express_number').val();
+            var expressRemark=$('#express_remark').val();
+                if(!expressCode){
+                    layer.alert('请选择物流公司');
+                    return;
+                }
+                if(!expressNumber){
+                    layer.alert('请输入运单编号');
+                    return;
+                }
+                if(!expressRemark){
+                    expressRemark='';
+                }
+                if(expressCode && expressNumber){
+                    $.ajax({
+                    type:"post",
+                    url:'/admin/Promotiongiftorder/express/type/2',
+                    dataType:'json',
+                    data:{order_number:orderId, express_code:expressCode,express_number:expressNumber,express_remark:expressRemark},
+                    success:function(e){
+                        var jsonData = JSON.parse(e); 
+	                    if(jsonData.code==0){
+	                    	layer.alert('发货成功！',function(){
+	                        	window.parent.location.reload();
+	                            parent.layer.close(index);
+	                                        
+	                        });
+	                    }else{
+	                        layer.alert('操作失败！');
+	                    }
+                    },
+                    error:function(e){
+                        layer.alert(e);
+                    }
+                });
+            }
+
+            
+        });
+        
+        
+        //获取物流公司信息
+        $.ajax({
+            type : "post",
+            url : '/admin/Agentorders/getDeliveryCompanyInfo/',
+            dataType : 'json',
+            data: {id:orderId},
+            success : function(e) {
+		            var jsonData = JSON.parse(e);                        
+		            var strHtml='';
+		            $.each(jsonData,function(index,val){
+		            	strHtml+='<option value='+val.code+'>'+val.name+'</option>';
+		            });
+		                        
+		            $("#express_code").html(strHtml);
+	            },
+            error:function(e){
+            }
+           });
+ });
+ </script>

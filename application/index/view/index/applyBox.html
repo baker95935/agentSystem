@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="applyBoxContent">
+			<ul>
+				{volist name="list" id="v"}
+				<li onclick='redirect("{eq name="$type" value="1"}{:url("Index/applyRegist",input("param."),"")}/apply/{$key}{/eq}{eq name="$type" value="2"}{:url("Index/applyUpdate",input("param."),"")}/apply/{$key}{/eq}");'>
+					<a href="javascript:;">{$v}</a>
+				</li>
+				{/volist}
+			</ul>
+		</div>
+	</body>
+	<script type="text/javascript">
+		// 跳转
+		function redirect(url){
+			window.location.href = url;
+		}
+	</script>
+</html>

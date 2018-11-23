@@ -1,0 +1,102 @@
+{include file='header'/}
+<div id="performance-top">
+	<h5>代理商身份</h5>
+</div>
+
+<table id="level-width" class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th style="30%">代理商等级</th>
+        <th style="30%">招商奖励深度</th>
+        <th style="20%">显示</th>
+        <th style="20%">启用</th>
+    </tr>
+    </thead>
+    <form method="post" action="{:url('/admin/Agentlevel/save')}">
+    
+    {notempty name="list"}
+    
+    {foreach name="list" item="item"}
+    <tr>
+	    <td>
+	    	<input type="hidden" name="id{$item.id}" value="{$item.id}">
+	    	<input type="text"  class="span" required  name="name{$item.id}" value="{$item.name}" placeholder="请输入等级名称"></td>
+	   	<td>
+	    	<input type="text"  class="span" required  pattern="[0-6]"  title="奖励深度必须0到6之间"   name="deep{$item.id}" value="{$item.deep}" placeholder="请输入推荐深度"></td>
+	    <td>
+ 
+	   		<div id="agent-level" class="reward-layout">
+					<input type="checkbox" id="toggle{$item.id}" name="show{$item.id}" {present name="item.show"} {if condition="$item.show eq 1 "} checked="checked"  {/if} {/present} >
+					<label for="toggle{$item.id}" class="button-label">
+				    	<span class="button-circle"></span>
+				    	<span class="text on">是</span>
+				    	<span class="text off">否</span>
+		    		</label>
+			</div>
+	    </td>
+	    <td>
+ 
+	    	<div id="agent-level" class="reward-layout">
+					<input type="checkbox" id="toggle_{$item.id}" name="valid{$item.id}" {present name="item.valid"} {if condition="$item.valid eq 1 "} checked="checked"  {/if} {/present} >
+					<label for="toggle_{$item.id}" class="button-label">
+				    	<span class="button-circle"></span>
+				    	<span class="text on">是</span>
+				    	<span class="text off">否</span>
+		    		</label>
+			</div>
+	    </td>
+    </tr>
+    {/foreach}
+    
+    {else /}
+    
+	    {foreach name="listLevel" item="item"}
+	    <tr>
+		    <td>
+		    	<input type="text"  class="span" required  name="name{$item}" value="{$item.name}" placeholder="请输入等级名称"></td>
+		   	<td>
+		    	<input type="text"  class="span" required   pattern="[0-6]"  title="奖励深度必须0到6之间"  name="deep{$item}" value="2" placeholder="请输入推荐奖励深度"></td>
+		    <td>
+	 
+		   		<div id="agent-level" class="reward-layout">
+					<input type="checkbox" id="toggle_{$item.id}" name="show{$item.id}">
+					<label for="toggle_{$item.id}" class="button-label">
+				    	<span class="button-circle"></span>
+				    	<span class="text on">是</span>
+				    	<span class="text off">否</span>
+		    		</label>
+			</div>
+		    </td>
+		    <td>
+		    
+		    	<div id="agent-level" class="reward-layout">
+					<input type="checkbox" id="toggle_{$item.id}" name="show{$item.id}">
+					<label for="toggle{$item.id}" class="button-label">
+				    	<span class="button-circle"></span>
+				    	<span class="text on">是</span>
+				    	<span class="text off">否</span>
+		    		</label>
+			</div>
+		    </td>
+	    </tr>
+	    
+	    {/foreach}
+    
+   {/notempty}
+    
+    
+        <tr>
+	    <td colspan="4">
+	    	<div align="center">
+	    		<input type="hidden" name="listLevelCount" id="listLevelCount" value="{$listLevelCount}">
+	    		<input type="hidden" name="listMinNumber" id="listMinNumber" value="{$listMinNumber}">
+	    		<button type="submit" class="btn btn-primary" >保存</button>
+	    	</div>
+	    </td>
+    </tr>
+    </form>
+</table>
+ 
+</body>
+</html>
+ 

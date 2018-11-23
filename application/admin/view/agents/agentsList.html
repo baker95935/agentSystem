@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>代理商管理</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <!--S-->
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-datepicker.min.css" />
+    <!--E-->
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <!--S-->
+    <script type="text/javascript" src='/static/Js/bootstrap-datepicker.min.js'></script>
+    <script type="text/javascript" src='/static/Js/bootstrap-datepicker.zh-CN.min.js'></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <!--E-->
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+        #myScroll,#myScrollContent{width:98%;overflow-x: scroll;}
+    </style>
+</head>
+<body>
+    <div id="performance-top">
+        <h5>代理商管理</h5>
+    </div>
+<ul class="nav nav-tabs" style="margin-left:20px;">
+    <li class="active">
+        <a href="javascript:;">全部</a>
+    </li>
+    <li><a href="{:url('Agents/applyListAgentAudit')}">待审核</a></li>
+    <li><a href="{:url('Agents/applyListAgentAgree')}">已审核</a></li>
+    <li><a href="{:url('Agents/applyListAgentDisagree')}">驳回</a></li>
+    <li><a href="{:url('Agents/addAgent')}">添加代理商</a></li>
+</ul>
+<form class="form-inline definewidth m20" method="get">
+    <table class="search_table" >
+        <tr>
+            <td class="td_r">代理商编号：</td>
+            <td> <input type="text" name="a_id" value="{present name='search.a_id'}{$search.a_id}{/present}" class="abc input-default search_input" />
+            </td>
+            <td class="td_r td_pl">姓名：</td>
+            <td> <input type="text" name="name" value="{present name='search.name'}{$search.name}{/present}" class="abc input-default search_input" />
+            </td>
+            <td class="td_r td_pl">手机：</td>
+            <td> <input type="text" name="phone" value="{present name='search.phone'}{$search.phone}{/present}" class="abc input-default search_input" />
+            </td>
+            <td class="td_r td_pl"> 代数：</td>
+            <td> <select name='generation' class="search_input">
+                    <option value='0'>全部</option>
+                    {present name='last_g'}
+                    {for start='1' end='$last_g'}
+                    <option value='{$i}'{present name='search.generation'}{if condition='$i eq $search.generation'} selected{/if}{/present}>{$i}代</option>
+                    {/for}
+                    {/present}
+                </select></td>
+            <td class="td_r td_pl">角色:</td>
+            <td><select name='role' class="search_input">
+                    <option value='-1'{notpresent name='search.role'} selected{/notpresent}>全　部</option>
+                    {foreach name="levelList" item="item"}
+                    <option value='{$item.id}'{present name='search.role'}{if condition='$item.id eq $search.role'} selected{/if}{/present}>{$item.name}</option>
+                    {/foreach}
+                </select></td>
+            <td class="td_r td_pl"> 状态：</td>
+            <td>
+                <select name='status' class="search_input">
+                    <option value='-1'{notpresent name='search.status'} selected{/notpresent}>全　部</option>
+                    <option value='1'{present name='search.status'}{eq name='search.status' value='1'} selected{/eq}{/present}>申请注册</option>
+                    <option value='2'{present name='search.status'}{eq name='search.status' value='2'} selected{/eq}{/present}>申请升级</option>
+                    <option value='3'{present name='search.status'}{eq name='search.status' value='3'} selected{/eq}{/present}>已确认</option>
+                    <option value='4'{present name='search.status'}{eq name='search.status' value='4'} selected{/eq}{/present}>驳　回</option>
+                    <option value='5'{present name='search.status'}{eq name='search.status' value='5'} selected{/eq}{/present}>取　消</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="td_r"> 申请时间：</td>
+            <td><input type="text" name="begin" value="{present name='search.begin'}{$search.begin}{/present}" class="search_input abc input-default datepicker" />
+            </td>
+            <td class="td_c">~</td>
+            <td> <input type="text" name="end" value="{present name='search.end'}{$search.end}{/present}" class=" search_input abc input-default datepicker" />
+            </td>
+            <td colspan=6 class="td_l td_pl"><button type="button" class="btn btn-primary search">查询</button>&nbsp;&nbsp;<button type="button" class="btn btn-success export">导出</button></td>
+        </tr>
+    </table>
+</form>
+<div id="myScroll">
+  <div style="width:1600px;height:10px;"></div>
+</div>
+<div id="myScrollContent">
+  <div style="width:1600px;">
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+        <tr>
+            <th class="tc">代理商编号</th>
+            <th class="tc">姓名</th>
+            <th class="tc">联系方式</th>
+            <th class="tc">角色</th>
+            <th class="tc">状态</th>
+            <th class="tc">团队人数</th>
+            <!-- <th class="tc">销售总额</th> -->
+            <th class="tc">收入</th>
+            <th class="tc">库存</th>
+            <th class="tc">申请时间</th>
+            <th class="tc">操作</th>
+        </tr>
+    </thead>
+    {empty name='list'}
+    <tr>
+        <td colspan='10'>暂时没有申请</td>
+    </tr>
+    {else/}
+        {foreach name="list" item="item"}
+    <tr {if condition="$item.stock_money ELT $item.lowest_limit"}class="warning_red"{/if}>
+        <td class="tc infourl">{$item.a_id}</td>
+        <td>{$item.name}</td>
+        <td class="tl infourl">手机：{$item.phone}<br />微信号：{$item.wechat}  {present name='$item.bind_wechat'}<br>{if condition="$item.bind_wechat gt 0"}<font color="red">已关联微信</font>{/if}{/present}</td>
+        <td class="infourl"><span class='label label-info'>{$item.generation}代</span>&nbsp;<span class='label label-info'>{$item.role|get_reward_levelname}</span></td>
+        <td class="infourl"><span class='label label-info'>{$item.type_lang}</span></td>
+        <td class="tc infourl">{$item.team_num}人</td>
+        <!-- <td class="tr infourl">￥{$item.sale_num}</td> -->
+        <td class="tl infourl" style="font-size: 12px;">
+            总收入额：￥{$item.total}<br>
+            招商收益：￥{$item.invite}<br>
+            代理收入：￥{$item.direct+$item.indirect+$item.lower+$item.charge}<br>（直接收益：￥{$item.direct}&nbsp;&nbsp;间接销售收益：￥{$item.indirect}<br>&nbsp;&nbsp;下级升级充库存奖励：￥{$item.lower}&nbsp;&nbsp;下级充库存奖励：￥{$item.charge}）<br>
+            其他收入：￥{$item.other}（礼包奖励：￥{$item.other_gift}）<br>
+            业绩分红：￥{$item.reward}
+        </td>
+        <td class="tl infourl store" style="cursor: pointer;" onclick="redirect('{:url("Agents/inventory","a_id=".$item['a_id'])}');">
+            <p>当前库存：<span class='warn'>￥{$item.stock_money}</span></p>
+            <p>最低库存：<span class='warn'>￥{eq name='$item.role' value='0'}0.00{else/}{$item.lowest_limit}{/eq}</span></p>
+        </td>
+        <td class="tc infourl">{$item['create_ctime']}</td>
+        <td class="tl">
+            <a href="{:url('/admin/Agents/agentInfo/a_id/'.$item['a_id'])}" >查看详情</a><br />
+            <a href="javascript:;" class=' resetkey' data-aid='{$item.a_id}'>重置密码</a><br />
+            <a href="{:url('/admin/Agents/recommendAgent/id/'.$item['a_id'])}" >推荐的代理</a><br />
+            <a href="{:url('/admin/Agents/underAgent/id/'.$item['a_id'].'/rid/'.$item['role'])}">直属代理</a><br />
+            <a href="{:url('/admin/Agents/outsiderAgent/id/'.$item['a_id'].'/rid/0')}">下级会员</a><br />
+            {if condition='in_array($item.status,[1,2])'}{else/}<a onclick='poperLayer(2,{$item["a_id"]})'>变更代理角色</a><br />{/if}
+            <a onclick='poperLayer(1,{$item["a_id"]})'>更改上级关系</a><br />
+            <a href="javascript:;" class="del" data-id='{$item.a_id}'>删除</a>
+        </td>
+    </tr>
+        {/foreach}
+    {/empty}
+</table>
+</div>
+</div>
+<div class="inline pull-right page">
+{$list->render()}
+</div>
+<input type="hidden" id="agentId"/>
+</body>
+<script type="text/javascript">
+    $('.datepicker').datepicker({
+        autoclose: true,          //自动关闭
+        calendarWeeks: false,     //是否显示今年是第几周
+        clearBtn: true,           //显示清除按钮
+        daysOfWeekDisabled: [],   //星期几不可选
+        endDate: Infinity,        //日历结束日期
+        forceParse: true,         //是否强制转换不符合格式的字符串
+        format: 'yyyy-mm-dd',     //日期格式
+        keyboardNavigation: true, //是否显示箭头导航
+        language: 'zh-CN',        //语言
+        minViewMode: 0,
+        orientation: "auto",      //方向
+        rtl: false,
+        startDate: -Infinity,     //日历开始日期
+        startView: 0,             //开始显示
+        todayBtn: false,          //今天按钮
+        todayHighlight: true,     //今天高亮
+        weekStart: 0              //星期几是开始
+    });
+</script>
+<script type="text/javascript">
+    $(function () {
+        $("#myScroll").scroll(function(){
+         $("#myScrollContent").scrollLeft($(this).scrollLeft());
+      });
+      $("#myScrollContent").scroll(function(){
+           $("#myScroll").scrollLeft($(this).scrollLeft());
+      });
+      $(".store").mouseover(function(){
+         $(this).parent().css('background-color','#95B3D7');
+      }).mouseout(function(){
+        $(this).parent().css('background-color','#fff');
+      })
+        // 重置密码
+        $('.resetkey').click(function(){
+            layer.confirm("确认重置密码?",{btn:['确定','取消']},function(){
+
+                var _a_id = $(this).data('aid');
+                $.post('{:url("/admin/Agents/resetAgentPassword")}',{a_id:_a_id},function(){ layer.alert('新密码为手机号后6位');  });
+             },function(index){ layer.close(index); });
+        });
+
+        // 删除
+        $('.del').click(function(){
+            var _id = $(this).data('id');
+
+            layer.confirm("确认删除该代理商？",{btn:['确定','取消']},function(){
+
+                $.post('{:url("/admin/Agents/delAgent/")}',{id:_id},function(e){window.location.reload();},'json');
+             },function(index){ layer.close(index); });
+        });
+
+        // 查询
+        $('.search').click(function(){
+            var _start = $('input[name=begin]').val();
+            var _end  = $('input[name=end]').val();
+            if(_start && _end){
+                _start = new Date(_start.replace("-", "/").replace("-", "/"));
+                _end = new Date(_end.replace("-", "/").replace("-", "/"));
+                if(_start>_end){
+
+                    layer.alert('结束时间必须晚于开始时间！');
+                    return false;
+                }
+            }
+            $('form').attr('action',"{:url('/admin/Agents/agentsList')}").submit();
+        });
+
+        // 导出
+        $('.export').click(function(){
+            var _start = $('input[name=begin]').val();
+            var _end  = $('input[name=end]').val();
+            if(_start && _end){
+                _start = new Date(_start.replace("-", "/").replace("-", "/"));
+                _end = new Date(_end.replace("-", "/").replace("-", "/"));
+                if(_start>_end){
+
+                    layer.alert('结束时间必须晚于开始时间！');
+                    return false;
+                }
+            }
+            $('form').attr('action',"{:url('/admin/Agents/exportAgent')}").submit();
+        });
+
+    });
+
+    function poperLayer(stype,obj){
+        $("#agentId").val(obj);
+        var linkpage=null;
+        var strTitle=null;
+        var pWidth='600px';
+        var pHeight='300px';
+        switch(stype){
+            case 1://变更上级代理
+            var pHeight='250px';
+            strTitle='<span style="font-size:16px;font-weight: bolder;">更改上级关系<span>'
+            linkpage='agentsChangeRelationship.html';
+            break;
+            case 2://升级代理身份
+            strTitle='<span style="font-size:16px;font-weight: bolder;">变更代理角色<span>'
+            linkpage='agentsUpgradeIdentity.html';
+            break;
+        }
+        layer.open({
+            type: 2,
+            area: [pWidth, pHeight],
+            fixed: false, //不固定
+            maxmin: true,
+            title:strTitle,
+            content: linkpage,
+            end: function () {
+                $("#orderId").val("");
+            }
+        });
+    }
+
+    function redirect(url)
+    {
+        window.location.href = url;
+    }
+</script>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<style type="text/css">
+			body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="addressMContent">
+			<ul>
+				{present name='list'}
+				{volist name='list' id='vo'}
+				<li class='show_{$vo.id}'>
+					<div class="info" data-id='{$vo.id}'>
+						<div><h5>{$vo.name}</h5><span>{$vo.phone}</span></div>
+						<p>{:get_address_name_by_id($vo.province)}{:get_address_name_by_id($vo.city)}{:get_address_name_by_id($vo.area)}{$vo.address}</p>
+					</div>
+					<div class="other">
+						<div class="icon">
+							<label name="defaultAdd_2" class='{eq name="$vo.is_default" value="1"}checked{/eq}' for="defaultAdd_2" data-id='{$vo.id}'></label>
+							<input type="radio" name="address" value="Alipay" id="defaultAdd_2" {eq name='$vo.is_default' value='1'}checked{/eq}/>
+							<span>默认地址</span>
+						</div>
+						<div class="text">
+							<button class='mod' data-id='{$vo.id}'>编辑</button>
+							<button class='del' data-id='{$vo.id}'>删除</button>
+						</div>
+					</div>
+				</li>
+				{/volist}
+				{/present}
+			</ul>
+			<div class="footer">
+				{if condition='(input("param.id") AND input("param.num"))'}
+			 		<button onclick='redirect("{:url('index/Person/addAddress','id='.input("param.id").'&num='.input("param.num"))}")'>新增收货地址</button>
+				{elseif condition='input("param.id")'}
+			 		<button onclick='redirect("{:url('index/Person/addAddress','id='.input("param.id"))}")'>新增收货地址</button>
+				{else /}
+					<button onclick='redirect("{:url("Person/addAddress")}")'>新增收货地址</button>
+				{/if}
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="/static/Js/jquery-2.1.0.min.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		// 添加
+		function redirect(url){
+			window.location.href = url;
+		}
+
+		$(function(){
+
+			// 设置默认地址
+			$("label").click(function(){
+				var _id = $(this).data('id');
+				$("label").attr('class','');
+				$('input').removeAttr('checked');
+				$(this).attr('class','checked');
+				var id=$(this).attr('name');
+				$("#"+id).attr('checked','checked');
+				$.ajax({
+					url:'{:url("Person/setDefault")}',
+					data:{id:_id},
+					success:function(e){
+						if (e.error) {
+							mobileTip(e.error.msg);
+							return false;
+						} else{
+							mobileTip(e.msg);
+						};
+					}
+				});
+			});
+
+			// 编辑
+			$('.mod').click(function(){
+				var _id = $(this).data('id');
+				window.location.href = '/index/Person/modAddress/id/'+_id;
+			});
+
+			// 删除
+			$('.del').click(function(){
+				var _id = $(this).data('id');
+				if(_id){
+					$.ajax({
+						url:'{:url("Person/delAddress")}',
+						type:'post',
+						data:{id:_id},
+						success:function(e){
+							if (e.error) {
+								mobileTip(e.error.msg);
+								return false;
+							} else{
+								$('.show_'+_id).hide();
+								mobileTip(e.msg);
+							};
+						}
+					});
+				}
+			});
+
+{if condition='(input("param.id") AND input("param.num")) OR input("param.cids")'}
+			// 订单确认页选择地址
+			$('.info').click(function(event) {
+				var _rid = $(this).data('id');
+				redirect('{:url("Product/preOrder",input("param."),'')}/rid/'+_rid);
+			});
+{elseif condition='input("param.id")'/}
+			// 礼包确认页选择地址
+			$('.info').click(function(event) {
+				var _rid = $(this).data('id');
+				redirect('{:url("Promotiongift/order",input("param."),'')}/rid/'+_rid);
+			});
+{/if}
+
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

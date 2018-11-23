@@ -1,0 +1,185 @@
+{include file='header'/}
+
+<style>.price{display: inline-block;width: 60px;text-align: left;}#myScroll,#myScrollContent{width:98%;overflow-x: scroll;}.table{margin: 10px 0 0 0;}</style>
+<div id="performance-top">
+    <h5>退货申请记录</h5>
+</div>
+<form class="form-inline definewidth search_table" action="{:url('/admin/Agentorderrefund/index')}" method="get">  
+    <table class="search_table">
+        <tr>
+          <td class="td_r">代理商ID：</td>
+          <td>
+            <input type="text" name="agent_id" id="agent_id" class="abc input-default" placeholder="代理商ID" value="{if condition='$agent_id gt 0'}{$agent_id}{/if}">
+          </td>  
+          <td class="td_r td_pl">代理商姓名：</td>
+          <td>
+            <input type="text" name="name" id="name" class="abc input-default" placeholder="代理商姓名" value="{if condition='$name gt 0'}{$name}{/if}">
+          </td>  
+          <td class="td_r td_pl">联系方式：</td>
+          <td>
+            <input type="text" name="contact" id="contact" class="abc input-default" placeholder="联系方式" value="{if condition='$contact gt 0'}{$contact}{/if}">
+          </td>  
+          <td class="td_r td_pl">角色：</td>
+          <td>
+            <select name="role" id="role" class="search_input"> 
+                <option value="0">全部</option>
+                {foreach name="roleList" item="item"}
+                    <option value="{$item.id}" {if condition="$role eq $item.id"} selected="selected" {/if} >{$item.name}</option>
+                {/foreach}
+            </select>
+          </td>  
+        </tr>
+        <tr>
+            <td class="td_r">订单编号：</td>
+            <td><input type="text" name="order_number" id="order_number" class="abc input-default" placeholder="订单编号" value="{if condition='$order_number gt 0'}{$order_number}{/if}"></td>  
+            <td class="td_c">审核状态</td>
+            <td>
+             <select name="auth_status" id="auth_status" class="search_input"> 
+                <option value="0">全部</option>
+                {foreach name="authStatusList" item="item"}
+                    <option value="{$key}" {if condition="$auth_status eq $key"} selected="selected" {/if} >{$item}</option>
+                {/foreach}
+            </select>
+            </td>  
+ 
+            
+            <td colspan="2" class="td_pl">
+                <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+                <button id="excel" type="button" class="btn btn-success">导出</button>
+            </td>
+           
+          </tr>
+    </table>
+</form>
+<div id="myScroll">
+  <div style="width:1800px;height:10px;"></div>
+</div>
+<div id="myScrollContent">
+  <div style="width:1800px;">
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th>代理商ID</th>
+        <th>姓名</th>
+        <th>联系方式</th>
+        <th>角色</th>
+        <th>订单编号</th>
+ 		<th>类型</th>
+        <th>退款金额</th>
+        <th>申请日期</th>
+        <th>物流名称</th>
+        <th>快递单号</th>
+        <th>退货理由</th>
+        <th>审核状态</th>
+        <th>操作</th>
+        <th>备注</th>
+        <th>财务备注</th>
+    </tr>
+    </thead>
+    {foreach name="returnList" item="item"}
+	     <tr>
+            <td>{$item.agent_id}</td>
+            <td>{$item->agents->name}</td>
+            <td>手机号：{$item->agents->phone}<br/>微信号：{$item->agents->wechat}</td>
+            <td>{$item->agents->generation}代 {$item->agents->role|get_reward_levelname}</td>
+            <td>{$item.order_number}</td>
+         	<td>{$item.type}</td>
+            <td><span class="price">￥{$item->orders->order_amount_pay}</span></td>
+            <td>{$item.create_time}</td>
+            <td>{$item.express_name}</td>
+            <td>{$item.express_number}</td>
+            <td>{$item.remark}</td>
+            <td>{$item.auth_status}</td>
+            <td>
+            	{if condition="$item->getData('auth_status') eq 1"}
+            		<button type="button" class="btn btn-danger" onclick='popOper({$item["id"]},3,1)' >驳回</button>
+            		<button type="button" class="btn btn-success" onclick='popOper({$item["id"]},2,1)' >通过</button>
+            	{/if}
+            	
+            	{if condition="$item->getData('auth_status') eq 2"}
+	            	{if condition="$item->financial_auth eq 1"}
+	            		<button type="button" class="btn btn-success" onclick='popOper({$item["id"]},2,2)' >财务确认</button>
+	            	{else /}
+	            		财务已确认
+	            	{/if}
+            		 
+            	{/if}
+            	
+            	 <input type="hidden" id='{$item["id"]}' value='{$item["order_number"]}'/>
+            </td>
+            <td style="text-align:left;font-size:12px;">{$item.reason}</td>
+             <td style="text-align:left;font-size:12px;">{$item.financial_reason}</td>
+        </tr>	
+     {/foreach}
+</table>
+</div>
+</div>
+<input type="hidden" id='orderId'/>
+<input type="hidden" id='authStatus'/>
+<div class="inline pull-right page">
+{$returnList->render()}
+</div>
+</body>
+</html>
+<script>
+$(function () {
+    
+ 
+  $("#myScroll").scroll(function(){
+         $("#myScrollContent").scrollLeft($(this).scrollLeft());
+      });
+      $("#myScrollContent").scroll(function(){
+           $("#myScroll").scrollLeft($(this).scrollLeft());
+      }); 
+
+});
+
+
+//弹出操作
+function popOper(oId,status,oType){
+       oId=$("#"+oId).val();
+       $("#orderId").val(oId);
+       $("#authStatus").val(status);
+       var tabId=sessionStorage.getItem('tabId');
+       var linkUrl='';
+       if(tabId!=null){
+           linkUrl='../../';
+       }
+
+       var linkpage=null;
+       var strTitle='<span style="font-size:14px;font-weight: bolder;">&nbsp;(订单编号'+oId+')<span>';
+       var pWidth=0;
+       var pHeight='300px';
+ 
+ 
+ 
+       switch(oType){
+       case 1://审核
+    	   linkpage="{:url('/admin/Agentorderreturngoods/reason/')}";
+           strTitle='<span style="font-size:14px;font-weight: bolder;">审核退货<span>'+strTitle;
+           pWidth='400px';
+           break;
+       case 2://财务审核
+            linkpage="{:url('/admin/Agentorderreturngoods/financialReason/')}";
+            strTitle='<span style="font-size:16px;font-weight: bolder;">财务审核退货<span>'+strTitle;
+            pWidth='600px';
+           break;
+       }
+
+       layer.open({
+               type: 2,
+               area: [pWidth, pHeight],
+               fixed: false, //不固定
+               maxmin: true,
+               title:strTitle,
+               content: linkpage,
+               end: function () {
+                   $("#orderId").val("");
+                 //  location.reload();
+               }
+       });
+
+
+   }
+</script>
+ 

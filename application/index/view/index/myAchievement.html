@@ -1,0 +1,246 @@
+{include file='index@common/header' /}
+	<script type="text/javascript" charset="utf-8" src="/static/Js/g2.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/Js/data-set.min.js"></script>
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+	</style>
+</head>
+<body>
+	<div id="myPerformanceLayout">
+		<div class="teamTitle">
+			<div>
+				<a href="{:url('Person/myProfit')}">
+					<p>销售总额：<span>{$data.sale_total}</span>元</p>
+					<p>订单总数：<span>{$data.order_total}</span>单</p>
+				</a>
+			</div>
+		</div>
+		<div class="teamChart">
+			<section class="amount">
+				<p>日销售额：<span>{$data.sale_day}</span>元</p>
+				<p><i class="vain"></i>日订单数：<span>{$data.order_day}</span>单</p>
+			</section>
+			<ul class="chart">
+				<li>
+					<p>销售额</p>
+					<div id="mountSale"></div>
+				</li>
+				<li>
+					<p>订单量</p>
+					<div id="mountOrder"></div>
+				</li>
+			 </ul>
+			<section class="amount">
+				<p>本月销售额：<span>{$data.sale_arg_month}</span>元</p>
+				<p><i class="vain"></i>本月订单数：<span>{$data.order_arg_month}</span>单</p>
+			</section>
+		</div>
+		<div class="teamSize">
+			<div>
+				<a href="{:url('personteam/agencyteam')}"><p>团队总人数：<span>{$data.team_total}</span>人</p></a>
+			</div>
+		</div>
+		<section class="myTeam">
+			<p>日增：<span>{$data.add_day}</span>人</p>
+			<div id="mountAdd"></div>
+		</section>
+	</div>
+	{include file='index@common/footer_button'}
+<script type="text/javascript">
+	const { DataView } = DataSet;
+	const sale_data  = {$sale_percent};
+	const order_data = {$order_percent};
+	const team_data  = {$team_percent};
+	var num_sale=-20,num_order=-20,num_team=-20;
+	if (sale_data.length == 0 && order_data.length==0) {
+			document.querySelectorAll("#myPerformanceLayout .chart")[0].style.display="none";
+	}
+	if(team_data===undefined || team_data.length==0){
+		document.querySelectorAll("#myPerformanceLayout .myTeam")[0].style.display="none";
+	}
+	if(sale_data.length==1){
+		num_sale=-65;
+	}
+	if(order_data.length==1){
+		num_order=-65;
+	}
+	if(team_data.length==1){
+		num_team=-80;
+	}
+	const saleImg = new DataView();
+	saleImg.source(sale_data).transform({
+		type: 'percent',
+		field: 'count',//data 中的key
+		dimension: 'item',//data 中的key
+		as: 'percent'
+	});
+	const chart = new G2.Chart({
+		container: 'mountSale',
+		forceFit: true,
+		height:200,
+		padding:[25,0,50,0],
+	});
+	chart.source(saleImg, {
+		percent: {
+			formatter: val => {
+				val = (val * 100).toFixed(2) + '%';
+				return val;
+			}
+		}
+	});
+	chart.coord('theta');
+	chart.tooltip({
+		showTitle: false,
+		itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+	});
+	chart.intervalStack()
+	.position('percent')
+	.color('item', ['#a8a2fc','#69bbf5'])
+	.label('percent', {
+      offset:num_sale,
+      // autoRotate: false,
+      textStyle: {
+        rotate: 0,
+        textAlign: 'center',
+        shadowBlur: 2,
+        shadowColor: 'rgba(0, 0, 0, .45)'
+      }
+    })
+	.tooltip('item*percent', (item, percent) => {
+		percent = (percent * 100).toFixed(2)+ '%';
+		return {
+			name: item,
+			value: percent
+		};
+	})
+	.style({
+		lineWidth: 1,
+		stroke: '#fff'
+	});
+	chart.legend({ //底部标注
+		offsetX:-10,
+		offsetY:50,
+		position:'left',
+		marker: 'square' // 设置图例 marker 的显示样式
+	});
+	chart.render();
+</script>
+<script type="text/javascript">
+	const orderImg = new DataView();
+	orderImg.source(order_data).transform({
+		type: 'percent',
+		field: 'count',//data 中的key
+		dimension: 'item',//data 中的key
+		as: 'percent'
+	});
+	const orderChart= new G2.Chart({
+		container: 'mountOrder',
+		forceFit: true,
+		height:200,
+		padding:[25,0,50,0],
+	});
+	orderChart.source(orderImg, {
+		percent: {
+			formatter: val => {
+				val = parseInt(val * 100) + '%';
+				return val;
+			}
+		}
+	});
+	orderChart.coord('theta');
+	orderChart.tooltip({
+		showTitle: false,
+		itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+	});
+	orderChart.intervalStack()
+	.position('percent')
+	.color('item', ['#a8a2fc','#69bbf5'])
+	.label('percent', {
+      offset: num_order,
+      // autoRotate: false,
+      textStyle: {
+        rotate: 0,
+        textAlign: 'center',
+        shadowBlur: 2,
+        shadowColor: 'rgba(0, 0, 0, .45)'
+      }
+    })
+	.tooltip('item*percent', (item, percent) => {
+		percent =parseInt( percent * 100 )+ '%';
+		return {
+			name: item,
+			value: percent
+		};
+	})
+	.style({
+		lineWidth: 1,
+		stroke: '#fff'
+	});
+	orderChart.legend({ //底部标注
+		offsetX:-10,
+		offsetY:50,
+		position:'left',
+		marker: 'square' // 设置图例 marker 的显示样式
+	});
+	orderChart.render();
+</script>
+<script type="text/javascript">
+	const teamImg = new DataView();
+	teamImg.source(team_data).transform({
+		type: 'percent',
+		field: 'count',//data 中的key
+		dimension: 'item',//data 中的key
+		as: 'percent'
+	});
+	const myChart= new G2.Chart({
+		container: 'mountAdd',
+		forceFit: true,
+		height:200,
+		padding:[0,0,50,0],
+	});
+	// myChart.source(teamImg);
+	myChart.source(teamImg, {
+		percent: {
+			formatter: val => {
+				val = parseInt(val * 100) + '%';
+				return val;
+			}
+		}
+	});
+	myChart.coord('theta');
+	myChart.tooltip({
+		showTitle: false,
+		itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+	});
+	myChart.intervalStack()
+	.position('percent')
+	.color('item', ['#a8a2fc','#69bbf5'])
+	.label('percent', {
+      offset: num_team,
+      // autoRotate: false,
+      textStyle: {
+        rotate: 0,
+        textAlign: 'center',
+        shadowBlur: 2,
+        shadowColor: 'rgba(0, 0, 0, .45)'
+      }
+    })
+	.tooltip('item*percent', (item, percent) => {
+		percent =parseInt(percent * 100) + '%';
+		return {
+			name: item,
+			value: percent
+		};
+	})
+	.style({
+		lineWidth: 1,
+		stroke: '#fff'
+	});
+	myChart.legend({ //底部标注
+		// offsetX:-10,
+		offsetY:-30,
+		position:'bottom',
+		marker: 'square' // 设置图例 marker 的显示样式
+	});
+	myChart.render();
+</script>

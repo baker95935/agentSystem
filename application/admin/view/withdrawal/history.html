@@ -1,0 +1,135 @@
+{include file='header'/}
+
+<div id="performance-top">
+	<h5>提现记录</h5>
+</div>
+<form class="form-inline definewidth " action="" method="get">
+<table class="table-condensed table-hover definewidth m20 search_table">
+<tr>
+	<td class="td_r">代理商ID：</td>
+	<td><input type="text" name="a_id" value="{$search.a_id}" class="abc input-default" placeholder="代理商ID" /></td>
+	<td class="td_r">代理商姓名：</td>
+	<td><input type="text" name="name" value="{$search.name}" class="abc input-default" placeholder="代理商姓名"></td>
+	<td class="td_r">联系方式：</td>
+	<td><input type="text" name="phone" value="{$search.phone}" class="abc input-default" placeholder="联系方式"></td>
+	<td class="td_r"> 角色：</td>
+	<td>
+		<select name="role" class="search_input">
+			<option value="-1">全部</option>
+			{foreach name="levelList" item="item" }
+			<option value="{$item.id}"{eq name='$search.role' value='$item.id'} selected='selected'{/eq}>{$item.name}</option>
+			{/foreach}
+		</select>
+	</td>
+	
+</tr>
+<tr>
+	<td class="td_r">审核状态：</td>
+		<td >
+			<select name="audit" class="search_input">
+				<option value="">全部</option>
+				{foreach name="audit_lang" key="audit_key" item="audit_item"}
+				<option value="{$audit_key}"{eq name='$search.audit' value='$audit_key'} selected='selected'{/eq}>{$audit_item}</option>
+				{/foreach}
+			</select>
+		</td>
+	<td class='td_r'>账户类型：</td>
+	<td>
+		<select name="type" class="search_input">
+			<option value="">全部</option>
+			{foreach name="type_lang" key="type_key" item="type_item"}
+			<option value="{$type_key}"{eq name='$search.type' value='$type_key'} selected='selected'{/eq}>{$type_item}</option>
+			{/foreach}
+		</select>
+	</td>
+	<td class="td_r">申请日期：</td>
+	<td><input type="text" name="apply_stime" value='{$search.apply_stime}' placeholder="开始时间" class="datepicker" /></td>
+	<td class="td_c">~</td>
+	<td><input type="text" name="apply_etime" value='{$search.apply_etime}' placeholder="结束时间" class="datepicker" /></td>
+</tr>
+<tr>
+	<td class="td_r">审核日期：</td>
+	<td><input type="text" name="audit_stime" value='{$search.audit_stime}' placeholder="开始时间" class="datepicker" /></td>
+	<td class="td_c">~</td>
+	<td><input type="text" name="audit_etime" value='{$search.audit_etime}' placeholder="结束时间" class="datepicker" /></td>
+	<td colspan="4">
+		<button type="button" class="btn btn-primary ml20">查询</button>&nbsp;&nbsp;
+		<button type="button" class="btn btn-success" id="excel">导出</button>
+	</td>
+</tr>
+<tr>
+	
+</tr>
+</table>
+</form>
+<br>
+<table class="table table-bordered table-hover table-width">
+<thead>
+	<tr>
+		<th>代理商ID</th>
+		<th>姓名</th>
+		<th>联系方式</th>
+		<th>角色</th>
+		<th>申请提现金额</th>
+		<th>账户类型</th>
+		<th>申请日期</th>
+		<th>审核日期</th>
+		<th>备注</th>
+	</tr>
+</thead>
+{empty name='list'}
+<tr>
+	<td colspan='9'>暂无数据</td>
+</tr>
+{else/}
+{foreach name="list" item="item"}
+<tr>
+	<td>{$item->a_id}</td>
+	<td>{$item->name}({$item->nickname})</td>
+	<td>{$item->phone}({$item->wechat})</td>
+	<td>{$item->generation}代 {$item.role|get_reward_levelname}</td>
+	<td>￥{$item.money}</td>
+	<td>{$item.type}</td>
+	<td>{$item.create_ctime}</td>
+	<td>{$item.audit_atime}</td>
+	<td>{$item.remark}</td>
+</tr>
+{/foreach}
+{/empty}
+</table>
+<div class="inline pull-right page">
+{$list->render()}
+</div>
+</body>
+</html>
+<script type="text/javascript" src="/static/Js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="/static/Js/bootstrap-datepicker.zh-CN.min.js"></script>
+<script type="text/javascript" src="/static/Js/artDialog/artDialog.js"></script>
+<script type="text/javascript">
+	$('.datepicker').datepicker({
+		autoclose: true,          //自动关闭
+		calendarWeeks: false,     //是否显示今年是第几周
+		clearBtn: true,           //显示清除按钮
+		daysOfWeekDisabled: [],   //星期几不可选
+		endDate: Infinity,        //日历结束日期
+		forceParse: true,         //是否强制转换不符合格式的字符串
+		format: 'yyyy-mm-dd',     //日期格式
+		keyboardNavigation: true, //是否显示箭头导航
+		language: 'zh-CN',        //语言
+	});
+
+	$(function () {
+
+		// 导出
+		$('#excel').click(function(){
+			$('form').attr('action',"{:url('Withdrawal/export','t=2')}");
+			$('form').submit();
+		});
+
+		// 查询
+		$('.btn-primary').click(function(){
+			$('form').attr('action',"{:url('/admin/Withdrawal/history')}");
+			$('form').submit();
+		});
+	});
+</script>

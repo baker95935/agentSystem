@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>编辑运费模板</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div id="performance-top">
+        <h5>物流快递</h5>
+    </div>
+    <ul id="logistics-tab" class="definewidth">
+        <li><a href="{:url('Expresstemplete/index')}" class="logistics-tab-bottom">运费模板设置</a></li>
+        <li><a href="{:url('Expressrule/index')}">运费设置</a></li>
+    </ul>
+    <form class="form-inline definewidth logistics-editor" id="agentorders">
+        快递模板名称：<input type="text" name="name" value="{$info.name}" class="abc input-default search_input" id="name" /><i>长度为1~16位字符</i>
+        <p>全选<input type="checkbox" id="checkAll" /></p>
+        <ol>
+            {empty name='list'}
+            <span style="color:red;">请先添加运费规则</span>
+            {else/}
+            {foreach name='list' id='item'}
+            <li>
+                <input type="checkbox" name='rules[]' value='{$item.id}' id='i_{$item.id}' {in name="$item.id" value="$info.express_rule_ids"}checked='checked'{/in} />
+                <lable for='i_{$item.id}'>{$item.name}</lable>
+            </li>
+            {/foreach}
+            {/empty}
+        </ol>
+        <div>
+            <button type="button" class="btn btn-primary">提交</button>&nbsp;&nbsp;
+            <button type="button" class="btn btn-success" id="addnew">取消</button>
+        </div>
+        <input type="hidden" name="id" value="{$info.id}" />
+    </form>
+</body>
+</html>
+<script type="text/javascript">
+
+    // 跳转
+    function redirect(url){
+        window.location.href = url;
+    }
+
+    $(function () {
+        // 全选
+        $('#checkAll').on('click', function() {
+            let checkVal = $(this).prop('checked');
+            $('li :checkbox').prop('checked',checkVal);
+        });
+
+        // 提交
+        $('.btn-primary').click(function(){
+            var _name = $('input[name=name]').val();
+            if(_name == ''){
+                layer.open({
+                    content:'模板名称不能为空'
+                });
+                return false;
+            }
+            $.ajax({
+                url:'{:url("Expresstemplete/update")}',
+                type:'post',
+                data:$('#agentorders').serialize(),
+                success:function(e){
+                    if (e.error) {
+                        layer.open({
+                            content:e.error.msg
+                        });
+                    } else {
+                        layer.open({
+                            content:e.msg
+                            ,btn: ['确定']
+                            ,yes: function(index){
+                                layer.close(index);
+                                redirect('{:url("Expresstemplete/index")}');
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        // 取消
+        $('#addnew').click(function(){
+            redirect('{:url("Expresstemplete/index")}');
+        });
+    });
+</script>

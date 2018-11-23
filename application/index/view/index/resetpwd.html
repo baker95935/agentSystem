@@ -1,0 +1,55 @@
+{include file='index@common/header'}
+	<style type="text/css">
+		body{background-color: #F5F5F5;}
+		button{border: 0;}
+	</style>
+	<script type="text/javascript" src="/static/Js/jquery-2.1.0.min.js" charset="utf-8"></script>
+</head>
+<body>
+	<div id="loginPasswordLayout">
+		<div>
+			<input type="password" name="pwd" onkeyup='value=value.replace(/^\s+|\s+$/g,"")' id="pwd" placeholder="请输入新密码" />
+		</div>
+		<div>
+			<input type="password" name="newPwd" onkeyup='value=value.replace(/^\s+|\s+$/g,"")' id="newPwd" placeholder="请再次输入密码" />
+		</div>
+		<p class="text">备注:密码由6-20位英文字母、数字或符号组成</p>
+		<button type='button' class="commonButton">确认</button>
+	</div>
+</body>
+<script type="text/javascript">
+	$(function(){
+		$('.commonButton').click(function(){
+			var _pwd = $.trim($('#pwd').val());
+			var _repwd = $.trim($('#newPwd').val());
+			var reg = /[^A-Za-z0-9~!@#\$%^&*\(\)\{\};,.\?\/]/;
+			if(_pwd == '' ){
+				msgTip('密码不能为空');
+				return false;
+			}else if(reg.test(_pwd)){
+				msgTip('只能包含英文字母、数字或特殊符号');
+				return false;
+			}else if(_pwd.length < 6 || _pwd.length > 20){
+				msgTip('密码长度为6-20位');
+				return false;
+			}
+			if(_pwd != _repwd){
+				msgTip('两次密码输入不一致');
+				return false;
+			}
+			$.ajax({
+				url:'{:url("Index/setNewKey")}',
+				type:'post',
+				data:{pwd:_pwd,repwd:_repwd},
+				success:function(e){
+					if(e.error){
+						msgTip(e.error.msg);
+					}else{
+						msgTipUrl(e.msg,e.url);
+					}
+				}
+			});
+		});
+	});
+</script>
+</html>

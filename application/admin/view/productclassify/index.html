@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+  <div id="performance-top">
+        <h5>分类管理</h5>
+   </div>
+<form class="form-inline definewidth ml40  search_table" action="{:url('/admin/Productclassify/index')}" method="get">
+    分类名称：
+    <input type="text" name="name" id="name"class="abc input-default width-auto" placeholder="" value="">&nbsp;&nbsp;
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-success" id="addnew">新增</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-danger" id="delall" onclick="alldelate()">批量删除</button>&nbsp;&nbsp;
+</form>
+<table class="table table-bordered table-hover definewidth m10" >
+    <thead>
+        <tr>
+            <th width="1%"><input type="checkbox" id="selectall" onclick="selectall()"></th>
+            <th width="5%">编号</th>
+            <th>分类名称</th>
+            <th width="20%">添加时间</th>
+            
+            <th width="10%">操作</th>
+        </tr>
+    </thead>
+    {foreach name="classifyList" item="item"}
+        <tr>
+            <th width="1%"><input type="checkbox" class="checkbox" id='{$item["id"]}' onchange='checkId({$item["id"]})'  name="ids" value="{$item['id']}"></th>
+            <td>{$item.id}</td>
+            <td class="tl">{$item.classify_name}</td>
+            <td>{$item.create_time}</td>
+            <td>
+                <a onclick='editClass({$item["id"]})' style="cursor: pointer;">编辑</a>
+                <a onclick='classDelete({$item["id"]})'style="cursor: pointer;" >删除</a>
+            </td>
+        </tr>
+        {foreach name="item.sendList" item="vo"}
+             <tr>
+                <th width="1%"><input type="checkbox" class="checkbox"  id='{$vo["id"]}' onchange='checkId({$vo["id"]})'   name="ids" value="{$vo.id}"></th>
+                <td>{$vo.id}</td>
+                <td class="tl lti2">∟{$vo.classify_name}</td>
+                <td>{$vo.create_time}</td>
+                <td>
+                   <a onclick='editClass({$vo["id"]})' style="cursor: pointer;">编辑</a>
+                   <a onclick='classDelete({$vo["id"]})' style="cursor: pointer;">删除</a>
+                </td>
+            </tr>
+            {foreach name="vo.classifyThree" item="voo"}
+                <tr>
+                    <th width="1%"><input type="checkbox" class="checkbox" id='{$voo["id"]}' onchange='checkId({$voo["id"]})'   name="ids" value="{$voo.id}"></th>
+                    <td>{$voo.id}</td>
+                    <td class="tl lti4">∟{$voo.classify_name}</td>
+                    <td width="10%">{$voo.create_time}</td>
+                    <td>
+                        <a onclick='editClass({$voo["id"]})' style="cursor: pointer;">编辑</a>
+                        <a onclick='classDelete({$voo["id"]})' style="cursor: pointer;">删除</a>
+                    </td>
+                </tr>
+            {/foreach}
+        {/foreach}
+    {/foreach}
+</table>
+<div class="inline pull-right page">
+    {$classifyList->render()}
+ </div>
+ <input type="hidden" id="classId"/>
+</body>
+</html>
+
+<script>
+    $(function () {
+		$('#addnew').click(function(){
+                layer.open({
+                    type: 2,
+                    area: ['400px', '280px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    title:'产品分类设置',
+                    content: 'create.html',
+                    end: function () {
+                      //  location.reload();
+                     }
+                    });
+		 });
+    });
+	function editClass(id){
+        $("#classId").val(id);
+        layer.open({
+                    type: 2,
+                    area: ['400px', '280px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    title:'产品分类设置',
+                    content: 'create.html',
+                    end: function () {$("#classId").val("");//location.reload();
+                                     }
+                    });
+    }
+    /*全选*/
+    function selectall(){
+
+        var all_box = $("#selectall").is(':checked')
+        if( all_box ){
+            $(".checkbox").prop("checked",true);
+        }else{
+            $(".checkbox").prop("checked",false);
+        }
+    }
+
+    function classDelete(id){
+
+         layer.confirm("是否要删除该分类？",{btn:['确定','取消']},function(){
+            $.ajax({
+            type : "post",
+            url : '/admin/Productclassify/delete/',
+            dataType : 'json',
+            data: {id:id,},
+            success : function(data) {
+                var jsonData = JSON.parse(data);
+                if (jsonData.code=='1'){
+                    layer.alert("删除成功!",function(){ window.location.reload(); 
+                    });}
+                else if(jsonData.code=='0'){
+                    layer.alert("存在下级类名，请先删除下级类名！");
+                }
+                else {
+                    layer.alert("删除失败！");
+                }
+             },
+            error:function(data){
+                layer.alert("删除失败！");
+             }
+        });
+
+         },function(index){ layer.close(index); });
+
+       
+    }
+    //批量删除
+    function alldelate(){
+        var id=$('input:checkbox[name^=ids]:checked').map(function(){
+            return $(this).val();
+        }).get().join(",");
+        if(!id)
+        {
+            layer.alert("请选择要删除的类名!");
+        }
+        else
+        {
+            layer.confirm("是否要删除该分类？",{btn:['确定','取消']},function(){
+            $.ajax({
+            type : "post",
+            url : '/admin/Productclassify/delete/',
+            dataType : 'json',
+            data: {id:id,},
+            success : function(data) {
+                var jsonData = JSON.parse(data);
+                if (jsonData.code=='1'){
+                    layer.alert("删除成功!",function(){ window.location.reload(); 
+                    });}
+                else if(jsonData.code=='0'){
+                    layer.alert("所选类名存在下级类名，请先删除下级类名！",function(index){
+                        layer.close(index);
+                    });
+                }
+                else {
+                    layer.alert("删除失败！");
+                }
+             },
+            error:function(data){
+                layer.alert("删除失败！");
+             }
+             });
+
+         },function(index){ 
+            $("#selectall").attr("checked", false);
+            $(".checkbox").prop("checked",false);
+            layer.close(index); });
+        }
+    }
+    function checkId(id){
+        $.ajax({
+            type : "post",
+            url : '/admin/Productclassify/checkChild/',
+            dataType : 'json',
+            data: {id:id,},
+            success : function(e) {
+                var jsonData = JSON.parse(e);
+				$.each(jsonData, function(index,data) {
+                    if($("#"+data.id).is(":checked")){
+                       
+                         $("#"+data.id).prop("checked",false);
+                    }else{
+                         $("#"+data.id).prop("checked",true);
+                    }
+				}); 
+            },
+            error:function(data){}
+        });  
+    }
+</script>

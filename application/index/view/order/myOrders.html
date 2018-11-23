@@ -1,0 +1,312 @@
+{include file='index@common/header'/}
+<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+			.none {display: none;}.status-total{display: flex;justify-content: space-between;align-items: center;}
+			.status-total>span{color: #ff0000;margin-left: .75rem;border:1px solid #ff0000;padding: 2px;}
+		</style>
+		<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+<body>
+	<div id="lowerOrderLayout">
+				<ol>
+					<li {if condition="$status eq 0"} class="current" {/if}>
+						<p><img {if condition="$status eq 0"}src="/static/Images/O_light_1.png" {else}src="/static/Images/O_gray_1.png"{/if} alt="全部" /></p>
+						<a href="{:url("/index/Order/myOrders/status/0")}">全部订单</a>
+					</li>
+				 
+					<li {if condition="$status eq 1"} class="current" {/if}>
+						<p><img {if condition="$status eq 1"}src="/static/Images/O_light_2.png" {else}src="/static/Images/O_gray_2.png"{/if} alt="待付款" /></p>
+						<a href="{:url("/index/Order/myOrders/status/1")}">待付款</a>
+					</li>
+		 
+					<li {if condition="$status eq 2"} class="current" {/if}>
+						<p><img {if condition="$status eq 2"}src="/static/Images/O_light_3.png" {else}src="/static/Images/O_gray_3.png"{/if} alt="待发货" /></p>
+						<a href="{:url("/index/Order/myOrders/status/2")}">待发货</a>
+					</li>
+					<li {if condition="$status eq 3"} class="current" {/if}>
+						<p><img {if condition="$status eq 3"}src="/static/Images/O_light_4.png" {else}src="/static/Images/O_gray_4.png"{/if} alt="待收货" /></p>
+						<a href="{:url("/index/Order/myOrders/status/3")}">待收货</a>
+					</li>
+					<li {if condition="$status eq 4"} class="current" {/if}>
+						<p><img {if condition="$status eq 4"}src="/static/Images/O_light_5.png" {else}src="/static/Images/O_gray_5.png"{/if} alt="已完成" /></p>
+						<a href="{:url("/index/Order/myOrders/status/4")}">已完成</a>
+					</li>
+				 
+					<li {if condition="$status eq 7"} class="current" {/if}>
+						<p><img {if condition="$status eq 7"}src="/static/Images/O_light_5.png" {else}src="/static/Images/O_gray_5.png"{/if} alt="售后服务" /></p>
+						<a href="{:url("/index/Order/myOrders/status/7")}">售后服务</a>
+					</li>
+		 
+				</ol>
+				<div class="content">
+					<div class="order">
+
+					{foreach name="orderList" item="item"}
+						<div class="wordColor order-status title">
+							<div><span>订单编号：</span>{$item.order_number}</div>
+						</div>
+						<ul>
+							{foreach name="item.productList" item="kk"}
+							<li>
+					  			<a href="">
+					  					<img src="{$kk.product.product_img}" alt="" />
+					  				<div>
+					  					<p class="proName">{present name="kk->product->is_first_order"}{eq name="kk->product->is_first_order" value='1'}<span class="proFlag">首单商品</span>{/eq}{/present}{$kk.pname}</p>
+					  					<p class="other">
+					  						<span class="goods-price"><span class="yen">￥</span>{$kk.pprice}</span>
+					  						<span class="sale">X{$kk.pnumber}</span>
+					  					</p>
+					  				</div>
+					  			</a>
+					  		</li>
+					  		{/foreach}
+
+						</ul>
+						<div class="takeInfo wordColor text-right">
+								<p><span>商品金额：</span>￥{$item.ptotal_price}</p>
+								<p class="pMargin"><span>运费：</span>￥{$item.trans_expenses}</p>
+								<p><span>代理折扣：</span>￥{$item.agent_total_price}</p>
+							</div>
+						<div class="status-total">  
+							{if condition="!empty($item.returnInfo)"}
+								<span class="auth-status">
+									{if condition="$item.returnInfo.auth_status eq 1"}
+										 退货审核中 
+									{elseif condition="$item.returnInfo.auth_status eq 2"}
+										 退货通过 
+									{elseif condition="$item.returnInfo.auth_status eq 3"}
+										 退货拒绝 
+									{/if}
+								</span>
+							{/if}
+							{if condition="$item.order_status eq 7 "} 
+								<span class="auth-status">
+									{if condition="$item.refundInfo.auth_status eq 1"}
+										 退款审核中 
+									{elseif condition="$item.refundInfo.auth_status eq 2"}
+										 退款通过 
+									{elseif condition="$item.refundInfo.auth_status eq 3"}
+										 退款拒绝 
+									{/if}
+								</span>
+							{else /}
+								<span style="border:none;"></span>
+							{/if}
+							<p class="total"><span>实际金额：{if condition="$item.trans_expenses >1"}(含运费{$item.trans_expenses}){/if}</span><span class="goods-price"><span class="yen">￥</span>{$item.order_amount_pay}</span></p>
+						</div>
+						
+						<div class="btn">
+							<!--条件判断需要显示的按钮-->
+							<a href="{:url('/index/Order/orderDetail/id/'.$item.order_number)}"><button>订单详情</button></a>
+							{if condition="$item.order_status eq 1"}<button onclick="cancleOrder('{$item.order_number}')">取消</button>{/if}
+							
+							{if condition="in_array($item.order_status,array(2))"}
+								{if condition="$item.productInfo.is_agent_level==0"}  
+								<!-- <button onclick="refundOrder('{$item.order_number}')">退款</button> -->
+								{/if}
+							{/if}
+							
+							{if condition="$item.order_status eq 1 && $item.paystyle eq 2 "}<a href="{:url('/index/pay/wechat/order_number/'.$item.order_number)}"><button>继续支付</button></a>{/if}
+							{if condition="$item.order_status eq 1 && $item.paystyle eq 3 "}<a href="{:url('/index/pay/stock/order_number/'.$item.order_number)}"><button>继续支付</button></a>{/if}
+							
+							{if condition="$item.order_status eq 3 "}  
+							<button onclick="confirmOrder('{$item.order_number}')">确认收货</button>
+								{if condition="empty($item.returnInfo)"}
+								<!-- <a href="{:url('/index/Order/orderDetail/id/'.$item.order_number.'/type/1/returnGoods/1')}#position"><button>申请退货</button></a> -->
+								{/if}
+							{/if}
+							{if condition="in_array($item.order_status,array(3,4))"}
+								<a href="{:url('/index/Order/expressInfo/order_number/'.$item.order_number.'/type/1')}"><button>查看物流</button></a>
+
+							{/if}
+							{if condition="$item.order_status eq 4 "}  
+							<button onclick="closeOrder('{$item.order_number}')">关闭</button>
+								{if condition="$item.productInfo.is_agent_level==0"}  
+								<a href="{:url('/index/Product/preOrder/id/'.$item.pid.'/num/1')}"><button>再次购买</button></a>
+								{/if}
+							{/if}
+							{if condition="$item.order_status eq 7 "}   
+								<button onclick="deleteOrder('{$item.order_number}')">删除</button>
+								
+							{/if}
+						</div>
+						<div style="height:.4rem;background-color:#F5F5F5;width:100%;"></div>
+					{/foreach}
+
+					</div>
+
+
+				</div>
+			</div>
+	{include file='index@common/footer_button'}
+	<script type="text/javascript">
+		$(function(){
+			$('.auth-status').each(function(){ //兼容历史数据status不存在的情况
+				var status=$(this).text().trim().length;
+				if(status<=0){
+					$(this).css('visibility','hidden');
+				}
+			});
+
+		})
+		//订单退款
+		function refundOrder(id,type)
+		{
+			if(!type){type=1;}
+			layer.msg('你确定申请退款吗', {
+				  time: 0 //不自动关闭
+				  ,btn: ['确定', '取消']
+				  ,yes: function(index){
+				    layer.close(index);
+
+				    $.ajax({
+						url:'{:url("/index/Order/changeOrderStatus")}',
+						data:{order_number:id,order_status:7,type:type},
+						type:'post',
+						success:function(data){
+							if(data){
+								location.reload();
+							}else{
+								layer.alert('操作失败，请重试');
+								return false;
+							}
+						}
+					});
+
+				  }
+			});
+		}
+		
+		//订单取消
+		function cancleOrder(id,type)
+		{
+			if(!type){type=1;}
+			layer.msg('你确定取消吗', {
+				  time: 0 //不自动关闭
+				  ,btn: ['确定', '取消']
+				  ,yes: function(index){
+				    layer.close(index);
+
+				    $.ajax({
+						url:'{:url("/index/Order/changeOrderStatus")}',
+						data:{order_number:id,order_status:7,type:type},
+						type:'post',
+						success:function(data){
+							if(data){
+								location.reload();
+							}else{
+								layer.alert('操作失败，请重试');
+								return false;
+							}
+						}
+					});
+
+				  }
+			});
+		}
+
+
+		//订单收货
+		function confirmOrder(id,type)
+		{
+			if(!type){type=1;}
+			layer.msg('你确定确认收货吗', {
+				  time: 0 //不自动关闭
+				  ,btn: ['确定', '取消']
+				  ,yes: function(index){
+				    layer.close(index);
+				    $.ajax({
+						url:'{:url("/index/Order/changeOrderStatus")}',
+						data:{order_number:id,order_status:4,type:type},
+						type:'post',
+						success:function(data){
+							if(data){
+								location.reload();
+							}else{
+								layer.alert('操作失败，请重试');
+								return false;
+							}
+						}
+				});
+				}
+			});
+		}
+
+		//订单关闭
+		function closeOrder(id,type)
+		{
+			if(!type){type=1;}
+			layer.msg('你确定关闭订单吗', {
+				  time: 0 //不自动关闭
+				  ,btn: ['确定', '取消']
+				  ,yes: function(index){
+				    layer.close(index);
+
+				    $.ajax({
+						url:'{:url("/index/Order/changeOrderStatus")}',
+						data:{order_number:id,order_status:5,type:type},
+						type:'post',
+						success:function(data){
+							if(data){
+								location.reload();
+							}else{
+								layer.alert('操作失败，请重试');
+								return false;
+							}
+						}
+					});
+				  }
+			});
+		}
+
+		//订单删除
+		function deleteOrder(id,type)
+		{
+			if(!type){type=1;}
+			layer.msg('你确定删除订单吗', {
+				  time: 0 //不自动关闭
+				  ,btn: ['确定', '取消']
+				  ,yes: function(index){
+				    layer.close(index);
+
+				    $.ajax({
+						url:'{:url("/index/Order/changeOrderStatus")}',
+						data:{order_number:id,order_status:6,type:type},
+						type:'post',
+						success:function(data){
+							if(data){
+								location.reload();
+							}else{
+								layer.alert('操作失败，请重试');
+								return false;
+							}
+						}
+					});
+				  }
+			});
+		}
+		
+		//订单退货
+		function returnGoodsOrder(id,type)
+		{
+			if(!type){type=1;}
+			layer.msg('你确定申请退货吗', {
+				  time: 0 //不自动关闭
+				  ,btn: ['确定', '取消']
+				  ,yes: function(index){
+				    layer.close(index);
+				    
+					location.reload();
+					
+				  }
+			});
+		}
+
+	</script>
+</html>

@@ -1,0 +1,47 @@
+{include file='common/header'}
+	<style type="text/css">
+		body{background-color: #F5F5F5;}
+		button{border: 0;}
+	</style>
+	<script type="text/javascript" src='/static/Js/jquery.js'></script>
+</head>
+<body>
+	<div id="WechatIDContent">
+		<div class="Wechat">
+			<input class="placeholder_99" type="text" name="WechatID" id="WechatID" placeholder="微信号" value="{$data.wechat}" />
+			{empty name='$data.openid'}<a href="{:url('Oauth/getWechatCode','bind='.$data.agent_id)}" class="unbound">未绑定</a>{else/}<a href="javascript:;" class="">已绑定</a>{/empty}
+		</div>
+		<button type='button' class='btn_id'>确认</button>
+	</div>
+</body>
+<script type="text/javascript">
+    $(function(){
+        $('.btn_id').click(function(){
+            var wechatID = $('input[name=WechatID]').val();
+			/* 提交验证 */
+            if(wechatID){
+                if(!wechatID){
+                    msgTip('请输入微信号');
+                    return false;
+                }
+                $.ajax({
+                    url:'{:url("Personalinfo/saveAll")}',
+                    data:{wechatID:wechatID},
+                    type:'post',
+                    success:function(e){
+                        if(e.error){
+                            msgAlert(e.error.msg);
+                            return false;
+                        }else{
+                            window.location.href = e.url;
+                        }
+                    }
+                });
+            }else{
+                msgTip('不能为空');
+                return false;
+            }
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<script src="/static/Js/g2.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/Js/data-set.min.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+            var docEl = document.documentElement;
+
+            function getSize() { // 获取屏幕的宽度
+                var screenWidth = docEl.clientWidth;
+                docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+            }
+            getSize(); // 页面加载完执行一次
+            window.onresize = function() {
+                getSize();
+            }
+		</script>
+	</head>
+	<body>
+		<div id="teamPerformanceLayout">
+			<div class="teamTitle">
+				<div class="details_btn">
+					<p>销售总额：<span>{$total.money_total}</span>元</p>
+					<p>订单总数：<span>{$total.order_total}</span>单</p>
+				</div>
+			</div>
+
+			<div class="teamChart">
+			   <section class="amount">
+			   		<p>日销售额：<span>{$day_total.day_money_total}</span>元</p>
+			   		<p><i class="vain"></i>日订单数：<span>{$day_total.day_order_total}</span>单</p>
+			   </section>
+			   <ul class="chart">
+			   		<li>
+			   			<p>销售额</p>
+			   			<div id="mountSale"></div>
+			   		</li>
+			   		<li>
+			   			<p>订单量</p>
+			   			<div id="mountOrder"></div>
+			   		</li>
+			   </ul>
+			    <section class="amount">
+
+			    	<p>本月销售额：<span>{$month_total.month_money_total}</span>元</p>
+			   		<p><i class="vain"></i>本月订单数：<span>{$month_total.month_order_total}</span>单</p>
+
+			    </section>
+			</div>
+
+
+		</div>
+	{include file='index@common/goBack'}
+	<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+       $(function () {
+           $(" .details_btn").click(function(){
+
+                   window.location.href ="{:url('index/index/privilegeTeamPerformance')}"
+
+           })
+       })
+	</script>
+	<script>
+  const { DataView } = DataSet;
+  var order_total={$total.order_total};
+  var day_order_total={$day_total.day_order_total};
+  var total_money={$money_residue};
+  var total_order={$order_residue};
+  var num_money=-20,num_order=-20;
+  var data,data2=[];
+  var colorArr_money,colorArr_order=[ '#69bbf5','#a8a2fc'];
+  if(order_total==0 || day_order_total==0){
+     document.querySelectorAll(".chart")[0].style.display="none";
+  }else{
+
+        if(total_money==0){
+           data = [{ item: '日占比', count:{$total_percent_money}}];
+           num_money=-65;colorArr_money=['#a8a2fc'];
+        }else{
+            data = [
+            { item: '剩余', count:{$money_residue}},
+            { item: '日占比', count:{$total_percent_money} }
+           ];
+        }
+        if(total_order==0){
+            data2 = [{ item: '日占比',count:{$total_percent_order}}];
+            num_order=-65;colorArr_order=['#a8a2fc'];
+        }else{
+          data2 = [
+            { item: '剩余', count:{$order_residue}},
+            { item: '日占比', count:{$total_percent_order}}
+          ];
+        }
+  }
+  const dv = new DataView();
+  dv.source(data).transform({
+    type: 'percent',
+    field: 'count',//data 中的key
+    dimension: 'item',//data 中的key
+    as: 'percent'
+  });
+  const chart = new G2.Chart({
+    container: 'mountSale',
+    forceFit: true,
+    height:200,
+    padding:[25,0,50,0]
+  });
+  chart.source(dv, {
+    percent: {
+      formatter: val => {
+        val = (val * 100).toFixed(2) + '%';
+        return val;
+      }
+    }
+  });
+  chart.coord('theta');
+  chart.tooltip({
+    showTitle: false,
+    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+  });
+  chart.intervalStack()
+    .position('percent')
+    .color('item',colorArr_money)
+   .label('percent', {
+      offset:num_money,
+      // autoRotate: false,
+      textStyle: {
+        rotate: 0,
+        textAlign: 'center',
+        shadowBlur: 2,
+        shadowColor: 'rgba(0, 0, 0, .45)'
+      }
+    })
+    .tooltip('item*percent', (item, percent) => {
+      percent = (percent * 100).toFixed(2) + '%';
+      return {
+        name: item,
+        value: percent
+      };
+    })
+    .style({
+      lineWidth: 1,
+      stroke: '#fff'
+    });
+    chart.legend({    //底部标注
+    	 offsetX:-10,
+    	 offsetY:50,
+	 position:'left',
+	  marker: 'square' // 设置图例 marker 的显示样式
+	});
+  chart.render();
+</script>
+<script type="text/javascript">
+	const dv2= new DataView();
+  dv2.source(data2).transform({
+    type: 'percent',
+    field: 'count',//data 中的key
+    dimension: 'item',//data 中的key
+    as: 'percent'
+  });
+  const orderChart= new G2.Chart({
+    container: 'mountOrder',
+    forceFit: true,
+    height:200,
+    padding:[25,0,50,0],
+  });
+  orderChart.source(dv2, {
+    percent: {
+      formatter: val => {
+        val = parseInt(val * 100) + '%';
+        return val;
+      }
+    }
+  });
+  orderChart.coord('theta');
+  orderChart.tooltip({
+    showTitle: false,
+    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+  });
+  orderChart.intervalStack()
+    .position('percent')
+    .color('item',colorArr_order)
+    .label('percent', {
+      offset:num_order,
+      // autoRotate: false,
+      textStyle: {
+        rotate: 0,
+        textAlign: 'center',
+        shadowBlur: 2,
+        shadowColor: 'rgba(0, 0, 0, .45)'
+      }
+    })
+    .tooltip('item*percent', (item, percent) => {
+      percent = parseInt(percent * 100) + '%';
+      return {
+        name: item,
+        value: percent
+      };
+    })
+    .style({
+      lineWidth: 1,
+      stroke: '#fff'
+    });
+    orderChart.legend({    //底部标注
+    	 offsetX:-10,
+    	 offsetY:50,
+	 position:'left',
+	  marker: 'square' // 设置图例 marker 的显示样式
+	});
+  orderChart.render();
+</script>
+</html>

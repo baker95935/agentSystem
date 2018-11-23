@@ -1,0 +1,89 @@
+{include file='index@common/header'}
+<link rel="stylesheet" type="text/css" href="/static/Css/my-shop.css">
+</head>
+<body style="background-color:rgb(245,245,245)">
+	<div id="PersonalInfoContent" class="store">
+	    <div class="header">
+		   		<p>
+					{if condition="empty($Request.session.user.head_img)"}
+						<img src="/static/Images/default_head.png" class="PerInfo_portrait" id="myimg" style="cursor: pointer;" />
+					{else /}
+					<img src="{$Request.session.user.head_img}" class="PerInfo_portrait" id='myimg'/>
+					{/if}
+				</p>
+				<ol class="text">
+					<li>{$info.shop_name}</li>
+					<li>授权ID:{$Request.session.user.a_id}</li>
+				</ol>
+	    </div>
+		<ul class="information">
+			<li><span>{$info.onsale}</span>上架数量</li>
+			<li><span>{$info.orders}</span>订单数</li>
+			<li><span>{$info.sale}</span>销售额</li>
+			<li><span>{$info.pv}</span>访客数</li>
+		</ul>
+		<ol class="store-code">
+			<li>
+				<a id="alertQRCode" href="javascript:;"><img src="/static/Images/icon_erweima.png" alt="">微店二维码</a>
+			</li>
+			<li>
+				<a href="{:url('Microshop/common_shop','pv=1&id='.$Think.session.user.a_id)}"><img src="/static/Images/icon_preview.png" alt="">预览</a>
+			</li>
+		</ol>
+	    <div class="list" onclick="redirect('{:url("Microshop/shopName")}')">
+		   	<div class="perInformation">
+		   		<p>店铺名称</p>
+		   	</div>
+	    </div>
+	    <div class="list" onclick="redirect('{:url("Microshop/shopBackground")}')">
+		   	<div class="perInformation">
+		   		<p>店铺背景</p>
+		   	</div>
+	    </div>
+	    <div class="list" onclick="redirect('{:url("Microshop/shopGoods")}')">
+		   	<div class="perInformation">
+		   		<p>店铺商品</p>
+		   	</div>
+	    </div>
+	</div>
+	{include file='index@common/goBack'}
+
+<script type="text/javascript" src="/static/Js/jquery.js"></script>
+<script src="/static/Js/html2canvas.min.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+	$(function(){
+
+		// 二维码图层
+        function layoutFun(){
+        	var textNode="<div id='homeBg'><aside style='opacity: 0;'>"+
+            	"<div id='inviteAgencyContent'>"+
+            	"<div class='layout'><img id='myimg' src='/{$info.qrcode}' alt='' /></div></div></aside>"+
+            	"<article id='bgImg'><img src=''/></div>";
+        	$('body').append(textNode);
+
+        	html2canvas(document.querySelector("#inviteAgencyContent")).then(canvas => {
+            	var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            	$("#bgImg>img").attr('src',image);
+            	$("#inviteAgencyContent").hide();
+        	});
+	    }
+        $('#alertQRCode').on('click',layoutFun);
+        // 点击图片外删除图层
+        $('body').on('click','#homeBg',function(){
+        	$("#homeBg").remove();
+        });
+        //阻止冒泡
+        $("body").on('click','#bgImg',function(event){ event.stopPropagation() })
+
+	});
+
+</script>
+
+	<!--页面背景图-->
+	<script>
+        var state = 1;
+		{present name='info.background'}
+        $(".header").css('background-image','url("{$info.background}")');
+		{/present}
+	</script>

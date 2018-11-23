@@ -1,0 +1,62 @@
+{include file='header'/}
+<div id="performance-top">
+                <h5>代理商库存转账记录</h5>
+            </div>
+<form id="agentorders" class="form-inline definewidth search_table" action="{:url('/admin/Agentstocktransfer/index')}" method="get">    
+    转账人ID：
+    <input type="text" name="operater_agent_id" id="operater_agent_id" class="abc input-default" placeholder="转账人ID" value="{if condition='$operater_agent_id gt 0'}{$operater_agent_id}{/if}">
+    &nbsp;&nbsp;  
+       转账金额：
+    <input type="text" name="money" id="money" class="abc input-default" placeholder="转账金额" value="{if condition='$money gt 0'}{$money}{/if}">
+    &nbsp;&nbsp;  
+    代理商ID：
+    <input type="text" name="agent_id" id="agent_id" class="abc input-default" placeholder="代理商ID" value="{if condition='$agent_id gt 0'}{$agent_id}{/if}">
+    &nbsp;&nbsp;  
+    代理商姓名：
+    <input type="text" name="name" id="name" class="abc input-default" placeholder="代理商姓名" value="{if condition='$name gt 0'}{$name}{/if}">
+    &nbsp;&nbsp;  
+    联系方式：
+    <input type="text" name="contact" id="contact" class="abc input-default" placeholder="联系方式" value="{if condition='$contact gt 0'}{$contact}{/if}">
+ 
+    <br><br>
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+     <button type="button" id="excel" class="btn btn-success">导出</button>
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+    	<th>转账人ID</th>
+        <th>代理商ID</th>
+        <th>转账金额</th>
+        <th>姓名</th>
+        <th>联系方式</th>
+        <th>当前角色</th>
+        <th>创建时间</th>
+    </tr>
+    </thead>
+    {foreach name="changeList" item="item"}
+	     <tr>
+	     	<td>{$item->operater_agent_id}</td>
+            <td>{$item->agents->agent_id}</td>
+            <td>{$item->money}</td>
+            <td class="tl">{$item->agents->name}</td>
+            <td class="tl">手机号：{$item->agents->phone}<br/>微信号：{$item->agents->wechat}</td>
+            <td>{$item->agents->role|get_reward_levelname}</td>
+            <td>{$item.create_time}</td>
+         
+        </tr>	
+     {/foreach}
+</table>
+<div class="inline pull-right page">
+{$changeList->render()}
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+    	$('#excel').click(function(){
+			window.location.href="{:url('/admin/Agentstocktransfer/excelIndex/agent_id/'.$agent_id.'/name/'.$name.'/contact/'.$contact.'/operater_agent_id/'.$operater_agent_id.'/money/'.$money)}";
+	 	});
+
+    });
+</script>

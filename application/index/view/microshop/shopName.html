@@ -1,0 +1,40 @@
+{include file='index@common/header'}
+<link rel="stylesheet" type="text/css" href="/static/Css/my-shop.css">
+<script type="text/javascript" src='/static/Js/jquery.js'></script>
+	</head>
+	<body>
+		<div id="AlipayContent" class="updateName">
+			<div>
+				<input type="text" name="account" value='{$date.shop_name}' class="placeholder_99" id="account" placeholder="微店名称" />
+			</div>
+			<button class="commonButton">确定</button>
+		</div>
+	{include file='index@common/goBack'}
+		<script type="text/javascript">
+            $(function(){
+                $('.commonButton').click(function(){
+                    var shopName = $('input[name=account]').val();
+					/* 提交验证 */
+                    if(shopName){
+                        $.ajax({
+                            url:'{:url("Microshop/save")}',
+                            data:{shopName:shopName},
+                            type:'post',
+                            success:function(e){
+//                            console.log(e);return false;
+                                if(e.error){
+                                    alert(e.error.msg);
+                                    return false;
+                                }else{
+                                    window.location.href = e.url;
+                                }
+                            }
+                        });
+                    }else{
+                        mobileTip('店铺名称不能为空');
+                        return false;
+                    }
+                });
+            });
+		</script>
+		<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>

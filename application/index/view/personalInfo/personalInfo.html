@@ -1,0 +1,210 @@
+{include file='index@common/header'}
+<style>body{background-color: #fff;}</style>
+</head>
+<body>
+	<div id="PersonalInfoContent">
+	    <div>
+		   	<div class="perInformation" >
+		   		<p>头像</p>
+		   		<p>
+					{if condition="empty($Agentslist.head_img)"}
+						<img src="/static/Images/1350.jpg" class="PerInfo_portrait" id="myimg" style="cursor: pointer;" />
+					{else /}
+					<img src="{$Agentslist.head_img}" class="PerInfo_portrait" id='myimg'/>
+					{/if}
+					<input type="file" name="up_img" id="up_img" onchange="setImagePreview(this)" style="position: absolute; right:0; top:0; width: 116px; height: 70px; opacity: 0; cursor: pointer;"/>
+					<small class="help-block cover-tips" style="color: #dd4b39;display: none;">请上传照片</small>
+					<input type=hidden name="default_imgurl" id="default_imgurl" value=" " />
+				</p>
+		   	</div>
+	    </div>
+
+	    <div>
+		   	<div class="perInformation" style="position:relative;">
+		   		<p>微信二维码</p>
+		   		<p>
+					<input type="file" name="QR_code_img" id="QR_code_img" onchange="setImageQR_code_img(this)" style="position: absolute; right:-12px; top:0; width: 200px; height:2.5rem; opacity: 0; cursor: pointer;"/>
+					上传
+				</p>
+		   	</div>
+	    </div>
+
+	    <div>
+		   	<div class="perInformationNoArrow">
+		   		<p>我的ID</p>
+		   		<p>{$Agentslist.agent_id}</p>
+		   	</div>
+	   	</div>
+
+	    <div>
+		   	<div class="perInformation" onclick='next(1);'>
+		   		<p>微信昵称</p>
+				<p>{$Agentslist.nickname}</p>
+		   	</div>
+	    </div>
+
+	    <div>
+		   	<div class="perInformation" onclick='next(2);'>
+		   		<p>微信号</p>
+		   		<p>{$Agentslist.wechat}</p>
+		   	</div>
+	    </div>
+
+	    <div>
+		   	<div class="perInformation" onclick='next(3);'>
+		   		<p>QQ</p>
+		   		<p>{$Agentslist.qq}</p>
+		   	</div>
+	    </div>
+
+	    <div style="height:.4rem;background: #F5F5F5;"></div>
+	    <div>
+		   	<div class="perInformation" onclick='next(4);'>
+		   		<p>姓名</p>
+		   		<p>{$Agentslist.name}</p>
+		   	</div>
+	    </div>
+
+	    <div>
+		   	<div class="perInformation" onclick='next(5);'>
+		   		<p>性别</p>
+		   		<p>
+					{if condition="$Agentslist.sex eq 'm'"}
+					男
+					{elseif condition="$Agentslist.sex eq 'w'"/}
+					女
+					{/if}
+				</p>
+		   	</div>
+	    </div>
+
+	    <div>
+		   	<div class="perInformationNoArrow">
+		   		<p>手机号</p>
+		   		<p>{$Agentslist.phone}</p>
+		   	</div>
+	   	</div>
+
+	   	<div>
+		   	<div class="perInformation" onclick='next(6);'>
+			   	<p>身份证</p>
+		   		<p>{$Agentslist.id_card}</p>
+		   	</div>
+	    </div>
+	    <div>
+		   	<div class="perInformation" onclick='next(7);'>
+			   	<p>地区</p>
+		   		<p>
+					{$Agentslist.province|get_address_name_by_id}
+					{$Agentslist.city|get_address_name_by_id}
+					{$Agentslist.area|get_address_name_by_id}
+				</p>
+		   	</div>
+	   </div>
+	</div>
+	{include file='index@common/footer_button'}
+<script type="text/javascript" src="/static/Js/jquery.js"></script>
+<script type="text/javascript" src="/static/Js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    // 跳转
+    function next(e){
+        if(e == 1){
+			window.location.href = "{:url('Personalinfo/WechatNickName')}";
+        }else if(e == 2){
+            window.location.href = "{:url('Personalinfo/WechatID')}";
+        }else if(e == 3){
+            window.location.href = "{:url('Personalinfo/myQQ')}";
+		}else if(e == 4){
+            window.location.href = "{:url('Personalinfo/myName')}";
+        }else if(e == 5){
+            window.location.href = "{:url('Personalinfo/sex')}";
+        }else if(e == 6){
+            window.location.href = "{:url('Personalinfo/identity')}";
+        }else if(e == 7){
+            window.location.href = "{:url('Personalinfo/address')}";
+        }
+    }
+</script>
+<!--上传图片-->
+<script>
+
+    function setImagePreview() {
+
+        var imgPath = $("#up_img").val();
+        var old_img = $("#default_imgurl").val();
+
+        $("#bt").removeAttr("onclick");
+
+        if (imgPath == "") {
+            alert('请选择上传图片！');
+            return;
+        }
+        //判断上传文件的后缀名
+        var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+        strExtension = strExtension.toLowerCase();
+        if (strExtension != 'jpg' && strExtension != 'gif' && strExtension != 'png' && strExtension != 'bmp' && strExtension != 'jpeg') {
+            alert('上传图片的格式不正确，请上传jpg、gif、png格式的图片！');
+            return;
+        }
+        $.ajaxFileUpload({
+            url: '{:url("Personalinfo/uploads")}',  //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: 'up_img', //文件上传域的ID
+            type: 'post',
+            dataType: 'json', //返回值类型 一般设置为json
+            success: function (data)  //服务器成功响应处理函数
+            {
+                if(data.state==1){
+                    $("#myimg").attr('src',data.savedir);
+                    $("#default_imgurl").val(data.savedir);
+                    //$("#old_img").val(data.savedir);
+                }
+//                    $("#bt").attr("onclick","submitV(this);");
+            },
+            error: function (err)//服务器响应失败处理函数
+            {
+                //$('#help-block').text(err.msg);
+            }
+        })
+    }
+</script>
+<!--上传二维码-->
+<script>
+    function setImageQR_code_img() {
+        var imgPath = $("#QR_code_img").val();
+        $("#bt").removeAttr("onclick");
+
+        if (imgPath == "") {
+            alert('请选择上传图片！');
+            return;
+        }
+        //判断上传文件的后缀名
+        var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+        strExtension = strExtension.toLowerCase();
+        if (strExtension != 'jpg' && strExtension != 'gif' && strExtension != 'png' && strExtension != 'bmp' && strExtension != 'jpeg') {
+            alert('上传图片的格式不正确，请上传jpg、gif、png格式的图片！');
+            return;
+        }
+        $.ajaxFileUpload({
+            url: '{:url("Personalinfo/upload_QR_code")}',  //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: 'QR_code_img', //文件上传域的ID
+            type: 'post',
+            dataType: 'json', //返回值类型 一般设置为json
+            success: function (data)  //服务器成功响应处理函数
+            {
+                if(data.state==1){
+                    alert('上传成功');
+                    $("#upload_QR_code").attr('src',data.savedir);
+//                            $("#default_imgurl").val(data.savedir);
+                    //$("#old_img").val(data.savedir);
+                }
+//                    $("#bt").attr("onclick","submitV(this);");
+            },
+            error: function (err)//服务器响应失败处理函数
+            {
+                //$('#help-block').text(err.msg);
+            }
+        })
+    }
+</script>

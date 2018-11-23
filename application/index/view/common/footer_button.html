@@ -1,0 +1,24 @@
+			<div class="footer" {if condition="$Think.session.user.role===0"}id="member"{/if}>
+				<div>
+					<button class="ripple" onclick="redirect('{:url('Product/index')}');">
+						<div {present name='spider["index"]'} {eq name='$spider["index"]' value='2'} style="color: #aaa2fb;"{/eq} {/present}>
+							<p><img src="/static/Images/{present name='spider["index"]'}{eq name='$spider["index"]' value='2'}light_2.png{else/}gray_2.png{/eq}{else/}gray_2.png{/present}" alt="商品" /></p>商品
+						</div>
+					</button>
+					{if condition="(!session('?user')) or ($Think.session.user.role>0)"}
+					<button class="ripple" onclick="{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Product/myCart')}'){/if}{else/}redirect('{:url('Product/myCart')}'){/present};">
+						<div{present name='spider["index"]'} {eq name='$spider["index"]' value='4'} style="color: #aaa2fb;"{/eq} {/present}>
+							<p><img src="/static/Images/{present name='spider["index"]'} {eq name='$spider["index"]' value='4'}light_3.png{else/}gray_3.png{/eq}{else/}gray_3.png{/present}" alt="购物车" /></p>购物车
+						</div>
+					</button>
+					{/if}
+					<button class="ripple" onclick="redirect('{:url('Person/index')}');">
+						<div{present name='spider["index"]'} {eq name='$spider["index"]' value='5'} style="color: #aaa2fb;"{/eq} {/present}>
+							<p><img src="/static/Images/{present name='$spider["index"]'} {eq name='$spider["index"]' value='5'}light_4.png{else/}gray_4.png{/eq}{else/}gray_4.png{/present}" alt="我的" /></p>我的
+						</div>
+					</button>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

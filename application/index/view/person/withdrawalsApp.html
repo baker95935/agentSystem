@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+			window.onload=function(){
+					var u = navigator.userAgent;
+		            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+		            if(isiOS){
+		            	document.querySelector("div.goBack").style.display="none";
+		            }
+				}	
+		</script>
+	</head>
+	<body>
+		<div id="OMListContent" class="applyTiXian">
+			<section>
+				<p>可提现金额（元）</p>
+				<h2>{$profit}</h2>
+			</section>
+			<div class="bottom">
+			   	<a href="{:url('Person/appWithdrawals')}">
+			   		<span><i class="lowerOrder"></i>提现申请</span>
+				</a>
+			</div>
+			<div>
+		   		<a href="{:url('Person/withdrawalsLog')}">
+			   		<span><i class="myOrder"></i>提现记录</span>
+				</a>
+			</div>
+		</div>
+		<div class="footer goBack">
+				<a href="javascript:history.back(-1);">返&nbsp;&nbsp;回</a>
+			</div>
+	</body>
+</html>

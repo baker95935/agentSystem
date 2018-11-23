@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>代理商申请-已审核</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <!--S-->
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-datepicker.min.css" />
+    <!--E-->
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <!--S-->
+    <script type="text/javascript" src='/static/Js/bootstrap-datepicker.min.js'></script>
+    <script type="text/javascript" src='/static/Js/bootstrap-datepicker.zh-CN.min.js'></script>
+    <!--E-->
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="performance-top">
+    <h5>代理商管理</h5>
+</div>
+<ul class="nav nav-tabs" style="margin-left:20px;">
+    <li>
+        <a href="{:url('Agents/agentsList')}">全部</a>
+    </li>
+    <li><a href="{:url('Agents/applyListAgentAudit')}">待审核</a></li>
+    <li class="active"><a href="javascript:;">已审核</a></li>
+    <li><a href="{:url('Agents/applyListAgentDisagree')}">驳回</a></li>
+    <li><a href="{:url('Agents/addAgent')}">添加代理商</a></li>
+</ul>
+<form class="form-inline definewidth m20" action="" method="get">
+    <table class="search_table">
+        <tr>
+            <td class="td_r">代理商编号：</td>
+            <td class="td_r td_pl"><input type="text" name="a_id" value="{present name='search.a_id'}{$search.a_id}{/present}" class="abc input-default" />
+            </td>
+            <td class="td_r td_pl"> 姓名：</td>
+            <td class="td_r td_pl"> <input type="text" name="name" value="{present name='search.name'}{$search.name}{/present}" class="abc input-default" />
+            </td>
+            <td class="td_r td_pl">手机：</td>
+            <td> <input type="text" name="phone" value="{present name='search.phone'}{$search.phone}{/present}" class="abc input-default search_input" />
+            </td>
+
+            <td class="td_r td_pl">代数：</td>
+            <td class="td_r td_pl"> <select name='generation' class="search_input">
+                    <option value='0'>全部</option>
+                    {present name='last_g'}
+                    {for start='1' end='$last_g+1'}
+                    <option value='{$i}'{present name='search.generation'}{if condition='$i eq $search.generation'} selected{/if}{/present}>{$i}代</option>
+                    {/for}
+                    {/present}
+                </select></td>
+            <td class="td_r td_pl">角色：</td>
+            <td class="td_r td_pl"> <select name='role' class="search_input">
+                    <option value='-1'{notpresent name='search.role'} selected{/notpresent}>全　部</option>
+                    {foreach name="levelList" item="item" }
+                    <option value='{$item.id}'{present name='search.role'}{if condition='$item.id eq $search.role'} selected{/if}{/present}>{$item.name}</option>
+                    {/foreach}
+                </select></td>
+        </tr>
+        <tr>
+            <td class="td_r"> 申请时间：</td>
+            <td class="td_r td_pl"> <input type="text" name="begin" value="{present name='search.begin'}{$search.begin}{/present}" class="abc input-default datepicker" />
+            </td>
+            <td class="td_c td_pl">~</td>
+            <td class="td_r td_pl"><input type="text" name="end" value="{present name='search.end'}{$search.end}{/present}" class="abc input-default datepicker" />
+            </td>
+            <td colspan=4  class="td_l td_pl"> <button type="button" class="btn btn-primary search">查询</button>&nbsp;&nbsp;
+                <button type="button" class="btn btn-success export">导出</button></td>
+
+        </tr>
+    </table>
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+        <tr>
+            <th>代理商编号</th>
+            <th>姓名</th>
+            <th>代数</th>
+            <th>角色</th>
+            <!-- <th>申请类型</th> -->
+            <th>团队人数</th>
+            <th>销售总额</th>
+            <th>剩余库存</th>
+            <th>申请时间</th>
+            <th>上级</th>
+            <th>支付金额</th>
+            <th>支付证明</th>
+            <th>审核时间</th>
+        </tr>
+    </thead>
+    {empty name='list'}
+    <tr>
+        <td colspan='12'>暂无信息</td>
+    </tr>
+    {else/}
+        {foreach name="list" item="item"}
+    <tr>
+        <td>{$item.a_id}</td>
+        <td class="tl">{$item.name}</td>
+        <td><span class='label label-info'>{$item.generation}代</span></td>
+        <td><span class='label label-info'>{$item.role|get_reward_levelname}</span></td>
+        <!-- <td>{*$item.type_lang*}</td> -->
+        <td>{$item.team_num}</td>
+        <td class="tr">￥{$item.sale_num}</td>
+        <td class="tr">￥{$item.stock_money}</td>
+        <td>{$item['create_ctime']}</td>
+        <td>{if condition='$item.apply_by_id'}ID：{$item.apply_by_id}<br>姓名：{$item.apply_name}<br>手机号：{$item.apply_phone}{/if}</td>
+        <td>￥{$item.money}</td>
+        <td>
+            <div id="layer-photos-demo" class="layer-photos-demo" style="width:50px;height: 50px;margin:0 auto;">
+                {if condition='$item.img'}<img layer-src="{$item.img}" src="{$item.img}" style="width:100%;"/>{/if}
+            </div>
+        </td>
+        <td>{$item['examine_etime']}</td>
+    </tr>
+        {/foreach}
+    {/empty}
+</table>
+<div class="inline pull-right page">
+{$list->render()}
+</div>
+</body>
+<script type="text/javascript">
+    $('.datepicker').datepicker({
+        autoclose: true,          //自动关闭
+        calendarWeeks: false,     //是否显示今年是第几周
+        clearBtn: true,           //显示清除按钮
+        daysOfWeekDisabled: [],   //星期几不可选
+        endDate: Infinity,        //日历结束日期
+        forceParse: true,         //是否强制转换不符合格式的字符串
+        format: 'yyyy-mm-dd',     //日期格式
+        keyboardNavigation: true, //是否显示箭头导航
+        language: 'zh-CN',        //语言
+        minViewMode: 0,
+        orientation: "auto",      //方向
+        rtl: false,
+        startDate: -Infinity,     //日历开始日期
+        startView: 0,             //开始显示
+        todayBtn: false,          //今天按钮
+        todayHighlight: true,     //今天高亮
+        weekStart: 0              //星期几是开始
+    });
+</script>
+<script type="text/javascript">
+    $(function () {
+        //查看大图
+        layer.photos({
+            photos: ".layer-photos-demo"
+        });
+
+        // 删除
+        $('.del').click(function(){
+            var _id = $(this).data('id');
+            modifyApply(_id,3,'是否确认删除该条代理商申请记录?');
+        });
+
+        // 发送修改申请操作
+        function modifyApply(m,n,msg){
+            if(msg){
+                if(confirm(msg)){
+                    $.post('{:url("/admin/Agents/examineApply/")}',{id:m,type:n},function(e){window.location.reload();},'json');
+                }
+            }else{
+                $.post('{:url("/admin/Agents/examineApply/")}',{id:m,type:n},function(e){
+                    if(e.error){alert(e.error.msg)}else{window.location.reload();}
+                },'json');
+            }
+        }
+
+        // 查询
+        $('.search').click(function(){
+            var _start = $('input[name=begin]').val();
+            var _end  = $('input[name=end]').val();
+            if(_start && _end){
+                _start = new Date(_start.replace("-", "/").replace("-", "/"));
+                _end = new Date(_end.replace("-", "/").replace("-", "/"));
+                if(_start>_end){
+                    alert('结束时间必须晚于开始时间！');
+                    return false;
+                }
+            }
+            $('form').attr('action',"{:url('/admin/Agents/applyListAgentAgree')}").submit();
+        });
+
+        // 导出
+        $('.export').click(function(){
+            var _start = $('input[name=begin]').val();
+            var _end  = $('input[name=end]').val();
+            if(_start && _end){
+                _start = new Date(_start.replace("-", "/").replace("-", "/"));
+                _end = new Date(_end.replace("-", "/").replace("-", "/"));
+                if(_start>_end){
+                    alert('结束时间必须晚于开始时间！');
+                    return false;
+                }
+            }
+            $('form').attr('action',"{:url('/admin/Agents/exportApp','type=2')}").submit();
+        });
+    });
+</script>
+</html>

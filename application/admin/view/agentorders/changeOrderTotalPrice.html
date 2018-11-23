@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>改价</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        input[type='number']{margin-bottom: 0px;border-radius: 0px;}
+
+    </style>
+
+</head>
+<body>
+   
+<!-- <form action="{:url('/admin/Agentorders/changeOrderTotalPriceSave/')}" method="post" > -->
+<table id="tAmount" class="table table-bordered table-hover  m10">
+    <thead>
+    <tr>
+        <th>商品名称</th>
+        <th style="width:20%">商品单价</th>
+        <th style="width:10%">数量</th>
+        <th style="width:20%">总价</th>
+        <th style="width:20%">改价</th>
+    </tr>
+    </thead>
+    <tbody id="orderInfo">
+    <!-- {foreach name="orderInfo" item="item"}
+	    <tr>
+	        <td>{$item.pname}</td>
+	        <td>{$item.pprice}</td>
+	        <td>{$item.pnumber}</td>
+	        <td>{$item.ptotal_price}</td>
+	        <td><input type="text" name="changPrice{$item.id}" id="changPrice{$item.id}"  value="{$item.ptotal_price_pay}"></td>
+	    </tr>
+ 	{/foreach} -->
+
+</tbody>
+</table>
+<div class="layui-layer-btn layui-layer-btn-">     
+        <a class="layui-layer-btn0">保存</a>
+        <a class="layui-layer-btn1">关闭</a>          
+</div>
+<!-- </form> -->
+<input type="hidden" id="orderAmountPay"/>
+</body>
+</html>
+<script>
+    $(function () {   
+        var index = parent.layer.getFrameIndex(window.name); 
+        var orderId=parent.document.getElementById("orderId").value;    
+        $.ajax({
+            type : "post",
+                    url : '/admin/Agentorders/getOrderTotalPrice/',
+                    dataType : 'json',
+                    data: {id:orderId},
+                    success : function(e) {
+                        var jsonData = JSON.parse(e);                        
+                        var strHtml=null;
+                        $.each(jsonData.orderInfo,function(index,val){
+                            strHtml+='<tr><td class="tl">'+val.pname+'</td><td>￥'
+                                    +val.pprice+'元</td><td>'
+                                    +val.pnumber+'</td><td>￥<span id='+val.id+'>'
+                                    +val.ptotal_price+'</span>元</td><td><input type="number"  name="changPrice{'
+                                    +val.id+'}"  value="'
+                                    +val.ptotal_price_pay+'" id='+val.id+' onblur="newAmount(this,'+val.id+')"></td>';
+                        });
+                        strHtml+='<tr><td colspan="5" class="tl">实付金额：￥'+jsonData.order_amount+
+                                '元</td></tr><tr><td colspan="5" class="tl">改价后：￥<span id="newPay">'+jsonData.order_amount_pay+'</span>元</td></tr>';
+                        $("#orderAmountPay").val(jsonData.order_amount_pay);
+                        $("#orderInfo").html(strHtml)
+                    },
+                    error:function(e){
+                        
+                    }
+           });
+        $('.layui-layer-btn1').click(function(){
+           parent.layer.close(index);
+        });
+        $('.layui-layer-btn0').click(function(){
+            var strline='';
+            $("#tAmount input").each(function(){
+               strline+=$(this).attr('id')+'|'+$(this).val()+',';
+            });
+            $.ajax({
+                    type : "post",
+                    url : '/admin/Agentorders/changeOrderTotalPriceSave/',
+                    dataType : 'json',
+                    data: {order_number:orderId,order_data:strline,newPay:$("#newPay").html()}, 
+                    success:function(e){
+                       
+                        if(e!=0){
+                        layer.alert('操作成功！',function(){
+                            window.parent.location.reload();
+                            parent.layer.close(index);
+                                      
+                        });
+                       }else{
+                        layer.alert('操作失败！');
+                       }
+                    },
+                    error:function(e){
+                        layer.alert(e);
+                    }
+            });
+         });
+
+
+ });
+	function newAmount(obj,id){
+        var ptotal_price=$('#'+id).html();
+        var newPay=$('#orderAmountPay').val();
+        $('#newPay').empty().html(parseFloat(parseFloat(newPay)-parseFloat(ptotal_price)+parseFloat(obj.value)));
+      
+    }
+</script>

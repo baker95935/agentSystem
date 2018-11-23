@@ -1,0 +1,32 @@
+{include file='index@common/header'/}
+	<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/Css/swiper.min.css"/>
+	<link rel="stylesheet" href="/static/Css/orderManage.css" />
+	<script type="text/javascript" src="/static/Js/jquery-2.1.0.min.js" charset="utf-8"></script>
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+	</style>
+</head>
+	<body>
+			<div id="upPackContent">	
+			  	<ul>
+			  	 {foreach name="giftList" item="item"}
+			  		<li>
+			  			<a href="{:url('/index/Promotiongift/detail/id/'.$item->id)}">
+			  				<img src="{$item.pic}" alt="" />
+			  				<div>
+			  					<p class="proName">{$item.name}</p>
+			  					<span class="level bronze">{$item.type|get_reward_levelname}大礼包</span>
+			  					<p>
+			  						<span class="goods-price"><span class="yen">￥</span>{$item.price}</span>
+			  						<span class="sale">销量：{$item.sale}件</span>		 
+			  						<!-- <span class="round"><i></i><i></i><i></i> </span> -->
+			  					</p>
+			  				</div>
+			  			</a>
+			  		</li>
+			  	 {/foreach}	
+			  	</ul>
+			</div>
+	{include file='index@common/footer_button'}
+</html>

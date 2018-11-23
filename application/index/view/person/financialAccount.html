@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<style type="text/css">
+			body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+			window.onload=function(){
+				var u = navigator.userAgent;
+	            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+	            if(isiOS){
+	            	document.querySelector("div.goBack").style.display="none";
+	            }
+			}
+		</script>
+	</head>
+	<body>
+		<div id="capitalContent">
+			<ul>
+				<li>
+					<div class="perInformation" style="background: none;    justify-content: space-between;" onclick='{if condition="$wechat_is_bind"} {if condition="$Request.param.choice eq 2"} redirect("{:url("person/recharge","type=3")}"); {/if} {else/} alert("请先关注公众号并重新登录") {/if}'>
+						<a href="javascript:;"><span>微信支付</span></a>
+						{if condition='!$wechat_is_bind'}
+						<span style="color: red;">未绑定</span>
+						{else/}
+						<span style="color: green;">已绑定</span>
+						{/if}
+					</div>
+				</li>
+				<li>
+					<div class="perInformation" onclick='redirect(1,{$bind.ali_set});'>
+						<a href="javascript:;"><span>支付宝账号</span></a>
+					</div>
+				</li>
+				<li>
+					<div class="perInformation" onclick='redirect(2,{$bind.bank_set});'>
+						<a href="javascript:;"><span>银行卡账号</span></a>
+					</div>
+				</li>
+			</ul>
+			<div class="description">
+				请设置您的支付账号。
+				1、微信支付账号支持在线交易及提现。
+				2、支付宝账号及银行卡账号暂时提供线下支付。
+			</div>
+		</div>
+		<div class="footer goBack">
+			<a href="javascript:history.back(-1);">返&nbsp;&nbsp;回</a>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var _choice = false;// 是否选择页
+		{if condition="input('param.')"} _choice = true; {/if}
+
+		// 跳转
+		function redirect(type,bool){
+			var url = '';
+			if(_choice)
+			{
+				url = '/index/Person/recharge/type/';
+			}
+			switch(type){
+				case 1:
+					if(bool){
+						url += type;
+					}else{
+						url = "{:url("Person/bindAlipay",input("param."))}";
+					}
+					break;
+				case 2:
+					if(bool){
+						url += type;
+					}else{
+						url = "{:url("Person/bindBank",input("param."))}";
+					}
+					break;
+			}
+			window.location.href = url;
+		}
+
+	</script>
+</html>

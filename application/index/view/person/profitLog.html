@@ -1,0 +1,201 @@
+{include file='index@common/header'}
+	<style type="text/css">
+		html,
+		body {
+			background-color: #F5F5F5;
+		}
+		.none {visibility: hidden;}
+	</style>
+</head>
+<body>
+	<div id="agencyTeamContent" class="profitLog">
+		<div class="top">
+			<div class="ProTop" id="search_btn">
+				<div class="search">
+					<i class="icon_search"></i>
+					<input type="text" name='search' value='{$search}' id="tvKeyword" placeholder="搜索订单编号" onkeydown='search();' />
+					<button class='close{empty name="search"} none{/empty}'></button>
+				</div>
+				<div class="search_btn">
+					<button type='button' class='btn_search'>搜索</button>
+				</div>
+			</div>
+			<ol>
+				<li class="current">全部</li>
+				<li>直销订单</li>
+				<li>间接订单</li>
+				<li>下级升级</li>
+				<li>下级充值</li>
+			</ol>
+		</div>
+		<input type="hidden" value="{$type}" class="choice_index" />
+		<div class="agencyLevel">
+			<!--全部订单-->
+			<div class="logContent">
+				{notempty name='allList'}
+				{volist name='allList' id='all_vo'}
+				<ul>
+					<li>
+						<div class="perInformation">
+							{if condition="($all_vo.type==7) or ($all_vo.type==8)"}
+							<a href="">
+								<span>编号：</span>{$all_vo.id}
+							</a>
+							{else /}
+							<a href="{eq name='$all_vo.agent_id' value='$Think.session.user.a_id'}{:url('Order/orderDetail','id='.$all_vo['order_number'])}{else/}{:url('Order/lowerOrderDetail','id='.$all_vo['order_number'])}{/eq}">
+								<span>订单编号：</span>{$all_vo.order_number}
+							</a>
+							{/if}
+						</div>
+					</li>
+					{if condition="$all_vo.type eq 7"}
+						<li><span>类型：</span>下级升级</li>
+						<li><span>时间：</span>{$all_vo.create_time}</li>
+						<li><span>交易金额：</span>{$all_vo.sales_amount}元</li>
+						<li><span>实际收益：</span>{$all_vo.profit}元</li>
+					{elseif condition="$all_vo.type eq 8"}
+						<li><span>类型：</span>下级充值</li>
+						<li><span>时间：</span>{$all_vo.create_time}</li>
+						<li><span>交易金额：</span>{$all_vo.sales_amount}元</li>
+						<li><span>实际收益：</span>{$all_vo.profit}元</li>
+					{else /}
+						<li><span>订单类型：</span>{eq name='$all_vo.type' value='7'}库存扣减{/eq}{eq name='$all_vo.type' value='6'}直销订单{/eq}{eq name='$all_vo.type' value='2'}间接订单{/eq}</li>
+						<li><span>下单时间：</span>{$all_vo.create_time}</li>
+						<li><span>销售价：</span>{$all_vo.sales_amount}元</li>
+						<li><span>成本价：</span>{$all_vo.sales_amount-$all_vo.profit}元</li>
+						<li><span>实际收益：</span>{$all_vo.profit}元</li>
+					{/if}
+				</ul>
+				{/volist}
+				{/notempty}
+			</div>
+			<!--直销订单-->
+			<div class="logContent">
+				{notempty name='directList'}
+				{volist name='directList' id='direct_vo'}
+				<ul>
+					<li>
+						<div class="perInformation">
+							<a href="{:url('Order/orderDetail','id='.$direct_vo['order_number'])}">
+								<span>订单编号：</span>{$direct_vo.order_number}
+							</a>
+						</div>
+					</li>
+					<li><span>订单类型：</span>直销订单</li>
+					<li><span>下单时间：</span>{$direct_vo.create_time}</li>
+					<li><span>销售价：</span>{$direct_vo.sales_amount}元</li>
+					<li><span>成本价：</span>{$direct_vo.sales_amount-$direct_vo.profit}元</li>
+					<li><span>实际收益：</span>{$direct_vo.profit}元</li>
+				</ul>
+				{/volist}
+				{/notempty}
+			</div>
+			<!--间接订单-->
+			<div class="logContent">
+				{notempty name='indirectList'}
+				{volist name='indirectList' id='indirect_vo'}
+				<ul>
+					<li>
+						<div class="perInformation">
+							<a href="{:url('Order/lowerOrderDetail','id='.$indirect_vo['order_number'])}">
+								<span>订单编号：</span>{$indirect_vo.order_number}
+							</a>
+						</div>
+					</li>
+					<li><span>订单类型：</span>间接订单</li>
+					<li><span>下单时间：</span>{$indirect_vo.create_time}</li>
+					<li><span>销售价：</span>{$indirect_vo.sales_amount}元</li>
+					<li><span>成本价：</span>{$indirect_vo.sales_amount-$indirect_vo.profit}元</li>
+					<li><span>实际收益：</span>{$indirect_vo.profit}元</li>
+				</ul>
+				{/volist}
+				{/notempty}
+			</div>
+			<!--下级升级-->
+			<div class="logContent">
+				{notempty name='update'}
+					{volist name='update' id='u_vo'}
+					<ul>
+						<li>
+							<div class="perInformation">
+								<a href="">
+									<span>编号：</span>{$u_vo.id}
+								</a>
+							</div>
+						</li>
+						<li><span>类型：</span>下级升级</li>
+						<li><span>时间：</span>{$u_vo.create_time}</li>
+						<li><span>交易金额：</span>{$u_vo.sales_amount}元</li>
+						<li><span>实际收益：</span>{$u_vo.profit}元</li>
+					</ul>
+					{/volist}
+				{/notempty}
+			</div>
+			<!--下级充值-->
+			<div class="logContent">
+				{notempty name='charge'}
+				{volist name='charge' id='l_c'}
+				<ul>
+					<li>
+						<div class="perInformation">
+							<a href="">
+								<span>编号：</span>{$l_c.id}
+							</a>
+						</div>
+					</li>
+					<li><span>类型：</span>下级充值</li>
+					<li><span>时间：</span>{$l_c.create_time}</li>
+					<li><span>交易金额：</span>{$l_c.sales_amount}元</li>
+					<li><span>实际收益：</span>{$l_c.profit}元</li>
+				</ul>
+				{/volist}
+				{/notempty}
+			</div>
+		</div>
+	</div>
+	{include file='index@common/footer_button'}
+<script type="text/javascript" src="/static/Js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+	function search(){
+		var index = $('.choice_index').val();
+		var key   = $('input[name=search]').val();
+		if(event.keyCode == 13){
+			redirect("/index/Person/profitlog/type/"+index+"/search/"+key);
+		}
+	}
+
+	$(function() {
+
+		$("#agencyTeamContent .agencyLevel .logContent").hide().eq({$type}).show();
+		$("#agencyTeamContent .top>ol li").removeClass('current').eq({$type}).addClass('current');
+		// 标签切换
+		$("#agencyTeamContent .top>ol li").click(function() {
+			var index = $(this).index();
+			$(this).addClass('current').siblings().removeClass('current');
+			$("#agencyTeamContent .agencyLevel>.logContent").hide().eq(index).show();
+		})
+
+		// 搜索失焦
+		$('input[name=search]').keyup(function(){
+			var _val = $(this).val();
+			if(_val){
+				$('.close').css("visibility","visible");
+			}else{
+				$('.close').css("visibility","hidden");
+			}
+		});
+
+		// 清空搜索
+		$('.close').click(function(){
+			$('input[name=search]').val('');
+			$(this).hide();
+		});
+
+		// 搜索按钮
+		$('.btn_search').click(function(){
+			var index = $('.choice_index').val();
+			var key   = $('input[name=search]').val();
+			redirect("/index/Person/stockLog/type/"+index+"/search/"+key);
+		});
+	})
+</script>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+			.none {display: none;}
+		</style>
+		<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+		var docEl = document.documentElement;
+
+		function getSize(){
+			var screenWidth = docEl.clientWidth;
+			docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+		}
+		getSize();
+
+		window.onresize = function() {
+			getSize();
+		}
+		</script>
+
+	</head>
+	<body>

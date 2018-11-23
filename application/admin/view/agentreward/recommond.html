@@ -1,0 +1,50 @@
+{include file='header'/}
+<form method="post" action="{:url('/admin/Agentreward/recommondSave')}">
+<div id="performance-top">
+	<h5>招商奖励</h5>
+	<div id="reward-layout">
+			<p>设置</p>
+			<div class="reward-layout">
+			    <input type="hidden" name="cid" value="{$configInfo.id}">
+				<input type="checkbox" id="toggle-button" name="valid_recommend_reward" {present name="configInfo.valid_recommend_reward"} {if condition="$configInfo.valid_recommend_reward eq 1 "} checked="checked"  {/if} {/present}>
+				<label for="toggle-button" class="button-label">
+			    	<span class="button-circle"></span>
+			    	<span class="text on">开</span>
+			    	<span class="text off">关</span>
+	    		</label>
+			</div>
+		</div>
+</div>
+ 
+<table  class="table table-bordered table-hover common_input definewidth m10">
+    <thead>
+    <tr>
+        <th style="width:10%;" rowspan="2">名称</th>
+        <th colspan="6">奖励系数<span style="color:red; font-size: 12px;">（奖励系数由左到右为1度、2度、3度、4度、5度、6度奖励系数，系数设置为0~100）</span>
+		</th>
+	</tr>
+    </thead>
+    
+	    {foreach name="listLevel" item="item"}
+	    <tr {if condition='$item.deep eq 0'} style="display: none;" {/if}>
+	    	<td style="width:10%;">{$item.name}</td>
+			{for start="0" end="$item.deep"}
+                        <td  width="15%" class="tl" {if condition='$i eq $item.deep-1'}  colspan="{$deep=abs($item.deep-7)}" {else/}{/if}>
+							<input type="hidden" class="input-medium" name="id_{$item.id}_{$i+1}" value="{present name="item['roleRatioId'][$i+1]"}{$item['roleRatioId'][$i+1]}{/present}" >
+							<input type="text" alt="{$i+1}度招商奖励系数"  pattern="^(\d?\d(\.\d*)?|100)$"  title="必须在0和100之间"   style="width:140px;" class="input-medium" name="value_{$item.id}_{$i+1}" value="{present name="$item['roleRatioValue'][$i+1]"}{$item['roleRatioValue'][$i+1]}{/present}"  placeholder="{$i+1}度招商比例系数" > 
+						</td>
+			{/for}
+	    </tr>
+	    {/foreach}
+    
+        <tr>
+	    <td colspan="7">
+	    	<div align="center"><button type="submit" class="btn btn-primary" >保存</button></div>
+	    </td>
+   		</tr>
+    </form>
+</table>
+ 
+</body>
+</html>
+ 

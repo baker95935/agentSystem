@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+			.none{display:none;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+			window.onload=function(){
+				var u = navigator.userAgent;
+	            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+	            if(isiOS){
+	            	document.querySelector("div.goBack").style.display="none";
+	            }
+			}
+		</script>
+	</head>
+	<body>
+		<div id="agencyTeamContent" class="profitLog">
+			<div class="top">
+				<div class="ProTop" id="search_btn">
+					<div class="search">
+						<i class="icon_search"></i>
+						<input type="text" name='search' value='{$search}' id="tvKeyword" placeholder="搜索订单编号" onkeydown='search();' />
+						<button class='close{empty name="search"} none{/empty}'></button>
+					</div>
+					<div class="search_btn">
+						<button type='button' class='btn_search'>搜索</button>
+					</div>
+				</div>
+				<ol>
+					<li class="current">全部</li>
+					<li>直销订单</li>
+					<li>间接订单</li>
+					<li>下级升级</li>
+					<li>下级充值</li>
+				</ol>
+			</div>
+			<input type="hidden" value="{$type}" class='choice_index' />
+			<div class="agencyLevel">
+				<!--全部订单-->
+				<div class="logContent">
+					{notempty name='allList'}
+					{volist name='allList' id='all_vo'}
+						{if condition="$all_vo.change_type eq 3"}
+						<ul>
+							<li>
+								<div class="perInformation">
+									<a href="{eq name='$all_vo.agent_id' value='$Think.session.user.a_id'}{:url('Order/orderDetail','id='.$all_vo['order_number'])}{else/}{:url('Order/lowerOrderDetail','id='.$all_vo['order_number'])}{/eq}">
+										<span>订单编号：</span>{$all_vo.order_number}
+									</a>
+								</div>
+							</li>
+							<li><span>订单类型：</span>{eq name='$all_vo.orderInfo.reward_type' value='4'}直销订单{else/}间接订单{/eq}</li>
+							<li><span>下单时间：</span>{$all_vo.create_time}</li>
+							<li><span>交易金额：</span>{$all_vo.orderInfo.sales_amount}元</li>
+							<li><span>库存余额：</span>{$all_vo.change_after}元</li>
+							<li><span>备注：</span>{$all_vo.remark}:￥{$all_vo.money}</li>
+						</ul>
+						{/if}
+						{if condition="($all_vo.change_type eq 5) or ($all_vo.change_type eq 7)"}
+							<ul>
+								<li>
+									<div class="perInformation">
+										<a href="">
+											<span>编号：</span>{$all_vo.id}
+										</a>
+									</div>
+								</li>
+								<li><span>类型：</span>{eq name='$all_vo.change_type' value='5'}下级升级{/eq}{eq name='$all_vo.change_type' value='7'}下级充值{/eq}</li>
+								<li><span>时间：</span>{$all_vo.create_time}</li>
+								<li><span>交易金额：</span>{$all_vo.money}元</li>
+								<li><span>库存余额：</span>{$all_vo.change_after}元</li>
+								<li><span>备注：</span>{$all_vo.remark}:￥{$all_vo.money}</li>
+							</ul>
+						{/if}
+
+					{/volist}
+					{/notempty}
+				</div>
+				<!--直销订单-->
+				<div class="logContent">
+					{notempty name='directList'}
+					{volist name='directList' id='direct_vo'}
+					<ul>
+						<li>
+							<div class="perInformation">
+								<a href="{eq name='$direct_vo.a_id' value='$Think.session.user.a_id'}{:url('Order/orderDetail','id='.$direct_vo['order_number'])}{else/}{:url('Order/lowerOrderDetail','id='.$direct_vo['order_number'])}{/eq}">
+									<span>订单编号：</span>{$direct_vo.order_number}
+								</a>
+							</div>
+						</li>
+						<li><span>订单类型：</span>直销订单</li>
+						<li><span>下单时间：</span>{$direct_vo.create_time}</li>
+						<li><span>交易金额：</span>{$direct_vo.sales_amount}元</li>
+						<li><span>库存余额：</span>{$direct_vo.change_after}元</li>
+						<li><span>备注：</span>{$direct_vo.remark}:￥{$direct_vo.money}</li>
+					</ul>
+					{/volist}
+					{/notempty}
+				</div>
+				<!--间接订单-->
+				<div class="logContent">
+					{notempty name='indirectList'}
+					{volist name='indirectList' id='indirect_vo'}
+					<ul>
+						<li>
+							<div class="perInformation">
+								<a href="{eq name='$indirect_vo.a_id' value='$Think.session.user.a_id'}{:url('Order/orderDetail','id='.$indirect_vo['order_number'])}{else/}{:url('Order/lowerOrderDetail','id='.$indirect_vo['order_number'])}{/eq}">
+									<span>订单编号：</span>{$indirect_vo.order_number}
+								</a>
+							</div>
+						</li>
+						<li><span>订单类型：</span>间接订单</li>
+						<li><span>下单时间：</span>{$indirect_vo.create_time}</li>
+						<li><span>交易金额：</span>{$indirect_vo.sales_amount}元</li>
+						<li><span>库存余额：</span>{$indirect_vo.change_after}元</li>
+						<li><span>备注：</span>{$indirect_vo.remark}:￥{$indirect_vo.money}</li>
+					</ul>
+					{/volist}
+					{/notempty}
+				</div>
+				<!--下级升级-->
+				<div class="logContent">
+					{notempty name='updateList'}
+						{volist name='updateList' id='u_vo'}
+						<ul>
+							<li>
+								<div class="perInformation">
+									<a href="">
+										<span>编号：</span>{$u_vo.id}
+									</a>
+								</div>
+							</li>
+							<li><span>类型：</span>下级升级</li>
+							<li><span>时间：</span>{$u_vo.create_time}</li>
+							<li><span>交易金额：</span>{$u_vo.money}元</li>
+							<li><span>库存余额：</span>{$u_vo.change_after}元</li>
+							<li><span>备注：</span>{$u_vo.remark}:￥{$u_vo.money}</li>
+						</ul>
+						{/volist}
+					{/notempty}
+				</div>
+				<!--下级充值-->
+				<div class="logContent">
+					{notempty name='chargeList'}
+						{volist name='chargeList' id='c_vo'}
+						<ul>
+							<li>
+								<div class="perInformation">
+									<a href="">
+										<span>编号：</span>{$c_vo.id}
+									</a>
+								</div>
+							</li>
+							<li><span>类型：</span>下级充值</li>
+							<li><span>时间：</span>{$c_vo.create_time}</li>
+							<li><span>交易金额：</span>{$c_vo.money}元</li>
+							<li><span>库存余额：</span>{$c_vo.change_after}元</li>
+							<li><span>备注：</span>{$c_vo.remark}:￥{$c_vo.money}</li>
+						</ul>
+						{/volist}
+					{/notempty}
+				</div>
+			</div>
+		</div>
+		<div class="footer goBack">
+			<a href="javascript:history.back(-1);">返&nbsp;&nbsp;回</a>
+		</div>
+	</body>
+	<script type="text/javascript" src="/static/Js/jquery-2.1.0.min.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		// 跳转
+		function redirect(url){
+			window.location.href = url;
+		}
+
+		function search(){
+			var index = $('.choice_index').val();
+			var key   = $('input[name=search]').val();
+			if(event.keyCode == 13){
+				redirect("/index/Person/stockLog/type/"+index+"/search/"+key);
+			}
+		}
+
+		$(function() {
+
+			$("#agencyTeamContent .agencyLevel .logContent").hide().eq({$type}).show();
+			$("#agencyTeamContent .top>ol li").removeClass('current').eq({$type}).addClass('current');
+			// 标签切换
+			$("#agencyTeamContent .top>ol li").click(function() {
+				var index = $(this).index();
+				$('.choice_index').val(index);
+				$(this).addClass('current').siblings().removeClass('current');
+				$("#agencyTeamContent .agencyLevel>.logContent").hide().eq(index).show();
+			});
+
+			// 搜索失焦
+			$('input[name=search]').keyup(function(){
+				var _val = $(this).val();
+				if(_val){
+					$('.close').show();
+				}else{
+					$('.close').hide();
+				}
+			});
+
+			// 清空搜索
+			$('.close').click(function(){
+				$('input[name=search]').val('');
+				$(this).hide();
+			});
+
+			// 搜索按钮
+			$('.btn_search').click(function(){
+				var index = $('.choice_index').val();
+				var key   = $('input[name=search]').val();
+				redirect("/index/Person/stockLog/type/"+index+"/search/"+key);
+			});
+		});
+	</script>
+</html>

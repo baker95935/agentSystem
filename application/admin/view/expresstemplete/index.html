@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>运费模板列表</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div id="performance-top">
+        <h5>物流快递</h5>
+    </div>
+    <ul id="logistics-tab" class="definewidth">
+        <li><a href="{:url('Expresstemplete/index')}" class="logistics-tab-bottom">运费模板设置</a></li>
+        <li><a href="{:url('Expressrule/index')}">运费设置</a></li>
+    </ul>
+    <div id="logistics-search" class="definewidth">
+        <form action="{:url('Expresstemplete/index')}" method="get" class="form-inline" id="agentorders">
+            <input type="text" name="name" value="{$name}" class="abc input-default search_input" id="name" placeholder="模板名称">
+            &nbsp;&nbsp;
+            <button type="submit" class="btn btn-primary">搜索</button>&nbsp;&nbsp;
+            <button type="button" class="btn btn-success" id="addnew">新建模板</button>
+        </form>
+    </div>
+    <table class="table table-bordered table-hover definewidth m10" id="logistics-table">
+        <thead>
+        <tr>
+            <th><input type="checkbox" id="selAll"></th>
+            <th>模板名称</th>
+            <th>创建时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        {foreach name="dictionaryList" item="item"}
+        <tr>
+            <td class="listCheck"><input type="checkbox" name='tids[]' value="{$item.id}" /></td>
+            <td>{$item.name}</td>
+            <td>{$item.create_ctime}</td>
+            <td class="logistics-operate">
+                <a href="{:url('Expresstemplete/edit','id='.$item['id'])}">编辑</a>
+	        	<a href="javascript:;" class="del" data-id="{$item.id}">删除</a>
+                <aside class="toggle-button-wrapper">
+                    <label for="toggle-button" class="button-label {$item.is_valid == 1 ? 'logistics-current' : ''}" flag="{$item.is_valid == 1 ? 'false' : 'true'}" data-id='{$item.id}'>
+                        <span class="button-circle"></span>
+                        <span class="text on">ON</span>
+                        <span class="text off">OFF</span>
+                    </label>
+                </aside>
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    <div class="inline pull-right page">
+    {$dictionaryList->render()}
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+    // 跳转
+    function redirect(url){
+        window.location.href = url;
+    }
+
+    // 启用修改
+    function ajaxEditor(_id,_state){
+        var stamp= new Date().getTime();
+        $.ajax({
+            url: '{:url("Expresstemplete/ajaxEnable")}?'+stamp,
+            data: {eid: _id,sta:_state},
+            dataType:'post'
+        });
+    }
+
+    $(function () {
+
+        // 添加
+    	$('#addnew').click(function(){
+			redirect('{:url("Expresstemplete/create")}');
+	 	});
+
+        // 启用按钮
+        $('.button-label').click(function(){
+            let _id = $(this).data('id');
+            let isShow=$(this).attr('flag')
+            if(isShow==='true'){
+                $(this).addClass('logistics-current');
+                $(this).attr('flag','false');
+                ajaxEditor(_id,1);
+            }else{
+               $(this).removeClass('logistics-current');
+               $(this).attr('flag','true');
+               ajaxEditor(_id,0);
+            }
+        });
+
+        $('#selAll').on('click',function(){
+            $('.listCheck :checkbox').prop('checked',$(this).prop('checked'));
+        })
+        const len=$('.listCheck').length;
+        $('.listCheck').on('change',function(){
+            let checkLength=$(".listCheck>input[type='checkbox']:checked").length;
+            if( len === checkLength){
+                $('#selAll').prop('checked',true)
+            }else{
+                $('#selAll').prop('checked',false)
+            }
+        });
+
+        // 删除
+        $('.del').click(function(){
+            let _id = $(this).data('id');
+            layer.confirm("确认删除？",{btn:['确定','取消']},function(){
+                $.ajax({
+                    url:'{:url("Expresstemplete/delete")}',
+                    data:{did:_id},
+                    success:function(e){
+                        if(e.error){
+                            layer.alert(e.error.msg);
+                        }else{
+                            // layer.alert(e.msg);
+                            window.location.reload();
+                        }
+                    }
+                });
+            },function(index){ layer.close(index); });
+        });
+    });
+</script>

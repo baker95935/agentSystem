@@ -1,0 +1,65 @@
+{include file='header'/}
+<div id="performance-top">
+                <h5>菜单管理</h5>
+            </div>
+<form class="form-inline definewidth" action="{:url('/admin/Adminmenu/index')}" method="get">
+    菜单名称：
+    <input type="text" name="name" id="name"class="abc input-default width-auto" placeholder="" value="">&nbsp;&nbsp; 
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+    <button type="button" class="btn btn-success" id="addnew">新增菜单</button>
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th>菜单标题</th>
+        <th style="width:20%;">模型</th>
+		<th style="width:20%;">方法</th>
+		<th style="width:10%;">组</th>
+		<th style="width:10%;">排序</th>
+        <th style="width:10%;">状态</th>
+        <th style="width:10%;">管理操作</th>
+    </tr>
+    </thead>
+	    {foreach name="menuList" item="item"}
+	    <tr>
+		<td class="tl">{$item.name}</td>
+		<td class="tl">{$item.module}</td>
+		<td class="tl">{$item.action}</td>
+		<td>{$item.group}</td>
+		<td>{$item.order}</td>
+		<td>{$item.status|get_admin_status}</td>
+        <td><a href="{:url('/admin/Adminmenu/create/id/'.$item->id)} ">编辑</a>
+        	<a onclick="return  confirm('确定删除吗，操作不可逆')" href="{:url('/admin/Adminmenu/delete/id/'.$item->id)} ">删除</a>
+        </td>
+	    </tr>
+	     {foreach name="item.sendList" item="vo"}
+	    <tr>
+	        <td class="tl  lti2">∟{$vo.name}</td>
+	        <td class="tl">{$vo.module}</td>
+			<td class="tl">{$vo.action}</td>
+			<td>{$vo.group}</td>
+			<td>{$vo.order}</td>
+	        <td>{$vo.status|get_admin_status}</td>
+	        <td>
+	        	<a href="{:url('/admin/Adminmenu/create/id/'.$vo->id)} ">编辑</a>  
+	        	<a onclick="return  confirm('确定删除吗，操作不可逆')" href="{:url('/admin/Adminmenu/delete/id/'.$vo->id)} ">删除</a>
+	        </td>
+	    </tr>
+	     {/foreach}
+	    {/foreach}
+</table>
+<div class="inline pull-right page">
+{$menuList->render()}
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+
+		$('#addnew').click(function(){
+				window.location.href="{:url('/admin/Adminmenu/create')}";
+		 });
+
+    });
+	
+</script>

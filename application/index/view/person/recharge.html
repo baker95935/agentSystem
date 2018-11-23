@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<style type="text/css">
+			body{background-color: #F5F5F5;}
+			button{border: 0;} .perInformation{justify-content: space-between;}
+			.last>label{border: 0;font-size: .75rem;padding-left: .75rem;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="AlipayContent" class="topUp">
+			<div>
+				<input type="text" value="{if condition='$lowest_limit > 0'}{$lowest_limit}{/if}" name="money" class="placeholder_99" placeholder="输入充值金额" onkeyup="formatNum(this);" />
+			</div>
+			<div class="line">
+				<div class="pay" onclick="redirect('{:url('Person/financialAccount','choice=2')}');">
+					<div class="perInformation">
+						<span>{$account.name}</span>
+						{if condition='($type eq 3) and !$wechat_is_bind'}
+						<span style="color:red;margin-right: 1rem;">未绑定</span>
+						{elseif condition='($type eq 3) and $wechat_is_bind' /}
+						<span style="color:green;margin-right: 1rem;">已绑定</span>
+						{/if}
+					</div>
+				</div>
+			</div>
+			{neq name='$type' value='3'}
+			<div class="last">
+				{present name="account.account"}
+				<label>{$account.account}</label>
+				{/present}
+			</div>
+			{/neq}
+			<input type='hidden' name='type' value='{$type}' />
+			<input type='hidden' name='account' value='{present name="account.account"}{$account.account}{/present}' />
+			<input type="hidden" value="{$wechat_is_bind}" class="isBind" />
+			<button class="commonButton">确认</button>
+		</div>
+	</body>
+	<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+	<script type="text/javascript">
+		function redirect(url){
+			window.location.href = url;
+		}
+
+		function formatNum(obj){
+			obj.value = obj.value.replace(/[^\d.]/g,""); //清除"数字"和"."以外的字符
+			obj.value = isNaN(parseInt(obj.value)) ? 0 : parseInt(obj.value);
+		}
+
+		$(function(){
+
+			// 确认
+			$('.commonButton').click(function(){
+				var _val = $.trim($('input[name=money]').val());
+				var _set = $('input[name=account]').val();
+				var _type = $('input[name=type]').val();
+				var _lowest_limit = {$lowest_limit};
+				if(_type == 3){
+					var _isBind = $('.isBind').val();
+					if(!_isBind){
+						mobileTip('微信支付未绑定');
+						return false;
+					}
+				}
+				if(isNaN(_val)){
+					mobileTip('请填写充值金额');
+					return false;
+				}
+				if(_val <= 0){
+					mobileTip('充值金额必须大于0');
+					return false;
+				}else if(_val<_lowest_limit){
+					mobileTip('充值金额必须大于等于'+_lowest_limit);
+					return false;
+				}else if(_val >= 10000 && _type == 3){
+					mobileTip('为保证您的资金安全，请采用支付宝或银行卡转账方式充值库存');
+					return false;
+				};
+				if(!_set && _type != 3){
+					mobileAlert('请先设置资金账户或填写付款帐号');
+					return false;
+				}
+				$.ajax({
+					url:'{:url("Person/saveRecharge")}',
+					type:'post',
+					data:{num:_val,account:_set,type:_type},
+					success:function(e){
+						if (e.error) {
+							mobileAlert(e.error.msg);
+							return false;
+						} else {
+							var _url = '{:url("Person/rechargeStock")}';
+							if(_type == 3) {
+								_url = '/index/pay/wechat/order_number/'+e;
+							}
+							redirect(_url);
+						};
+					}
+				});
+			});
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

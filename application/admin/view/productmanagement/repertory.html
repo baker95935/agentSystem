@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+     <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/ckform.js"></script>
+    <script type="text/javascript" src="/static/Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }.product_name{max-width: 110px;white-space: pre-wrap;overflow: hidden;}
+    </style>
+</head>
+<body>
+    <div id="performance-top">
+        <h5>产品管理</h5>
+    </div>
+    <ul class="nav nav-tabs" style="margin-left:20px;">
+        <li><a href="{:url('/admin/Productmanagement/index/')}">出售中</a></li>
+        <li class="active"><a href="javascript:void(0);">库存</a></li>
+        <li><a href="{:url('/admin/Productmanagement/create/')}">添加</a></li>
+        <li><a href="{:url('/admin/Productmanagement/insertExcel/')}">批量导入</a></li>
+    </ul>
+
+
+<form class="form-inline definewidth m20 search_table" action="{:url('/admin/Productmanagement/repertory')}" method="post">
+    <div class="flex_container">
+        <div>
+            <div>
+                产品ID:
+                <input type="text" name="id" id="id" class="abc input-default" placeholder="" value="" style="width: 150px">
+                产品名称：
+                <input type="text" name="product_name" id="product_name" class="abc input-default" placeholder="" value="{if condition='$product_name gt 0'}{$product_name}{/if}" style="width: 150px">&nbsp;&nbsp;
+                分组：
+                <input type="text" name="grouping_name" id="grouping_name" class="abc input-default" placeholder="" value="{if condition='$grouping_name gt 0'}{$grouping_name}{/if}" style="width: 150px">&nbsp;
+                产品标签：
+                <input type="text" name="label_name" id="label_name" class="abc input-default" placeholder="" value="{if condition='$label_name gt 0'}{$label_name}{/if}" style="width: 150px">&nbsp;
+            </div>
+        </div>
+        
+    </div>
+    
+    <div style="margin:6px 0;">
+        <span class="w-70">类目名称：</span>
+
+            <select style="width: 150px;" name="type_id" id="type_id" onchange="showProduct();" class="search_input">
+                <option selected = "selected">请选择</option>
+                 {$typeList}
+            </select>
+            <span id="productList" onclick="showProduct2();">
+                <if condition="$re.pid neq 0 ">
+                   <input type="hidden" name="productId" id="productId" value="">
+				 </if>
+             </span>
+            <span id="categorytwo" onclick="showProduct3();">
+                <if condition="$re.pid neq 0 ">
+                   <input type="hidden" name="productId" id="productId1" value="">
+				 </if>
+             </span>
+            <span id="categorythree">
+                <if condition="$re.pid neq 0 ">
+                   <input type="hidden" name="four_id" id="four_id" value="">
+				 </if>
+            </span>
+    </div>
+    <div>
+        <input type="hidden" name="one_id" id="one_id" value="{if condition='$one_id gt 0'}{$one_id}{/if}">
+        <input type="hidden" name="two_id" id="two_id" value="{if condition='$two_id gt 0'}{$two_id}{/if}">
+        <input type="hidden" name="three_id" id="three_id" value="{if condition='$three_id gt 0'}{$three_id}{/if}">
+        <input type="hidden" name="four_id" id="four_id" value="{if condition='$four_id gt 0'}{$four_id}{/if}">
+        <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp;
+        <button type="button" class="btn btn-success" id="excel">批量导出</button>&nbsp;&nbsp;
+        <button type="button" class="btn btn-danger" id="delall" onclick="alldelate()">批量删除</button>&nbsp;&nbsp;
+        </div>
+</form>
+<table class="table table-bordered table-hover definewidth m10" >
+    <thead>
+        <tr>
+            <th width="1%"><input type="checkbox" id="selectall" onclick="selectall()"></th>
+            <th>id</th>
+            <th>产品名称</th>
+            <th>产品类目</th>
+            <th>产品组别</th>
+            <th>产品价格</th>
+            <th>出货量</th>
+            <th>库存</th>
+            <th>封面图片</th>
+            <th>产品标签</th>
+            <th>创建时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    {foreach name="managementlist" item="item" }
+         <tr>
+
+            <th width="1%"><input type="checkbox" class="checkbox"   name="ids" value="{$item.id}"></th>
+             <td>{$item.id}</td>
+            <td class="product_name">{$item.product_name}</td>
+            <td>
+                {$item.category_name}
+            </td>
+             <td>
+                 {foreach name="item.grouping_list" item="value"}
+                 {$value.grouping_name}/
+                 {/foreach}
+             </td>
+             <td>
+                 <p>售价:{$item.sales_price}</p>
+                 成本价:{$item.cost_price}
+             </td>
+             <td></td>
+             <td>{$item.inventory}</td>
+             <td>
+                 <volist name="item.category_img" id="img" >
+                     <img style="width:50px;height:50px;" src="{$item.product_img}">
+                 </volist>
+             </td>
+             <td>
+                 {foreach name="item.label_list" item="kk"}
+                 {$kk.product_name}/
+                 {/foreach}
+             </td>
+            <td>{$item.create_time}</td>
+
+            <td>
+                <a href="{:url('/admin/Productmanagement/createEdit/id/'.$item->id)}">编辑</a>
+                <a href="{:url('/admin/Productmanagement/set_up_down',['id'=>$item->id,'state'=>$item->state])}">上架</a>
+                <a onclick="return  confirm('确定删除吗，操作不可逆')" href="{:url('/admin/Productmanagement/delete/id/'.$item->id)}">删除</a>
+                <a href="{:url('/admin/Productmanagement/create/id/')}">产品二维码</a>
+            </td>
+
+        </tr>
+    {/foreach}
+    </table>
+<div class="inline pull-right page">
+    {$managementlist->render()}
+</div>
+</body>
+</html>
+
+<script>
+    var state_r = 2;
+    $(function () {
+        $('#excel').click(function(){
+            window.location.href="{:url('/admin/Productmanagement/excelProductList/product_name/'.$product_name.'/grouping_name/'.$grouping_name.'/label_name/'.$label_name.'/one_id/'.$one_id.'/two_id/'.$two_id.'/three_id/'.$three_id.'/four_id/'.$four_id)}?state_r="+ state_r;
+
+        });
+    });
+    $(function () {
+		$('#addnew').click(function(){
+				window.location.href="{:url('/admin/Productmanagement/create/')}";
+		 });
+    });
+    $(function () {
+        $('#sell').click(function(){
+            window.location.href="{:url('/admin/Productmanagement/index/')}";
+        });
+    });
+	function del(id)
+	{
+		if(confirm("确定要删除吗？"))
+		{
+			var url = "index.html";
+			window.location.href=url;
+		}
+	}
+    /*全选*/
+    function selectall(){
+
+        var all_box = $("#selectall").is(':checked')
+        if( all_box ){
+            $(".checkbox").prop("checked",true);
+        }else{
+            $(".checkbox").prop("checked",false);
+        }
+    }
+    //批量删除
+    function alldelate(){
+        var id=$('input:checkbox[name^=ids]:checked').map(function(){
+            return $(this).val();
+        }).get().join(",");
+        if(!id)
+        {
+            alert('请选择要删除的项!');
+        }
+        else
+        {
+            var answer = confirm("删除后不能恢复，是否删除？");
+            if(answer)
+            {
+                $.ajax( {
+                    type : "post",
+                    url : '/admin/Productmanagement/delete' ,
+                    dataType : 'json',
+                    data: {id:id,},
+                    success : function(data) {
+                        if (data.status='ok'){
+                            alert("删除成功");
+                            var url = "repertory.html";
+                            window.location.href=url;
+                        }else {
+                                alert("系统错误，删除失败");
+                        }
+                    },
+                });
+            }
+        }
+    }
+</script>
+<script>
+    function showProduct() {
+        //思路整理，先获取分类ID，然后根据分类的IDAJAX查询数据，然后吐回来
+        var type_id = $('#type_id').val();
+        if (type_id != '') {
+            $.ajax({
+                url: '/admin/Productmanagement/getProductList',
+                type: 'GET',
+                data: {'type_id': type_id},
+                success: function (data) {
+
+                    if (data != '') {
+                        $("#productList").html(data);
+                    }
+
+                }
+            })
+        }
+
+    }
+    //获取三级分类
+    function showProduct2() {
+        var z_id = $('#two_id').val();
+        if (z_id != '') {
+            $.ajax({
+                url: '/admin/Productmanagement/getCategoryTwo',
+                type: 'GET',
+                data: {'z_id': z_id},
+                success: function (data) {
+
+                    if (data != '') {
+                        $("#categorytwo").html(data);
+                    }
+
+                }
+            })
+        }
+    }
+    //获取四级分类
+    function showProduct3() {
+        var three_id = $('#three_id').val();
+        if (three_id != '') {
+            $.ajax({
+                url: '/admin/Productmanagement/getCategoryThree',
+                type: 'GET',
+                data: {'three_id': three_id},
+                success: function (data) {
+
+                    if (data != '') {
+                        $("#categorythree").html(data);
+                    }
+
+                }
+            })
+        }
+    }
+
+</script>

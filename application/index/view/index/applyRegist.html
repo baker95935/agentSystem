@@ -1,0 +1,209 @@
+{include file='index@common/header'}
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/areachose.css"/>
+	    <script type="text/javascript" charset="utf-8" src="/static/Js/jquery-2.1.0.min.js"></script>
+		<script type="text/javascript" src="/static/Js/ajaxfileupload.js"></script>
+	    <script type="text/javascript" charset="utf-8" src="/static/Js/areachose.js"></script>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+	</head>
+	<body>
+		<div id="applyContent">
+			<ul>
+				<li>
+					<span>姓名：</span>
+					<input type="text" name="name" value='{present name="$data.name"}{$data.name}{/present}' id="name" />
+				</li>
+				<li>
+					<span>微信号：</span>
+					<input type="text" name="wechat" value='{present name="$data.wechat"}{$data.wechat}{/present}' id="weixin" />
+				</li>
+				<li>
+					<span>手机号：</span>
+					<input type="text" id="phone" value='{$info.phone}' readonly/>
+				</li>
+			</ul>
+		  	<div class="area">
+		  		<span>所在地区</span>
+				<div>
+					<a class="div_address" style="display:block;width:inherit;">
+						<span id="location_p">{present name="$data.province"}{notempty name='$data.province'}{$data.province}{else/}请选择地区{/notempty}{else/}请选择地区{/present}</span>
+						<span id="location_c">{present name="$data.city"}{neq name='data.city' value='0'}{$data.city}{/neq}{/present}</span>
+						<span id="location_a">{present name="$data.area"}{neq name='data.area' value='0'}{$data.area}{/neq}{/present}</span>
+					</a>
+				</div>
+		  	</div>
+		  	<div class="address">
+		  		<input type="text" name="address" value='{present name="$data.address"}{$data.address}{/present}' class="placeholder_99" id="telNumber" placeholder="详细地址" />
+		  	</div>
+			<div class="application">
+		   		<a href="javascript:choiceRole('{:url('Index/applyBox','type=1','')}');">
+			   		<span>申请身份</span>
+			   		<span>{$role_lang[$apply]}</span>
+				</a>
+				<input type='hidden' name='apply' value='{empty name="$apply"}{$info["role"]+1}{else/}{$apply}{/empty}' />
+			</div>
+			<div style="height:.4rem;background: #F5F5F5;"></div>
+			<div>
+				<input type="number" name="money" value="" class="placeholder_99" placeholder="支付金额"/>
+				<input type="hidden" name="img" value="" />
+			</div>
+			<div style="height:.4rem;background: #F5F5F5;"></div>
+			<div class="perInformation" style="position:relative;">
+		   		<p>上传交易单</p>
+				<p>
+					<input type="file" name="screen_img" id="screen_img" onchange="upImg(this)" style="position: absolute; right:-12px; top:0; width: 200px; height:2.5rem; opacity: 0; cursor: pointer;">
+					上传
+				</p>
+			</div>
+			<div style="height:.4rem;background: #F5F5F5;"></div>
+			<p class="apply_BZ">要求500K以下，请上传交易单</p>
+		   	<div class="footer">
+		   		<button type='button' id="btn">提交申请</button>
+		   	</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		// 跳转
+		function redirect(url){
+			window.location.href = url;
+		}
+
+		// 选择身份
+		function choiceRole(url){
+			var n = $.trim($('input[name=name]').val());
+			var w = $.trim($('input[name=wechat]').val());
+			var p = $.trim($('#location_p').text());
+			var c = $.trim($('#location_c').text());
+			var a = $.trim($('#location_a').text());
+			var A = $.trim($('input[name=address]').val());
+			if(n != '' && n != null && n != undefined){
+				url += '/n/'+n;
+			}
+			if(w != '' && w != null && w != undefined){
+				url += '/w/'+w;
+			}
+			if(p != '' && p != null && p != undefined && p != '请选择地区'){
+				url += '/p/'+p;
+			}
+			if(c != '' && c != null && c != undefined && c != 0){
+				url += '/c/'+c;
+			}
+			if(a != '' && a != null && a != undefined && a != 0){
+				url += '/a/'+a;
+			}
+			if(A != '' && A != null && A != undefined){
+				url += '/A/'+A;
+			}
+			redirect(url);
+		}
+
+		function upImg(obj){
+			var imgPath = $('#screen_img').val();
+			if (imgPath == "") {
+	            alert('请选择上传图片！');
+	            return;
+	        }
+	        //判断上传文件的后缀名
+	        var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+	        strExtension = strExtension.toLowerCase();
+	        if (strExtension != 'jpg' && strExtension != 'png' && strExtension != 'bmp' && strExtension != 'jpeg') {
+	            alert('上传图片的格式不正确，请上传jpg、bmp、png格式的图片！');
+	            return;
+	        }
+
+			$.ajaxFileUpload({
+	            url: '{:url("Index/uploadImg")}',
+	            secureuri: false,
+	            fileElementId: 'screen_img', //文件上传域的ID
+	            type: 'post',
+	            dataType:'json',
+	            success: function (e)
+	            {
+	            	if(e.img){
+	            		$("input[name=img]").val(e.img);
+	            	}
+	            },
+	            error: function (err)
+	            {
+
+	            }
+	        });
+		}
+
+		$(function(){
+
+			// 地址选择
+			$(".div_address").chosearea({
+				shengid:'location_p',
+				shiid:'location_c',
+				xianid:'location_a'
+			});
+
+			// 提交申请
+			$('#btn').click(function(){
+				var _name = $('input[name=name]').val();
+				var _wechat = $('input[name=wechat]').val();
+				var _p = $('#location_p').text();
+				var _c = $('#location_c').text();
+				var _a = $('#location_a').text();
+				var _add = $('input[name=address]').val();
+				var _apply = $('input[name=apply]').val();
+				var _img = $('input[name=img]').val();
+				var _money = $('input[name=money]').val();
+				if(_name == ''){
+					mobileTip('姓名不能为空');
+					return false;
+				}
+				if(_wechat == ''){
+					mobileTip('微信号不能为空');
+					return false;
+				}
+				if(_p == '' || _c == '' || _a == '' || _add == ''){
+					mobileTip('地址不能为空');
+					return false;
+				}
+				if(_apply == ''){
+					mobileTip('请选择身份');
+					return false;
+				}
+				if(!_img){
+					mobileTip('请上传交易单');
+					return false;
+				}
+				$('#btn').attr('disabled','disabled');// 按钮失效
+				$.ajax({
+					url:'{:url("Index/saveRgApply")}',
+					type:'post',
+					data:{name:_name,wechat:_wechat,p:_p,c:_c,a:_a,add:_add,apply:_apply,money:_money,img:_img},
+					success:function(e){
+						if(e.error){
+							$('#btn').removeAttr('disabled');
+							layer.open({
+							    content:e.error.msg,
+							    btn: ['确认'],
+							    yes: function(index){
+							    	window.location.href = e.error.url;
+							    	layer.close(index);
+							    }
+							});
+						}else{
+							layer.open({
+							    content:e.msg,
+							    btn: ['确认'],
+							    yes: function(index){
+							    	$('#btn').removeAttr('disabled');
+							    	window.location.href = '{:url("Index/myPrivilege")}';
+							    	layer.close(index);
+							    }
+							});
+						}
+					}
+				});
+			});
+		})
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

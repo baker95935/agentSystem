@@ -1,0 +1,50 @@
+{include file='index@common/header'}
+	<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+	<script type="text/javascript" src='/static/Js/jquery.js'></script>
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+	</style>
+</head>
+<body>
+	<div id="apply_logs">
+		{empty name='list'}
+		<div>
+			<ul><li>暂无记录</li></ul>
+		</div>
+		{else/}
+		{volist name='list' id='vo'}
+		<div>
+			<ul>
+				<li>
+					<span>{$vo.create}</span>
+					<span class="status">{eq name='vo.status' value='1'}通过{/eq}{eq name='vo.status' value='2'}驳回{/eq}{eq name='vo.status' value='0'}待审核{/eq}</span>
+				</li>
+				<li>
+					<span>ID：{$vo.id}</span><span>{$vo.name}</span>
+				</li>
+				<li>
+					<span>手机号：{$vo.phone}</span><span>申报身份：{$vo.target}</span>
+				</li>
+			</ul>
+			<div>
+				备注说明：{$vo.remarks}
+			</div>
+		</div>
+		{/volist}
+		{/empty}
+	</div>
+	<div class="footer goBack">
+		<a href="javascript:history.back(-1);">返&nbsp;&nbsp;回</a>
+	</div>
+</body>
+<script type="text/javascript">
+	window.onload=function(){
+		var u = navigator.userAgent;
+        var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+        if(isiOS){
+        	document.querySelector("div.goBack").style.display="none";
+        }
+	}
+</script>
+</html>

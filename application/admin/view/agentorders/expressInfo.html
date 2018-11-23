@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>物流信息跟踪</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/ckform.js"></script>
+    <script type="text/javascript" src="/static/Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<form id="form1">
+<table class="table table-bordered table-hover definewidth m10">
+<thead>
+<tr>
+	<th colspan="2">订单相关信息</th>
+</tr>
+</thead>
+	<tr><td>代理商ID：{$orderInfo.agent_id}</td><td>代理商姓名:{$orderInfo->agents->nickname}</td></tr>
+	<tr><td>收货人：{$addressInfo.consignee_name}</td><td>联系方式：{$addressInfo.consignee_phone}</td></tr>
+	<tr><td colspan="2">收货地址：{$addressInfo.province|get_address_name_by_id}{$addressInfo.city|get_address_name_by_id}{$addressInfo.area|get_address_name_by_id}{$addressInfo.address}</td></tr>
+	<tr><td>配送方式：{$deliveryInfo.express_name}</td><td>快递编号:{$deliveryInfo.express_number}</td></tr>
+	<tr><td>订单编号：{$orderInfo.order_number}</td><td>订单日期:{$orderInfo.create_time}</td></tr>
+</table>
+ <br>
+<table class="table table-bordered table-hover definewidth m10">
+<thead>
+<tr>
+	<th>商品ID</th>
+	<th>商品图片</th>
+	<th>商品名称</th>
+	<th>商品数量</th>
+	<th>单价</th>
+	<th>总价</th>
+	<th>代理商留言</th>
+	<th>公司留言</th>
+</tr>
+</thead>
+	{foreach name="productList" item="item"}
+	<tr><td>{$item.pid}</td><td>图片</td><td>{$item.pname}</td><td>{$item.pnumber}</td><td>{$item.pprice}</td><td>{$item.ptotal_price}</td><td>1</td><td>2</td></tr>
+	{/foreach}
+</table>
+<br><br>
+{if condition="$expressInfoUrl"}
+<div align="center">
+ <table class="table table-bordered table-hover definewidth m10">
+ <thead><tr><th>时间</th><th>内容</th></tr>
+ {foreach name="expressInfoUrl->data" item="item"}
+ <tr><td>{$item->time}</td><td>{$item->context}</td></tr>
+ {/foreach}
+ </table>
+ </div>
+{/if}
+</body>
+ 

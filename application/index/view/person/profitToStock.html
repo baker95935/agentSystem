@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="profitTstore">
+			<ul>
+				<li>
+					<aside class="perInformation" onclick='redirect("{:url("Person/toStockLog")}");'>
+						<p>可转库存金额：<span class="goods-price"><span class="yen">￥</span>{$profit_total}</span>元</p>
+						<span>记录</span>
+						<input type='hidden' value='{$profit_total}' />
+					</aside>
+				</li>
+				<li>
+					<input type="text" name="num" value="" class="placeholder_99" placeholder="输入转库存金额" onkeyup="value=value.replace(/[^\d.\d$]/g,'')"/>
+				</li>
+			</ul>
+			<button class="commonButton">提交</button>
+		</div>
+	{include file='index@common/footer_button'}
+	<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+	<script type="text/javascript">
+		// 跳转
+		function redirect(url){
+			window.location.href = url;
+		}
+
+		$(function(){
+
+			// 提交
+			$('.commonButton').click(function(){
+				var nameNum=$('input[name=num]').val();
+				var _val = parseFloat(nameNum);
+				var _all = parseFloat($('input[type=hidden]').val());
+				alert(nameNum)
+				if(nameNum!=''){
+					if(_val <= 0){
+						mobileTip('转存金额必须大于0');
+						return false;
+					}
+					if(_val > _all){
+						mobileTip('转存金额不能大于可转金额');
+						return false;
+					}
+				}else{
+					mobileTip('请填写金额!');
+					return false;
+				}
+				layer.open({
+				    content:'确认提交？'
+				    ,btn: ['确认', '取消']
+				    ,yes: function(index){
+				    	$.ajax({
+							url:'{:url("Person/saveProfitToStock")}',
+							data:{num:_val},
+							type:'post',
+							success:function(e){
+								if (e.error) {
+									mobileAlert(e.error.msg);
+									return false;
+								} else{
+									redirect('{:url("Person/myStock")}');
+								};
+							}
+						});
+				    	layer.close(index);
+				    }
+				});
+			});
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

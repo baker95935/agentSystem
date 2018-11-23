@@ -1,0 +1,58 @@
+{include file='index@common/header'}
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+		.PersonalContent .listInfo>i.myshop{background: url(/static/Images/icon_Myshop.png) no-repeat center center/22px;}
+	</style>
+</head>
+<body>
+	<div id="perCenterLayout">
+		<div class="headerPersonal">
+			<div>
+				<div class="headPic">
+					<a href="javascript:;" class="portrait">
+						<img src="{$data.head_img}" alt='代理商头像' />
+					</a>
+				</div>
+				<p class="nickName">{$Think.session.user.nickname}</p>
+				<p class="weixin">微信号：{$Think.session.user.wechat}</p>
+				<p class="other"><span>授权ID：{$Think.session.user.a_id}</span><span>级别：{$role_lang}</span></p>
+			</div>
+		</div>
+		<div class="PersonalContent">
+			<section onclick='redirect("{:url("Personalinfo/personalInfoList")}")'>
+				<div class="listInfo"><i class="personal"></i>个人信息</div>
+			</section>
+			{if condition='$Think.session.user.role gt 0'}
+		    <section onclick="{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Person/myAssets')}'){/if}{else/}redirect('{:url('Person/myAssets')}'){/present}">
+		    	<div class="listInfo"><i class="property"></i>我的资产</div>
+		    </section>
+		    <section onclick='redirect("{:url("Index/myPrivilege")}")'>
+		    	<div class="listInfo"><i class="privilege"></i>我的特权</div>
+		    </section>
+		    {/if}
+		    <!-- 
+		    <section onclick='redirect("{:url("Microshop/microshop")}")'>
+		    	<div class="listInfo"><i class="myshop"></i>我的店</div>
+		    </section>
+		     -->
+		    <section onclick="redirect('{:url('Order/myOrders')}')">
+		    	<div class="listInfo"><i class="order"></i>我的订单</div>
+		    </section>
+		    <section class="perAdd" onclick="redirect('{:url('Person/addressManage')}')">
+		    	<div class="listInfo"><i class="address"></i>收货地址</div>
+		    </section>
+		    {if condition='$Think.session.user.role gt 0'}
+		    <section onclick="{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Personteam/agencyTeam')}'){/if}{else/}redirect('{:url('Personteam/agencyTeam')}'){/present}">
+		    	<div class="listInfo"><i class="team"></i>代理团队</div>
+		    </section>
+		    {/if}
+		    <section onclick="redirect('{:url('Person/invite')}')">
+		    	<div class="listInfo"><i class="invite"></i>{eq name='$Think.session.user.role' value='0'}我的二维码{else/}邀请代理{/eq}</div>
+		    </section>
+		    {if condition='$Think.session.user.role gt 0'}
+		    <section onclick="{present name='tip'}{if condition='$tip'}memberTip({$tip}){else/}redirect('{:url('Personalinfo/accredit')}'){/if}{else/}redirect('{:url('Personalinfo/accredit')}'){/present}">
+		    	<div class="listInfo"><i class="accredit"></i>授权证书</div>
+		    </section>
+		    {/if}
+		</div>
+		{include file='index@common/footer_button'}

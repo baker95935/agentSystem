@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>更改上级关系</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+
+    <style type="text/css">
+        .table td,
+       .table th{
+            vertical-align:middle;
+        }
+    </style>
+</head>
+<body>
+    <table class="table table-bordered table-hover m10">
+        <tr>
+            <th style="width:15%;height:30px;">代理商</th>
+            <td class="tl" id="agentName" style="width:35%"></td>
+            <th style="width:15%">代理商ID</th>
+            <td class="tl" id="agentsId"></td>
+        </tr>
+        <tr>
+            <th style="width:15%;height:30px;">当前邀请人</th>
+            <td class="tl" id="inviterName"></td>
+            <th style="width:15%">邀请人ID</th>
+            <td class="tl" id="inviterID"></td>
+        </tr>
+        <tr>
+            <th style="width:15%;height:30px;">变更邀请人</th>
+            <td colspan="3" class="tl">
+                <select id="inviterArr" style="width:35%;margin-top:10px;"></select>
+                <input style="width:35%" type="text" placeholder='请输入代理ID/微信号/手机号' id="search_inviter" />
+                <a class="btn btn-primary" id='search'>搜索</a>
+            </td>
+        </tr>
+    </table>
+    <div class="layui-layer-btn layui-layer-btn-">
+        <a class="layui-layer-btn0">变更</a>
+        <a class="layui-layer-btn1">取消</a>
+    </div>
+</body>
+</html>
+<script>
+     $(function () {
+		var index = parent.layer.getFrameIndex(window.name);
+        var agentId=parent.document.getElementById("agentId").value;
+        var strHtml='<option value="0">无上级</option>';
+        if(agentId){
+            $.ajax({
+                type : "post",
+                url :'/admin/Agents/initChangeAndUpgradeData/',
+                dataType : 'json',
+                data: {agentsId:agentId},
+                success : function(e) {
+
+                    var jsonData = JSON.parse(e);
+                    $("#agentsId").html(jsonData.info.agent_id);
+                    $("#agentName").html(jsonData.info.name);
+                    $("#inviterName").html(jsonData.inviterName.name);
+                    $("#inviterID").html(jsonData.info.inviter);
+
+                    $.each($.parseJSON(jsonData.agent_arr),function(index,val){
+
+                        if(jsonData.info.inviter==val.agent_id){
+                            strHtml+='<option value="'+val.agent_id+'" selected>'+val.name+'('+val.phone+')</option>';
+                        }else{
+                            strHtml+='<option value="'+val.agent_id+'">'+val.name+'('+val.phone+')</option>';
+                        }
+
+                    });
+                    $("#inviterArr").html(strHtml);
+                },
+                error:function(e){
+                    layer.alert('信息获取失败');
+                }
+           });
+        }
+
+        $('.layui-layer-btn1').click(function(){
+           parent.layer.close(index);
+        });
+        $('.layui-layer-btn0').click(function(){
+            $.ajax({
+                    type : "post",
+                    url :'/admin/Agents/changerelationshop/',
+                    dataType : 'json',
+                    data: {agent_id:agentId,inviter_id:$("#inviterArr").val()},
+                    success : function(e) {
+                        if(e>0){
+                        layer.alert('变更成功',function(){
+                            window.parent.location.reload();
+                            parent.layer.close(index);
+
+                        });
+                       }else{
+                            layer.alert('变更失败，请重新操作！');
+                       }
+                    },
+                    error:function(e){
+                        layer.alert(e);
+                    }
+            });
+        });
+        $('#search').click(function(){
+            var strHtml='<option value="0">无上级</option>';
+            var search=$("#search_inviter").val();
+            if(search){
+                 $.ajax({
+                    type : "post",
+                    url :'/admin/Agents/agentSreach/',
+                    dataType : 'json',
+                    data: {searchInfo:search,id:agentId},
+                    success : function(e) {
+                      if(e==-1){
+                        layer.alert('查无此人');
+                      }else{
+                        var jsonData = JSON.parse(e);
+                        $.each(jsonData,function(index,val){
+                            strHtml+='<option value="'+val.agent_id+'" selected>'+val.name+'('+val.phone+')</option>';
+                       });
+                       $("#inviterArr").empty().html(strHtml);
+                       $("#search_inviter").val('');
+                      }
+                    },
+                    error:function(e){
+                        layer.alert('信息获取失败');
+                    }
+                });
+            }else{
+
+                $.ajax({
+                    type : "post",
+                    url :'/admin/Agents/allAgent/',
+                    data:{id:agentId},
+                    dataType : 'json',
+                    success : function(e) {
+                        var jsonData = JSON.parse(e);
+
+                        $.each(jsonData,function(index,val){
+
+                            strHtml+='<option value="'+val.agent_id+'">'+val.name+'('+val.phone+')</option>';
+                        });
+                        $("#inviterArr").empty().html(strHtml);
+                    },
+                    error:function(e){
+                        layer.alert('信息获取失败');
+                    }
+                });
+            }
+
+        });
+
+    });
+</script>

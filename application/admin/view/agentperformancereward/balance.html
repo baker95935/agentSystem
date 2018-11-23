@@ -1,0 +1,178 @@
+{include file='header'/}
+<style type="text/css">#myScroll,#myScrollContent{width:98%;overflow-x: scroll;margin: auto;}</style>
+<div id="performance-top">
+                <h5>业绩分红结算</h5>
+                <h6>当前结算日:{$year}-{$cmonth}-{$rewardInfo['performance_reward_clear_date']}</h6>
+            </div>
+<form id="agentorders" class="form-inline definewidth search_table" action="{:url('/admin/Agentperformancereward/balance')}" method="get">    
+    <table class="search_table">
+        <tr>
+            <td class="td_r">代理商ID：</td>
+            <td>
+                    <input type="text" name="agent_id" id="agent_id" class="abc input-default" placeholder="代理商ID" value="{if condition='$agent_id gt 0'}{$agent_id}{/if}">
+            </td>
+            <td class="td_r td_pl">代理商姓名：</td>
+            <td>
+                    <input type="text" name="name" id="name" class="abc input-default" placeholder="代理商姓名" value="{if condition='$name gt 0'}{$name}{/if}">
+            </td>
+            <td class="td_r td_pl">角色：</td>
+            <td>
+                    <select name="role" id="role" class="search_input">
+                            <option value="0">全部</option>
+                            {foreach name="roleList" item="item"}
+                                <option value="{$item.id}" {if condition="$role eq $item.id"} selected="selected" {/if} >{$item.name}</option>
+                            {/foreach}
+                            </select>
+            </td>
+            <td class="td_r td_pl">月份：</td>
+            <td>
+                    <select name="month" id="month" class="search_input">
+                            <option value=0>全部</option>
+                            {foreach name="monthAry" item="item"}
+                            <option value="{$item}">{$item}月</option>
+                            {/foreach}
+                            </select>
+            </td>
+            <td class="td_r td_pl">状态：</td>
+            <td>
+                    <select name="status" id="status" class="search_input">
+                            <option value=0>全部</option>
+                            {foreach name="rewardStatus" key=key item="item"}
+                            <option value="{$key}">{$item}</option>
+                            {/foreach}
+                            </select>
+            </td>
+        </tr>
+        <tr>
+                <td class="td_r">联系方式：</td>
+                <td>
+                        <input type="text" name="contact" id="contact" class="abc input-default" placeholder="联系方式" value="{if condition='$contact gt 0'}{$contact}{/if}">
+                </td>
+                <td colspan="8" class="td_pl">
+                        <button type="button" class="btn btn-success" onclick="multiDo()">批量结算</button>&nbsp;&nbsp; 
+                        <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+                        <button type="button" id="excel" class="btn btn-success">导出</button>
+                </td>
+                
+            </tr>
+    </table>
+</form>
+<div id="myScroll">
+  <div style="width:1700px;height:10px;"></div>
+</div>
+<div id="myScrollContent">
+<div style="width:1700px;">
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+    	<th><input type="checkbox" id="all" ></th>
+        <th>代理商ID</th>
+        <th>姓名</th>
+        <th>联系方式</th>
+        <th>角色</th>
+        <th>月份</th>
+        <th>状态</th>
+        <th>本月业绩分红</th>
+        <th>增长系数</th>
+        <th>上月业绩分红基数</th>
+        <th>本月业绩分红基数</th>
+        <th>本月招商奖励</th>
+        <th>本月代理收入</th>
+        <th>其他奖励</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    {foreach name="performanceList" item="item"}
+	     <tr>
+	     	<td><input type="checkbox" name="pid" value="{$item.id}"></td>
+            <td>{$item.agent_id}</td>
+            <td>{$item->agents->name}</td>
+            <td>手机号：{$item->agents->phone}<br/>微信号：{$item->agents->wechat}</td>
+            <td>{$item->agents->generation}代<br/> {$item->agents->role|get_reward_levelname}</td>
+            <td>{$item.month}月</td>
+            <td>{$item.status}</td>
+            <td>￥{$item.performance_profit}</td>
+            <td>{$item.increate_ratio}%</td>
+            <td>￥{$item.last_performance_base}</td>
+            <td>￥{$item.current_performance_base}</td>
+            <td>￥{$item.current_recommend_profit}</td>
+            <td>￥{$item.current_agent_profit}</td>
+            <td>￥{$item.current_promotion_gift_profit}</td>
+            <td>
+            {if condition="$item->getData('status') eq 1"}
+            	<a onclick="return  confirm('确定结算吗，操作不可逆')" href="{:url('/admin/Agentperformancereward/provideAgentPerformanceProfitById/pid/'.$item.id)}"><button type="button" class="btn btn-success">结算</button></a>
+            {else /}
+           		{$item.status}
+            {/if}
+            </td>
+        </tr>	
+     {/foreach}
+</table>
+</div>
+</div>
+<div class="inline pull-right page">
+{$performanceList->render()}
+</div>
+</body>
+</html>
+<script type="text/javascript">
+$(function () {
+    $("#myScroll").scroll(function(){
+         $("#myScrollContent").scrollLeft($(this).scrollLeft());
+      });
+      $("#myScrollContent").scroll(function(){
+           $("#myScroll").scrollLeft($(this).scrollLeft());
+      }); 
+	$("#all").click(function(){
+	if(this.checked){
+	    $("[name=pid]").prop("checked",true);}
+	else{ 
+		$("[name=pid]").prop("checked",false);
+	}
+	});
+	
+	$('#excel').click(function(){
+		window.location.href="{:url('/admin/Agentperformancereward/excelBalance/agent_id'.$agent_id.'/name/'.$name.'/contact/'.$contact.'/role/'.$role.'/month/'.$month.'/status/'.$status)}";
+ 	});
+	
+});
+
+
+
+//批量结算
+function multiDo()
+{
+    var pid=$('input:checkbox[name^=pid]:checked').map(function(){
+        return $(this).val();
+    }).get().join(",");
+    
+    if(!pid)
+    {
+        alert('请选择要批量结算的项!');
+    } else {
+        var answer = confirm("结算后不能恢复，是否结算？");
+        if(answer)
+        {
+            $.ajax( {
+                type : "post",
+                url : '/admin/Agentperformancereward/provideAgentPerformanceProfitById' ,
+                dataType : 'json',
+                data: {pid:pid,},
+                success : function(data) {
+                    if (data='ok'){
+                        alert("结算成功");
+                        window.location.href="{:url('/admin/Agentperformancereward/balance')}";
+                    }else {
+                    	alert("系统错误，结算失败");
+                    }
+                },
+                
+            });
+        	
+    	}
+	}
+}
+
+
+</script>
+ 

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+            var docEl = document.documentElement;
+
+            function getSize() { // 获取屏幕的宽度
+                var screenWidth = docEl.clientWidth;
+                docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+            }
+            getSize(); // 页面加载完执行一次
+            window.onresize = function() {
+                getSize();
+            }
+		</script>
+	</head>
+	<body>
+
+			<div id="PTPerformanceContent">
+			   <ul>
+				   {foreach $userinfo as $k=>$v}
+			   		<li>
+			   			<a href="{:url('/index/Personteam/agencyData/id/'.$v.agent_id)}">
+			   				<div id="top">
+			   						<img src="{$v.head_img}"/>
+			   					<div>
+			   						<p class="nick">昵&nbsp;称：{$v.nickname}</p>
+			   						<p>微信号： {$v.wechat}</p>
+			   						<p>身&nbsp;&nbsp;&nbsp;份：{$v.generation}度{$v.role|get_reward_levelname}代理</p>
+			   					</div>
+
+			   				</div>
+			   				<ol id="bottom">
+			   					<li>
+			   						<p>日销售额：￥{$v.day_money_total}</p>
+			   						<p>日订单量：{$v.day_order_total}</p>
+			   					</li>
+			   					<li>
+			   						<p>月销售额：￥{$v.month_money_total} </p>
+			   						<p>月订单量：{$v.month_order_total}</p>
+			   					</li>
+			   				</ol>
+			   			</a>
+			   		</li>
+			   		{/foreach}
+			   </ul>
+			</div>
+
+	{include file='index@common/goBack'}
+</html>

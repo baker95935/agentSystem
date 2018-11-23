@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<script type="text/javascript" charset="utf-8" src="/static/Js/jquery-2.1.0.min.js"></script>
+		<style type="text/css">
+			html,body{height: 100%;}
+			.none{
+				display:none;
+			}#tvKeyword{flex-grow:0;width: 88%;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="ProClassifyLayout">
+			<!--<div id="top">-->
+			<div class="ProTop">
+				<div class="search">
+					<i class="icon_search"></i>
+					<input type="text" name='search' id="tvKeyword" placeholder="搜索你想要找的商品" onkeydown='if(event.keyCode==13){search();}' />
+					<button class='clear none'></button>
+				</div>
+			</div>
+			<!--</div>-->
+			<div class="layout">
+				<!--左侧栏-->
+				<div class="classLeft">
+{volist name='top_category' id='vo'}
+					<ul class="level_4">
+						<li class="menu">
+							<a href="{if condition='$vo.hasSon gt 0'}{:url('Product/category','cid='.$vo['id'].'&from='.$from)}{else/}{if condition='$from gt 0'}{:url('Microshop/selectgoods','type='.$from.'&cid='.$vo['id'])}{else/}{:url('Product/index','cid='.$vo['id'])}{/if}{/if}">
+								<h2 class="level_css">{$vo.name}</h2>
+							</a>
+						</li>
+					</ul>
+{/volist}
+				</div>
+				<!--左侧栏-->
+				<!--右侧栏-->
+				<div class="classRight">
+					<ol class="nav">
+{notempty name='current_map'}
+	{volist name='current_map' id='current' key='ci'}
+						<li><a href="{if condition='$from gt 0'}{:url('Microshop/selectgoods','type='.$from.'&cid='.$vo['id'])}{else/}{:url('Product/index','cid='.$current['id'])}{/if}">{$current.category_name}</a></li>{if condition='$ci eq count($current_map)'}{else/}&rsaquo;{/if}
+	{/volist}
+{/notempty}
+					</ol>
+					<div>
+{notempty name='right_cate'}
+						<ul class="proLevel">
+	{volist name='right_cate' id='roc'}
+							<li>
+								<a href="{eq name='$roc.hasSon' value='0'}{if condition='$from gt 0'}{:url('Microshop/selectgoods','type='.$from.'&cid='.$vo['id'])}{else/}{:url('Product/index','cid='.$roc['id'])}{/if}{else/}{:url('Product/category','cid='.$roc['id'].'&from='.$from)}{/eq}">
+									<p><img src="{$roc.img}" alt="" /></p>
+									{$roc.name}
+								</a>
+							</li>
+	{/volist}
+						</ul>
+{/notempty}
+					</div>
+				</div>
+				<!--右侧栏-->
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		// 搜索
+		function search(){
+			let _url = '/index/Product/index/';
+			let _key = $('#tvKeyword').val();
+			window.location.href = _url + 'search/' + _key;
+		}
+
+		$(function(){
+			$(".level_4 .menu>a").click(function(e){
+				$(".level_4 .menu>ul").slideUp(), $(this).next().is(":visible") || $(this).next().slideDown(),
+				e.stopPropagation();
+			});
+
+			// 搜索
+			$('#tvKeyword').keyup(function(){
+				let _val = $(this).val();
+				if(_val){
+					$('.clear').show();
+				}else{
+					$('.clear').hide();
+				}
+			});
+
+			// 清空
+			$('.clear').click(function(){
+				$('#tvKeyword').val('');
+				$(this).hide();
+			});
+		});
+	</script>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .button-label{margin-bottom: -4px;margin-left: 6px;}
+    </style>
+</head>
+<body>
+    <div id="performance-top">
+        <h5>物流公司管理</h5>
+    </div>
+<form class="form-inline definewidth ml40 search_table" action="" method="get">
+    <input type="text" name="name" value="{present name='search'}{$search}{/present}" class="abc input-default width-auto" id="name">&nbsp;&nbsp;
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-success" onclick="information()">新增</button>
+</form>
+<table id="table-group" class="table table-bordered table-hover definewidth m10">
+    <thead>
+        <tr>
+            <th><input type="checkbox" id="selectall" onclick="selectall()"></th>
+            <th>物流公司名称</th>
+            <th>创建时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    {empty name='list'}
+    <tr>
+        <td colspan="4">暂无信息</td>
+    </tr>
+    {else/}
+        {volist name='list' id='vo'}
+    <tr>
+        <th><input type="checkbox" class="checkbox" name="ids" value="{$vo.id}" /></th>
+        <td class="modify_{$vo.id}">{$vo.name}</td>
+        <td>{$vo.create_ctime}</td>
+        <td>
+            <a onclick='information({$vo.id})' style="cursor: pointer;">编辑</a>
+            <a onclick="pdelete({$vo.id})" style="cursor: pointer;">删除</a>
+            <a class="reward-layout" id="agent-level">
+                <input type="checkbox" value="{$vo.id}" id="toggle{$vo.id}" {eq name="vo.is_use" value="1"}checked='checked'{/eq} data-val='{$vo.is_use}' />
+                <label for="toggle{$vo.id}" class="button-label">
+                    <span class="button-circle"></span>
+                    <span class="text on">是</span>
+                    <span class="text off">否</span>
+                </label>
+            </a>
+        </td>
+    </tr>
+        {/volist}
+    {/empty}
+</table>
+</body>
+<script>
+    /*新增修改物流公司名称*/
+    function information(i){
+        if(i){
+            var _val = $('.modify_'+i).html();
+            layer.prompt({
+                formType:0,
+                title:'编辑物流公司名称',
+            },function(_val,index){
+                if(_val){
+                    $.ajax({
+                        type:"post",
+                        url:"{:url('Expresscompany/update')}",
+                        dataType:"json",
+                        data:{name:_val,id:i},
+                        success:function(e){
+                            if(e.error){
+                                layer.alert(e.error.msg,function(){
+                                   window.location.reload();
+                                });
+                            }else{
+                                layer.alert(e.msg,function(){
+                                   window.location.reload();
+                                });
+                            }
+                        },
+                        error:function(e){
+                            layer.alert("添加失败，请重新输入！");
+                        }
+                    });
+                }
+                layer.close(index);
+            });
+        }else{
+            layer.prompt({
+                formType:0,
+                title:'请输入物流公司名称',
+            },function(val, index){
+                if(val){
+                    $.ajax({
+                        type:"post",
+                        url:"{:url('Expresscompany/save')}",
+                        dataType:"json",
+                        data:{"name":val},
+                        success:function(e){
+                            if(e.error){
+                                layer.alert(e.error.msg,function(){
+                                   window.location.reload();
+                                });
+                            }else{
+                                layer.alert(e.msg,function(){
+                                   window.location.reload();
+                                });
+                            }
+                        },
+                        error:function(e){
+                            layer.alert("添加失败，请重新输入！");
+                        }
+                    });
+                }
+                layer.close(index);
+            });
+        }
+    }
+
+    /*全选*/
+    function selectall(){
+        var all_box = $("#selectall").is(':checked')
+        if( all_box ){
+            $(".checkbox").prop("checked",true);
+        }else{
+            $(".checkbox").prop("checked",false);
+        }
+    }
+
+    //删除操作
+    function pdelete(pid){
+        layer.confirm('是否要删除?',{btn:['确定','取消']},function(){
+            $.ajax( {
+                type : "GET",
+                url : '{:url("Expresscompany/del")}' ,
+                dataType : 'json',
+                data: {id:pid},
+                success : function(e) {
+                    if (e.error){
+                        layer.alert(e.error.msg);
+                    }else{
+                        layer.alert(e.msg,function(){
+                            window.location.reload();
+                        });
+                    }
+                },
+            });
+        },function(index){
+            layer.close(index);
+        });
+    }
+
+    $(function(){
+        // 启用修改
+        $('.button-label').click(function(){
+            var _this = $(this).prev('input');
+            var _id = _this.val();
+            var _val = _this.data('val');
+            _val = Math.abs(parseInt(_val)-1);// 取反
+            $.ajax({
+                url:'{:url("Expresscompany/turn")}',
+                data:{id:_id,turn:_val},
+                success:function(e){
+                    if (e.error) {
+                        layer.alert(e.error.msg);
+                    } else {
+                        _this.data('val',_val);
+                        _this.attr('checked', 'checked');
+                    }
+                }
+            });
+        });
+    });
+</script>
+</html>

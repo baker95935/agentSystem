@@ -1,0 +1,108 @@
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>微店背景上传</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/my-shop.css">
+		<script type="text/javascript" src='/static/Js/jquery.js'></script>
+		<script type="text/javascript">
+		var docEl = document.documentElement;
+		function getSize() { // 获取屏幕的宽度
+		  var screenWidth = docEl.clientWidth; 
+		  docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+		}
+		getSize();// 页面加载完执行一次
+		window.onresize = function() {
+		  getSize();
+		}
+		</script>
+	</head>
+	<body style="background-color: #FFF;">
+		<div id="upImage">
+
+			<div class="picture">
+				{if condition="empty($shoplist.background)"}
+				<img style="height:124px;" src="/static/Images/picture_default.png" id="myimg"  >
+				{else}
+				<img style="height:124px;" src="{$shoplist.background}" id="new-img"  >
+				{/if}
+			</div>
+			<p class='up_btn clearfix'>
+				<span>大小：500kb  375px*142px</span>
+				<a>
+					上传图片
+					<input style="height: 220px" type="file" name="up_img" id="up_img" onchange="setImagePreview(this)"/>
+					<input type=hidden name="default_imgurl" id="default_imgurl"/>
+				</a>
+			</p>
+			<button type='button' id="button"  class='commonButton'>确认</button>
+		</div>
+
+	</body>
+	<script type="text/javascript" src="/static/Js/ajaxfileupload.js"></script>
+	<script type="text/javascript">
+        $('#button').click(function () {
+            var  imgUrl=$("#default_imgurl").val();
+            if (imgUrl){
+                $.ajax( {
+                    type : "post",
+                    url :'{:url("Microshop/save_background")}',
+                    dataType : 'json',
+                    data: {imgurl:imgUrl},
+                    success : function(info) {
+                        if(info.state==1){
+                            window.location.href = info.savedir;
+                        }
+                    },
+
+                });
+            }
+        });
+	</script>
+	<script type="text/javascript">
+
+        function setImagePreview() {
+        var files=document.getElementById('up_img').files;
+            if(files.length == 0){
+                return;
+            }
+            var file = files[0];
+        var imgPath = $("#up_img").val();
+        if (imgPath == "") {
+            alert('请选择上传图片！');
+            return;
+        }
+        //判断上传文件的后缀名
+        var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+        strExtension = strExtension.toLowerCase();
+        if (strExtension != 'jpg' && strExtension != 'gif' && strExtension != 'png' && strExtension != 'bmp' && strExtension != 'jpeg') {
+            alert('上传图片的格式不正确，请上传jpg、gif、png格式的图片！');
+            return;
+        }
+        
+        $.ajaxFileUpload({
+            url: '{:url("Microshop/uploads")}',  //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: 'up_img', //文件上传域的ID
+            type: 'post',
+            dataType: 'json', //返回值类型 一般设置为json
+            success: function (data)  //服务器成功响应处理函数
+            {
+                if(data.state==1){
+                    $("#new-img").attr('src',data.savedir);
+                    $("#default_imgurl").val(data.savedir);
+                }
+            }
+        })
+    }
+	</script>
+
+
+
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

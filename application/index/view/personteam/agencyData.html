@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>详细资料</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+
+	<body>
+
+		<div id="agencyDataContent">
+ 			<div class="top">
+				<img src="{$data.head_img} "/>
+				<div>
+					<h2>{$data.nickname}</h2>
+					<h3 class="first">微信号：{$data.wechat}</h3>
+					{if condition="$type eq 1"}
+					<h3>级别：{$data.role|get_reward_levelname}代理</h3>
+					{else/}
+					<h3>级别：{$data.generation}度{$data.role|get_reward_levelname}代理</h3>
+					{/if}
+				</div>
+			</div>
+			<ul>
+				<li>
+					<span>手机号</span>{$data.phone}
+				</li>
+				<li>
+					<span>上级</span>{$data.inviter|get_agent_name_by_id}
+				</li>
+				<li>
+					<span>上级ID</span>{$data.inviter}
+				</li>
+				<li>
+					<span>地址</span>
+									   {$data.city|get_address_name_by_id}
+					                   {$data.area|get_address_name_by_id}
+					                   {$data.address}
+				</li>
+			</ul>
+ 		</div>
+
+	</body>
+
+</html>

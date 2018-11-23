@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/swiper.min.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body style="background-color:#fff;">
+		<div id="proDetailLayout">
+			<div class="proBanner">
+				<div class="swiper-container">
+			        <div class="swiper-wrapper">
+			            <div class="swiper-slide"><img src="{$info.product_img}"/></div>
+			        </div>
+			        <!-- Add Pagination -->
+			        <div class="swiper-pagination"></div>
+		   		</div>
+			</div>
+			<div class="detail">
+				<div class="proText">
+					<p class="proName">{eq name='info.is_first_order' value='1'}<span class="proFlag">首单商品</span>{/eq}{$info.product_name}</p>
+					<p class="goods-price"><span class="yen">￥</span>{$info.sales_price}</p>
+					<p class="store">
+						<input type='hidden' value='{$info.id}' id='pid' />
+						<input type='hidden' value='{$can_buy}' id='can_buy' />
+						<input type='hidden' value='{$limit_buy}' id='limit_buy' />
+						<input type="hidden" value="{$info.is_Purchase_a}" id="is_Purchase_a">
+						<input type="hidden" value="{$info.is_agent_level}" id="is_agent_level">
+						<input type="hidden" value="{$info.is_first_order}" id="is_first_order">
+						<span>库存：<i>{$info.inventory}</i>{$info.unit}</span>
+						<span>销量：{$info.mix_volume}件</span>
+					</p>
+					<div class="buy">购买数量：
+						<p>
+							<span class="sign minus"></span>
+							<input type="text" value="1" id="number"/>
+							<span class="sign add"></span>
+						</p>
+					</div>
+				</div>
+				<p class="line"></p>
+				<div class="detailContainer">
+					<div id="instructions">
+						<div>
+							<span class="current">详细说明</span>
+							{if !empty($info.specification)}<span>产品规格</span> {/if}
+							{if $imgCount}<span><a href="{:url('Product/share','id='.$info['id'])}" style="color: #a8a2fc;">分享资料</a></span>{/if}
+						</div>
+					</div>
+					<p class="line"></p>
+					<div id="instructionsContent">
+						<article>{$info.details}</article>
+						<article>{$info.specification}</article>
+					</div>
+				</div>
+			</div>
+			<div class="footer" {if condition="$Think.session.user.role > 0"}id="member"{/if}>
+				<div> 
+					{if condition="$Think.session.user.role > 0"}
+					<span class='addCart'>加入购物车</span>
+					{/if}
+					<span class='justBuy'>立即购买</span>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" charset="utf-8" src="/static/Js/jquery-2.1.0.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/Js/swiper.min.js"></script>
+	<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var swiper = new Swiper('#proDetailLayout .swiper-container', {
+	        pagination: '.swiper-pagination',
+	        spaceBetween: 30,loop: true,autoplay: 2500
+   		});
+	</script>
+	<script type="text/javascript">
+		var agent_role = '{$Think.session.user.role}';
+		$(function(){
+			
+			var role_tip={$role_tip};
+			if(role_tip==1) {
+				layer.alert('您的等级已大于此商品对应的等级，请购买其他产品', function(){
+					window.location.href='{:url("index/product/index")}';
+				});
+				return false;
+			}
+
+			// 数量增加
+			$('.add').on('click',function(){
+				$(this).css("cursor","pointer");
+				var _sum = parseInt($('#number').val());// 当前数
+				var _all = parseInt($('i').text());// 总库存
+				if (_sum < _all) {
+					_sum++;
+				} else {
+					_sum = _all;
+				};
+				
+				var _purchase = parseInt($('#is_Purchase_a').val());//限购的
+				if(_purchase==1) {
+					mobileAlert('限购产品只能购买一件');
+					return false;
+				}
+				
+				var _is_agent_level = parseInt($('#is_agent_level').val());//等级商品
+				if(_is_agent_level>0) {
+					mobileAlert('等级产品只能购买一件');
+					return false;
+				}
+				
+				$('#number').val(_sum);
+			});
+
+			// 数量减少
+			$('.minus').on('click',function(){$(this).css("cursor","pointer");
+				var _sum = parseInt($('#number').val());// 当前数
+				var _all = parseInt($('i').text());// 总库存
+				if (_sum > 1 && _sum <_all) {
+					_sum--;
+				} else if(_sum >_all){
+					_sum = _all-1;
+				} else {
+					_sum = 1;
+				};
+				$('#number').val(_sum);
+			});
+
+			// 商品介绍标签切换
+			$("#instructionsContent>article").hide().first().show();
+			$("#instructions>div>span").on('click',function(){ $(this).css("cursor","pointer");
+				$('#instructions>div>span').removeClass('current');
+				$(this).addClass('current');
+				var index = $(this).index();
+				$("#instructionsContent>article").hide().eq(index).show();
+			});
+
+			// 添加购物车
+			$('.addCart').on('click',function(){
+				{if condition='!$Think.session.user'}
+				window.location.href = '{:url("Index/login")}'; return false;
+				{/if}
+				$(this).css("cursor","pointer");
+				var _num = parseInt($('#number').val());
+				var _all = parseInt($('i').text());
+				var _pid = $('#pid').val();
+				var _limit = $('#limit_buy').val();
+				
+				if(_num < 1){
+					mobileTip('请选择要添加的数量');
+					return false;
+				}
+				if(_num > _all){
+					mobileTip('库存不足');
+					return false;
+				};
+
+				var _first = $('#is_first_order').val();
+
+				if(_first==1) {
+					mobileAlert('首单产品不能加入购物车');
+					return false;
+				}
+				
+				var _purchase=$('#is_Purchase_a').val();
+				if(_purchase==1 && _num!=1) {
+					mobileAlert('限购产品只能添加一件');
+					return false;
+				}
+				
+				var _is_agent_level = parseInt($('#is_agent_level').val());//等级商品
+				if(_is_agent_level>0) {
+					mobileAlert('等级产品不能加入购物车');
+					return false;
+				}
+				
+				if(_limit == 1) {
+					mobileAlert('此商品只能购买一件,不能加入购物车');
+					return false;
+				}
+				
+				
+				$.ajax({
+					url:'{:url("Product/addToCart")}',
+					type:'post',
+					data:{pid:_pid,num:_num},
+					success:function(e){
+						if (e.error) {
+							if (e.error.status == 301) {
+								layer.open({
+									content:e.error.msg,
+									btn: ['确定'],
+									yes: function(index){
+										layer.close(index);
+										window.location.href = '{:url("Index/applyRegist")}';
+									}
+								});
+							}else{
+								mobileAlert(e.error.msg);
+							}
+							return false;
+						} else{
+							mobileTip(e.msg);
+						};
+					}
+				});
+			});
+
+			// 立即购买
+			$('.justBuy').on('click',function(){
+				{if condition='!$Think.session.user'}
+				window.location.href = '{:url("Index/login")}'; return false;
+				{/if}
+				$(this).css("cursor","pointer");
+				var _num = parseInt($('#number').val());
+				var _all = parseInt($('i').text());
+				var _pid = $('#pid').val();
+				var _can = $('#can_buy').val();
+				var _limit = $('#limit_buy').val();
+				var _first = $('#is_first_order').val();
+
+				if(_can == 0) {
+					mobileAlert('首单产品只能购买一次');
+					return false;
+				}
+				
+				if(_limit == 1) {
+					mobileAlert('此商品只能购买一件');
+					return false;
+				}
+				
+				//if(agent_role==0) {
+					//mobileAlert('请与您的推荐人联系升级身份,然后再购买');
+					//return false;
+				//}
+
+				if(_num > _all){
+					mobileAlert('库存不足');
+					return false;
+				}else{
+					if(parseInt(agent_role) <= 0 && _first == 1)
+					{
+						layer.open({
+							content:'您不是代理商，如果购买本商品将成为代理商',
+							btn: ['确定'],
+							yes: function(index){
+								layer.close(index);
+								window.location.href = '/index/Product/preOrder/id/'+_pid+'/num/'+_num;
+							}
+						});
+					}else{
+						window.location.href = '/index/Product/preOrder/id/'+_pid+'/num/'+_num;
+					}
+				}
+			});
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

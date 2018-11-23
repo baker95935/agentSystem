@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>库存明细</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <!--S-->
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-datepicker.min.css" />
+    <!--E-->
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <!--S-->
+    <script type="text/javascript" src='/static/Js/bootstrap-datepicker.min.js'></script>
+    <script type="text/javascript" src='/static/Js/bootstrap-datepicker.zh-CN.min.js'></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <!--E-->
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .btn-content a{display: block;margin: 4px 0;}.title-text{padding: }
+        .title-text>ul{display: flex;height: 40px;}.title-text>ul>li{width: 30%;}
+    </style>
+</head>
+<body>
+<div id="performance-top">
+    <h5>库存明细</h5>
+</div>
+<div class="title-text definewidth">
+    <ul>
+        <li>代理商ID：{$info.agent_id}</li>
+        <li>代理商姓名：{$info.name}</li>
+        <li>联系方式：{$info.phone}</li>
+        <li>身份：{$info.role}</li>
+        <li>库存总额：￥{$info.stock_money}</li>
+    </ul>
+</div>
+<form action="{:url('Agents/inventory','a_id='.$a_id)}" method="post" class="form-inline definewidth m20" style="display: none;">
+    <table class="search_table">
+        <tr>
+            <td class="td_r">订单编号：</td>
+            <td><input type="text" name="number" value="{present name='search.number'}{$search.number}{/present}" class="abc input-default search_input" /></td>
+            <td class="td_r td_pl">交易金额：</td>
+            <td><input type="text" name="money" value="{present name='search.money'}{$search.money}{/present}" class="abc input-default search_input" /></td>
+            <td class="td_l td_pl"> 订单类型：
+                <select name='type' class="search_input">
+                    <option value='0'>全部</option>
+                    <option value="4"{present name='search.type'}{eq name='search.type' value='4'} selected{/eq}{/present}>直销订单</option>
+                    <option value="3"{present name='search.type'}{eq name='search.type' value='3'} selected{/eq}{/present}>间接订单</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="td_r"> 下单日期：</td>
+            <td><input type="text" name="begin" value="{present name='search.begin'}{$search.begin}{/present}" class="search_input abc input-default datepicker" /></td>
+            <td class="td_c">~</td>
+            <td> <input type="text" name="end" value="{present name='search.end'}{$search.end}{/present}" class="search_input abc input-default datepicker" /></td>
+            <td class="td_l td_pl">
+                <button type="button" class="btn btn-primary search">查询</button>&nbsp;&nbsp;
+                <button type="button" class="btn btn-success export">导出</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+        <tr>
+            <th class="tc">ID</th>
+            <th class="tc">订单编号</th>
+            <th class="tc">类型</th>
+            <th class="tc">日期</th>
+            <th class="tc">交易金额</th>
+            <th class="tc">代理收益</th>
+            <th class="tc">库存余额</th>
+            <th class="tc">备注</th>
+        </tr>
+    </thead>
+    {empty name='list'}
+    <tr>
+        <td colspan="8">暂无记录</td>
+    </tr>
+    {else/}
+        {volist name='list' id='vo'}
+    <tr class="warning_red">
+        <td class="tc infourl">{$vo.id}</td>
+        <td class="infourl">{$vo.order_number}</td>
+        <td class="infourl">{eq name='$vo.change_type' value='3'}{eq name='$vo.reward_type' value='4'}间接订单{/eq}{eq name='$vo.reward_type' value='3'}直销订单{/eq}{else/}{$lang[$vo.change_type]}{/eq}</td>
+        <td class="infourl">{$vo.create_time}</td>
+        <td class="infourl">￥{$vo.money}</td>
+        <td class="infourl">{eq name='$vo.reward_type' value='3'}￥{$vo.wholesale_reward}{/eq}{eq name='$vo.reward_type' value='2'}￥{$vo.directsale_reward}{/eq}</td>
+        <td class="infourl">￥{$vo.change_after}</td>
+        <td class="infourl">{$vo.remark}</td>
+    </tr>
+        {/volist}
+    {/empty}
+</table>
+<!-- <div class="inline pull-right page">{*$list->render()*}</div> -->
+</body>
+<script type="text/javascript">
+    $('.datepicker').datepicker({
+        autoclose: true,          //自动关闭
+        calendarWeeks: false,     //是否显示今年是第几周
+        clearBtn: true,           //显示清除按钮
+        daysOfWeekDisabled: [],   //星期几不可选
+        endDate: Infinity,        //日历结束日期
+        forceParse: true,         //是否强制转换不符合格式的字符串
+        format: 'yyyy-mm-dd',     //日期格式
+        keyboardNavigation: true, //是否显示箭头导航
+        language: 'zh-CN',        //语言
+        minViewMode: 0,
+        orientation: "auto",      //方向
+        rtl: false,
+        startDate: -Infinity,     //日历开始日期
+        startView: 0,             //开始显示
+        todayBtn: false,          //今天按钮
+        todayHighlight: true,     //今天高亮
+        weekStart: 0              //星期几是开始
+    });
+
+    $(function(){
+        // 查询
+        $('.search').click(function(){
+            var _sTime = $('input[name=begin]').val();
+            var _eTime = $('input[name=end]').val();
+            if(_sTime != '' && _eTime != '' && _sTime > _eTime){
+                alert('开始时间不能大于结束时间');
+                return false;
+            }
+            $('form').attr('action',"{:url('Agents/inventory','a_id='.$a_id)}").submit();
+        });
+
+        // 导出
+        $('.export').click(function(){
+            var _sTime = $('input[name=begin]').val();
+            var _eTime = $('input[name=end]').val();
+            if(_sTime != '' && _eTime != '' && _sTime > _eTime){
+                alert('开始时间不能大于结束时间');
+                return false;
+            }
+            $('form').attr('action',"{:url('Agents/exportInventory','a_id='.$a_id)}").submit();
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,71 @@
+{include file='index@common/header'}
+	<style type="text/css">
+		html,
+		body {
+			background-color: #F5F5F5;
+		}
+	</style>
+</head>
+<body>
+	<div id="agencyLevelContent">
+
+			<div class="ProTop" id="search_btn">
+				<div class="search">
+					<i class="icon_search"></i>
+					<input id="tvKeyword" type="text" name="content" placeholder="微信昵称、微信号、手机号">
+					<button></button>
+				</div>
+				<div class="search_btn">
+					<button type='button' class='btn_search'>搜索</button>
+				</div>
+			</div>
+		<ul>
+			{foreach $userlist as $k=>$v}
+			<li>
+				<a href="{:url('/index/Personteam/agencyData/id/'.$v.agent_id.'/type/'.$type)}">
+						<div class="perInformation">
+						<img src="{$v.head_img}"/>
+						<div>
+							<aside>
+							<h5>{$v.nickname}</h5>
+							<p>{$v.generation}代</p>
+							</aside>
+							<aside>
+								<p class="pattern">直属代理：{$v.directly_count}人</p>
+								<p>推荐代理：{$v.recommend_count}人</p>
+							</aside>
+						</div>
+					</div>
+					</a>
+			</li>
+			{/foreach}
+		</ul>
+	</div>
+	{include file='index@common/goBack'}
+<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	$(function(){
+		$("#agencyTeamContent .agencyLevel>ul:last-child").hide();
+		$("#agencyTeamContent .top>ol li").click(function(){
+			let index=$(this).index();
+			$(this).addClass('current').siblings().removeClass('current');
+			$("#agencyTeamContent .agencyLevel>ul").hide().eq(index).show();
+		})
+	})
+</script>
+<script type="text/javascript">
+    $(function () {
+        $(".search>button").click(function(){
+            $("#tvKeyword").val("");
+        })
+        $("#search_btn .search_btn").click(function(){
+            let searchText=$("#tvKeyword").val();
+            if(searchText==null||searchText==""){
+                mobileTip("请输入搜索内容");
+            }else{
+                window.location.href ="{:url('/index/Personteam/agencyLevel')}?content="+ searchText;
+            }
+        })
+    })
+</script>
+<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>

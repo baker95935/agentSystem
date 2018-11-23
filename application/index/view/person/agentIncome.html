@@ -1,0 +1,147 @@
+{include file='index@common/header'}
+	<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+	</style>
+</head>
+<body>
+	<div id="agencyIncomeLayout">
+		<ol class="top">
+			<li>
+				<div class="backArrowRight">
+					<p>代理收益：<span>￥{$data.total}</span>元</p>
+					<a href="javascript:void(0);" id="dateTime">{$month}</a>
+				</div>
+			</li>
+			<li>
+				<div>
+					<span>￥{$data.before}元</span>
+					<span class="color_66">上月累计代理收益</span>
+				</div>
+				<div class="line_left">
+					<span>￥{$data.now}元</span>
+					<span class="color_66">本月累计代理收益</span>
+				</div>
+			</li>
+		</ol>
+		<div class="chart">
+			<p>本月收益</p>
+			<div id="div_chart"></div>
+		</div>
+		{empty name='list'}
+
+		{else/}
+		{volist name='list' id='vo'}
+		<div class="logContent">
+			<p>
+				<span>{eq name='$vo.type' value='6'}直销收益{/eq}{eq name='$vo.type' value='2'}间接销售收益{/eq}：￥{$vo.profit}</span>
+			</p>
+			<ul>
+				<li>订单编号：{$vo.order_number}</li>
+				<li>下单日期：{$vo.create_time}</li>
+			</ul>
+		</div>
+		{/volist}
+		{/empty}
+		{notempty name="stockChargeList"}
+			{volist name='stockChargeList' id='vo'}
+			<div class="logContent">
+				<ul>
+					<li>
+						<ol>
+							<li>类型：{if condition="$vo.type eq 7"} 下级升级奖励{else /}下级充值奖励{/if}</li>
+							<li>代理ID：{$vo.agent_id}</li>
+						</ol>
+					</li>
+					<li>
+						<ol>
+							<li>奖励金额：￥{$vo.profit}</li>
+							<li>日期：{$vo.create_time}</li>
+						</ol>
+					</li>
+				</ul>
+			</div>
+			{/volist}
+		
+		{/notempty}
+	</div>
+	{include file='index@common/goBack'}
+<script type="text/javascript" src="/static/Js/g2.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/Js/data-set.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/Js/myCalendar.js" charset="utf-8"></script>
+<script type="text/javascript">
+	// 日期
+	document.getElementById('dateTime').onclick=function(){
+		new myCalendar('dateTime',function(yearResult,monthResult){
+    		window.location.href = '/index/Person/agentIncome/month/'+yearResult+'-'+monthResult;
+		});
+	}
+</script>
+<script type="text/javascript">
+	const { DataView } = DataSet;
+	const _data = {$data.percent};
+	var my_offset=-20;
+	if (_data.length==0) {
+		document.querySelectorAll(".chart")[0].style.display="none";
+	}else if(_data.length==1){
+		my_offset=-80;
+	}
+	const dv = new DataView();
+	dv.source(_data).transform({
+	    type: 'percent',
+	    field: 'count',//data 中的key
+	    dimension: 'item',//data 中的key
+	    as: 'percent'
+	});
+	const chart = new G2.Chart({
+	    container: 'div_chart',
+	    forceFit: true,
+	    height:230,
+	    padding:[15,50,65,15],
+	});
+	chart.source(dv, {
+	    percent: {
+	    	formatter: val => {
+	        	val = (val * 100).toFixed(2) + '%';
+	        	return val;
+	    	}
+	    }
+	});
+	chart.coord('theta');
+	chart.tooltip({
+	    showTitle: false,
+	    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+	});
+	chart.intervalStack()
+    .position('percent')
+    .color('item', [ '#69bbf5','#a8a2fc','#ededed','pink'])//设置颜色
+    .label('percent', {
+      offset:my_offset,
+      // autoRotate: false,
+      textStyle: {
+        rotate: 0,
+        textAlign: 'center',
+        shadowBlur: 2,
+        shadowColor: 'rgba(0, 0, 0, .45)'
+      }
+    })
+    .tooltip('item*percent', (item, percent) => {
+		percent = (percent * 100).toFixed(2) + '%';
+		return {
+	        name: item,
+	        value: percent
+		};
+	})
+    .style({
+		lineWidth: 1,
+		stroke: '#fff'
+    });
+    chart.legend({//底部标注
+    	offsetX:0,
+    	offsetY:-25,
+		position:'bottom',
+		marker: 'square' // 设置图例 marker 的显示样式
+	});
+	chart.render();
+</script>

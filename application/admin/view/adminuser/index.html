@@ -1,0 +1,50 @@
+{include file='header'/}
+<div id="performance-top">
+                <h5>用户管理</h5>
+            </div>
+<form class="form-inline definewidth" action="{:url('/admin/Adminuser/index')}" method="get">    
+    用户名称：
+    <input type="text" name="username" id="username"class="abc input-default width-auto" placeholder="" value="">
+    &nbsp;&nbsp;  
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+    <button type="button" class="btn btn-success" id="addnew">新增用户</button>
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th>用户id</th>
+        <th>用户名</th>
+        <th>真实姓名</th>
+        <th>创建时间</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    {foreach name="userList" item="item"}
+	     <tr>
+            <td>{$item.id}</td>
+            <td>{$item.username}</td>
+            <td>{$item.realname}</td>
+            <td>{$item.create_time}</td>
+            <td>
+                <a  href="{:url('/admin/Adminuser/create/id/'.$item->id)} ">编辑</a>  
+	        	<a onclick="return  confirm('确定删除吗，操作不可逆')" href="{:url('/admin/Adminuser/delete/id/'.$item->id)} ">删除</a>            
+            </td>
+        </tr>	
+     {/foreach}
+</table>
+<div class="inline pull-right page">
+{$userList->render()}
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+        
+    	$('#addnew').click(function(){
+			window.location.href="{:url('/admin/Adminuser/create')}";
+	 	});
+
+    });
+
+	 
+</script>

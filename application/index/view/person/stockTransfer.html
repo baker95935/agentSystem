@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+		<script type="text/javascript" src='/static/Js/jquery.js'></script>
+		<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="turn-store">
+			<form >
+				<p class="store"><input type="text" name="phone" placeholder="下级代理手机号"></p>
+				<div style="display:none" id="show_id">
+				<p class="store">ID:<span class="aid"></span></p>
+				</div>
+				<p class="store"><input name="money" type="number" placeholder="转库存金额"></p>
+				<div class="btn-content">
+					<button type="button" class="commonButton" id="commonButtonTransfer">转</button><button type="button" id="commonButtonWechat" class="commonButton">微信充值</button>
+				</div>
+			</form>
+			{if condition="!empty($allList)"}
+			<section class="store-detail">
+				<h2>转库存记录</h2>
+				{foreach name="allList" item="item"}
+				<div>
+					<ul>
+						<li><span>代理商ID:{$item.agent_id}</span><span>{$item.create_time}</span></li>
+						<li><span>昵称：{$item.agent_id|get_agent_name_by_id}</span><span>￥{$item.money}元</span></li>
+					</ul>
+				</div>
+				{/foreach}
+ 
+			</section>
+			{/if}
+		</div>
+		<div style="height:2.5rem;"></div>
+	{include file='index@common/goBack'}
+</html>
+<script type="text/javascript">
+
+function redirect(url){
+	window.location.href = url;
+}
+
+$(function(){
+
+	var mSg = '';
+
+	// 检查手机是否存在
+	$('input[name=phone]').blur(function(event) {
+		var _this = $(this);
+		var _id = _this.val();
+		if(_id){
+			$.ajax({
+				url:'{:url("Person/checkAgentIsSet")}',
+				data:{phone:_id},
+				success:function(e){
+					if(e.error){
+						mSg = e.error.msg;
+						$('.aid').text('');
+					}else{
+						$('.aid').text(e.agent_id);
+						$("#show_id").show();
+						mSg = '';
+					}
+				}
+			});
+		}
+	});
+	
+	// 提交
+	$('#commonButtonTransfer').click(function(){
+	 
+		var _phone = $('input[name=phone]').val();
+		var _money = $('input[name=money]').val();
+		var _url = '';
+		if(!_phone){
+			layer.alert('请填写手机号');
+			return false;
+		}
+ 
+		if(mSg){
+			layer.alert(mSg);
+			return false;
+		}
+		if(!_money || _money < 0){
+			layer.alert('请填写有效转账金额');
+			return false;
+		}else if(_money > 9999999.9){
+			layer.alert('转账输入错误，请重新输入');
+			return false;
+		}
+	 
+		if(_money > 0){
+			$.ajax({
+				url:'{:url("Person/saveStockTransfer")}',
+				data:$('form').serialize(),
+				success:function(e){
+					if(e.error){
+						if(e.error.url){
+							_url = e.error.url;
+						}
+						layer.alert(e.error.msg);
+					}else{
+						layer.alert(e.msg, function(){
+							window.location.href=e.url;
+						});
+					}
+				}
+			});
+		} 
+	});
+	
+	
+	//微信充值
+	$('#commonButtonWechat').click(function(){
+		
+		var _phone = $('input[name=phone]').val();
+		var _money = $('input[name=money]').val();
+		var _url = '';
+		if(!_phone){
+			layer.alert('请填写手机号');
+			return false;
+		}
+ 
+		if(mSg){
+			layer.alert(mSg);
+			return false;
+		}
+		if(!_money || _money < 0){
+			layer.alert('请填写有效转账金额');
+			return false;
+		}else if(_money > 9999999.9){
+			layer.alert('转账输入错误，请重新输入');
+			return false;
+		}
+		
+		$.ajax({
+			url:'{:url("Person/saveChargeStockByWeChat")}',
+			type:'post',
+			data:{phone:_phone,money:_money},
+			success:function(e){
+				if (e.error) {
+					layer.alert(e.error.msg);
+					return false;
+				} else {
+					var _url = '/index/pay/wechat/order_number/'+e;
+					redirect(_url);
+				};
+			}
+		});
+	});
+})
+</script>

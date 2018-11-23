@@ -1,0 +1,60 @@
+{include file='header'/}
+<form method="post" action="{:url('/admin/Agentreward/performanceSave')}">
+<div id="performance-top">
+	<h5>业绩分红</h5>
+	<div id="reward-layout">
+			<p>设置</p>
+			<div class="reward-layout">
+				<input type="hidden" name="cid" value="{$configInfo.id}">
+				<input type="checkbox" id="toggle-button" name="valid_performance_reward" {present name="configInfo.valid_agency_reward"} {present name="configInfo.valid_performance_reward"} {if condition="$configInfo.valid_performance_reward eq 1 "} checked="checked"  {/if} {/present}   >
+				<label for="toggle-button" class="button-label">
+			    	<span class="button-circle"></span>
+			    	<span class="text on">开</span>
+			    	<span class="text off">关</span>
+	    		</label>
+			</div>
+		</div>
+	<div class="reward_clear">
+		每月结算日&nbsp;&nbsp;&nbsp;&nbsp;<input class="span2" type="text" required pattern="[1-9]|(?:[1-2][0-8])"  title="请输入1到28"  name=performance_reward_clear_date value={present name="configInfo.performance_reward_clear_date"}{$configInfo.performance_reward_clear_date}{/present}  placeholder="请输入1到28">
+	</div>
+	<h6>奖励设置</h6>
+</div>
+ 
+ 
+<table id="Per-definewidth" class="table table-bordered table-hover definewidth m10">
+    <thead>
+    	<tr>
+        	<th style="width:25%;">角色</th>
+        	<th>奖励比例%</th>
+    	</tr>
+    </thead>
+    
+ 
+    
+    	 {foreach name="listLevel" item="item"}
+	    <tr>
+		    <td>
+		    	{$item->name}
+		    	<input type="hidden" name="role{$item.id}" value="{$item.id}">
+		    </td>
+		    <td>
+		    	<input type="text" required  pattern="^(\d?\d(\.\d*)?|100)$"  title="必须在1和100之间"  name="ratio{$item.id}" value="{present name="item['ratio']"}{$item.ratio}{/present}" placeholder="请输入数字">
+		    </td>
+	    </tr>
+	    	 	<input type="hidden" name="id{$item.id}" id="id" value="{present name="item['performance_id']"}{$item.performance_id}{/present}">
+	    {/foreach}
+ 
+    
+        <tr>
+	    <td colspan="6">
+	    	<div align="center">
+	    		<button type="submit" class="btn btn-primary" >保存</button>
+	    	</div>
+	    </td>
+    </tr>
+    </form>
+</table>
+ 
+</body>
+</html>
+ 

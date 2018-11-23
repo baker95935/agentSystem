@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="shareInfoLayout">
+			<div>
+				<div class="textInfo">
+					<p class='con' style='text-align:left;'>{$info}</p>
+				</div>
+				<p><button data-clipboard-action="copy" data-clipboard-target=".con">复制</button></p>
+			</div>
+			<ul class="shareContainer">
+				{notempty name='imgs'}
+				{volist name='imgs' id='vo'}
+				<li><a><img src="{$vo.img}" alt="" /></a></li>
+				{/volist}
+				{/notempty}
+			</ul>
+		</div>
+		<div class="footer goBack">
+				<a href="javascript:history.back(-1);">返&nbsp;&nbsp;回</a>
+			</div>
+	</body>
+	<script type="text/javascript" src='/static/Js/clipboard.min.js'></script>
+	<script type="text/javascript">
+		var clipboard = new ClipboardJS('button');
+
+	    clipboard.on('success', function(e) {
+	        mobileTip('复制成功');
+	    });
+
+	    clipboard.on('error', function(e) {
+	        mobileTip('复制失败，请手动选中复制');
+	    });
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+	<script type="text/javascript" src='/static/Js/jquery-2.1.4.min.js'></script>
+	<script>
+		$(function(){
+			$(".shareContainer a").on('click',function(){
+				var src_text=$(this).find("img").attr("src");
+				var layer_content="<section id='mask'><div><img id='photo' src='"+src_text+"'/><button class='close'></button></div></section>";
+				$("#shareInfoLayout").append(layer_content);
+				$(document).on("click",".close",function(){
+					$("#mask").remove();
+				})
+			});
+			
+		});
+	</script>
+</html>

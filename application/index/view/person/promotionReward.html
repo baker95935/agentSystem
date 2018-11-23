@@ -1,0 +1,84 @@
+{include file='index@common/header'}
+	<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+		#agencyIncomeLayout.promotion .logContent>ul{justify-content:space-between;}#agencyIncomeLayout.promotion .logContent>ul>li{width: auto;}
+	</style>
+</head>
+<body>
+	<div id="agencyIncomeLayout" class="promotion">
+		<ol class="top">
+			<li>
+				<div class="backArrowRight">
+					<p>奖励总额： <span>￥{$data.total} </span>元</p>
+					<a href="javascript:void(0);" id="dateTime">{$month}</a>
+				</div>
+			</li>
+			<li>
+				<div>
+					<span>￥{$data.before}</span>
+					<span class="color_66">上月累计奖励</span>
+				</div>
+				<div class="line_left">
+					<span>￥{$data.now}</span>
+					<span class="color_66">本月累计奖励</span>
+				</div>
+			</li>
+		</ol>
+
+		{empty name='list'}
+			<!-- 暂无数据 -->
+		{else/}
+		{volist name='list' id='vo'}
+		<div class="logContent">
+			<ul>
+				<li>
+					<ol>
+						<li>类型：{$vo.name}</li>
+						<li>订单编号：{$vo.order_number}</li>
+					</ol>
+				</li>
+				<li>
+					<ol>
+						<li>奖励金额：￥{$vo.profit}</li>
+						<li>下单日期：{$vo.create_time}</li>
+					</ol>
+				</li>
+			</ul>
+		</div>
+		{/volist}
+		{/empty}
+		
+		{notempty name="stockChargeList"}
+			{volist name='stockChargeList' id='vo'}
+			<div class="logContent">
+				<ul>
+					<li>
+						<ol>
+							<li>类型：库存充值奖励</li>
+							<li>代理ID：{$vo.agent_id}</li>
+						</ol>
+					</li>
+					<li>
+						<ol>
+							<li>奖励金额：￥{$vo.profit}</li>
+							<li>日期：{$vo.create_time}</li>
+						</ol>
+					</li>
+				</ul>
+			</div>
+			{/volist}
+		
+		{/notempty}
+	</div>
+	{include file='index@common/goBack'}
+<script type="text/javascript" src="/static/Js/myCalendar.js" charset="utf-8"></script>
+<script type="text/javascript">
+	// 日期
+	document.getElementById('dateTime').onclick=function(){
+		new myCalendar('dateTime',function(yearResult,monthResult){
+    		window.location.href = '/index/Person/inviteReward/month/'+yearResult+'-'+monthResult;
+		});
+	}
+</script>

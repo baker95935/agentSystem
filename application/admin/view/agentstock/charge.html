@@ -1,0 +1,45 @@
+{include file='header'/}
+
+<form action="{:url('/admin/Agentstock/chargeSave/')}" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+<h5>充值库存</h5>
+ <div class="control-group">
+    <tr>
+        <td width="10%" class="tableleft">代理商ID：{$agentInfo.agent_id}</td><td width="10%" class="tableleft">代理商名称：{$agentInfo.name}</td>
+    </tr>
+    <tr>
+</table>
+
+<table id="agentorders" class="table table-bordered table-hover definewidth m10">
+ <div class="control-group">
+ 	<tr>
+        <td width="10%" class="tableleft">当前库存：</td>
+        <td>{$agentInfo['stock_money']}</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">充值金额：</td>
+        <td><input type="text"  class="control-group controls width-auto"  placeholder="请输入充值金额" value="" name="money"/></td>
+    </tr>
+    <tr>
+    <tr>
+        <td class="tableleft"></td>
+        <td>
+        	<input type="hidden" name="agent_id" id="agent_id" value="{present name="agentInfo.agent_id"}{$agentInfo.agent_id}{/present}">
+            <button type="submit" class="btn btn-primary" type="button">确定</button>
+             &nbsp;&nbsp;
+             <button type="button" class="btn btn-success" name="backid" id="backid">取消</button>
+        </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>
+ 
+<script>
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="{:url('/admin/Agentstock/index/')}";
+		 });
+
+    });
+</script>

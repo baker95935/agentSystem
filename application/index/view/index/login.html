@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<script type="text/javascript" src='/static/Js/jquery.js'></script>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+		<style>
+			body{background-color: #fff;}
+		</style>
+	</head>
+	<body>
+		<div id="loginLayout">
+			<div class="topBg">
+				<div id="background" class="wall"></div>
+		        <div id="midground" class="wall"></div>
+		        <div id="foreground" class="wall"></div>
+			</div>
+			<div class="container">
+				<ul>
+					<li class="phone">
+						<i></i>
+						<input type="text" name="phone" class="inputPlac" id="phone" placeholder="输入手机号" />
+					</li>
+					<li class="pwd">
+						<i></i>
+						<input type="password" name="pwd" class="inputPlac" id="pwd" placeholder="登录密码" />
+					</li>
+				</ul>
+				<div class="forget clearfix">
+					<a href="{:url('index/register')}"><span>立即注册</span></a>
+					<a href="{:url('index/forget')}"><span>忘记密码？</span></a>
+				</div>
+				<button type='button' class='sub_btn'>登录</button>
+				<p class="tip">温馨提示：登录密码为手机号码后六位，登录成功后请尽快修改密码！</p>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		$(function(){
+			$('.sub_btn').click(function(){
+				var _phone = $('input[name=phone]').val();
+				var _pwd = $('input[name=pwd]').val();
+				/* 提交验证 */
+				if(_phone && _pwd){
+					$.ajax({
+						url:'{:url("/index/Index/doLogin")}',
+						data:{phone:_phone,password:_pwd},
+						type:'post',
+						success:function(e){
+							if(e.error){
+								alert(e.error.msg);
+								return false;
+							}else{
+								window.location.href = e.url;
+							}
+						}
+					});
+				}else{
+					if(_phone == ''){
+						alert('手机号不能为空');
+						return false;
+					}
+					if(_pwd == ''){
+						alert('登录密码不能为空');
+						return false;
+					}
+				}
+			});
+		});
+	</script>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+        <div id="performance-top">
+                <h5>分组管理</h5>
+            </div>
+<form class="form-inline definewidth ml40  search_table" action="{:url('/admin/Productgrouping/index')}" method="get">
+    分组名称：
+    <input type="text" name="name" id="name"class="abc input-default width-auto" placeholder="" value="">&nbsp;&nbsp;
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-success" id="addnew">新增</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-danger" id="delall" onclick="alldelate()">批量删除</button>&nbsp;&nbsp;
+</form>
+<table id="table-group" class="table table-bordered table-hover definewidth m10" >
+    <thead>
+
+        <tr>
+            <th width="1%"><input type="checkbox" id="selectall" onclick="selectall()"></th>
+            <th width="5%">编号</th>
+            <th>分组名称</th>
+            <th width="20%">添加时间</th>
+            <th width="10%">操作</th>
+        </tr>
+
+    </thead>
+    {foreach name="groupingList" item="item"}
+	     <tr>
+             <th width="1%"><input type="checkbox" class="checkbox" name="ids" value="{$item['id']}"></th>
+            <td>{$item.id}</td>
+            <td class="tl">{$item.grouping_name}</td>
+            <td>{$item.create_time}</td>
+            <td>
+               <a onclick='editGroup({$item["id"]})' style="cursor: pointer;">编辑</a>
+	           <a onclick='deleteFoId({$item["id"]})' style="cursor: pointer;">删除</a>
+            </td>
+        </tr>
+    {/foreach}
+</table>
+<div class="inline pull-right page">
+    {$groupingList->render()}
+</div>
+</body>
+</html>
+
+<script>
+    $(function () {
+		$('#addnew').click(function(){
+             layer.prompt({
+                    formType:0,
+                    title:'请输入组名',
+             },function(val, index){
+                    if(val){
+                        $.ajax({
+                            type:"post",
+                            url:"/admin/Productgrouping/save",
+                            dataType:"json",
+                            data:{"id":null,"name":val},
+                            success:function(e){
+                                var jsonData = JSON.parse(e);
+                                switch(jsonData.code){
+                                    case -1:
+                                    layer.alert(jsonData.msg);
+                                    break;
+                                    case 0:
+                                   layer.alert("添加失败，请重新输入！",function(){
+                                       window.location.reload();
+                                    });
+                                    break;
+                                    case 1:
+                                    layer.alert("添加成功",function(){
+                                       window.location.reload();
+                                    });
+                                    break;
+                                }
+                            },
+                            error:function(e){
+                                layer.alert("添加失败，请重新输入！");
+                            }
+                        });
+                    }
+                     layer.close(index);
+                });
+         });
+
+
+    });
+    function editGroup(id){
+             $.ajax({
+                type:"post",
+                            url:"/admin/Productgrouping/create/id/",
+                            dataType:"json",
+                            data:{"id":id},
+                            success:function(e){
+                                layer.prompt({
+                                    formType:0,
+                                       title:'当前组ID：'+id,
+                                       value:e
+                                },function(val,index){
+                                    $.ajax({
+                                        type:"post",
+                                        url:"/admin/Productgrouping/save",
+                                        dataType:"json",
+                                        data:{"id":id,"name":val},
+                                        success:function(data){
+                                            var jsonData = JSON.parse(data);
+                                            switch(jsonData.code){
+                                                case -1:
+                                                layer.alert("组名已存在，请重新输入！")
+                                                break;
+
+                                                case 0:
+                                            layer.alert("保存失败，请重新输入！",function(){
+                                                window.location.reload();
+                                                });
+                                                break;
+                                                case 1:
+                                                layer.alert("保存成功",function(){
+                                                window.location.reload();
+                                                });
+                                                break;
+                                            }
+                                        },
+                                        error:function(data){
+                                            var jsonData = JSON.parse(data);
+                                            layer.alert("保存失败，请重新输入！");
+                                        }
+                                    });
+                                    layer.close(index);
+                                });
+                            },
+                            error:function(e){
+                                layer.alert("组名读取失败，请重新操作！");
+                            }
+             });
+          }
+    /*全选*/
+    function selectall(){
+
+        var all_box = $("#selectall").is(':checked')
+        if( all_box ){
+            $(".checkbox").prop("checked",true);
+        }else{
+            $(".checkbox").prop("checked",false);
+        }
+    }
+    //批量删除
+    function alldelate(){
+        var id=$('input:checkbox[name^=ids]:checked').map(function(){
+            return $(this).val();
+        }).get().join(",");
+        if(!id)
+        {
+            layer.alert("请选择要删除的组!");
+        }
+        else
+        {
+           layer.confirm("是否删除所选组？",{btn:['确定','取消']},function(){
+
+                   $.ajax( {
+                    type : "post",
+                    url : '/admin/Productgrouping/delete' ,
+                    dataType : 'json',
+                    data: {id:id,},
+                    success : function(data) {
+                        var jsonData = JSON.parse(data);
+                        if (jsonData.status=='ok'){
+                            layer.alert("删除成功!",function(){
+                                                window.location.reload();
+                            });
+
+                        }else {
+                            layer.alert("删除失败！");
+                        }
+                    },
+                    error:function(e){
+                        layer.alert("删除失败！");
+                    }
+                });
+           },function(index){
+                $("#selectall").attr("checked", false);
+                $(".checkbox").prop("checked",false);
+                layer.close(index);
+            })
+
+        }
+    }
+    //删除
+    function deleteFoId(id){
+        layer.confirm("是否要删除该组？",{btn:['确定','取消']},function(){
+            $.ajax({
+                    type : "post",
+                    url : '/admin/Productgrouping/delete/' ,
+                    dataType : 'json',
+                    data: {id:id},
+                    success : function(e) {
+                        var jsonData = JSON.parse(e);
+                        if (jsonData.status=='ok'){
+                            layer.alert("删除成功!",function(){
+                                 window.location.reload();
+                            });
+
+                        }else {
+                            layer.alert("删除失败！");
+                        }
+                    },
+                    error:function(e){
+                        layer.alert("删除失败！");
+                    }
+            });
+        },function(index){
+
+            layer.close(index);
+        });
+    }
+</script>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css" />
+		<link rel="stylesheet" type="text/css" href="/static/Js/layer_mobile/need/layer.css" />
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}.footer>p,.footer>p>span:first-child{border:0;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="giftOrderLayout">
+			<div class="address" onclick='redirect("{:url('Person/addressManage',input('param.'))}");'>
+				<div>
+					<p>
+						<span>收货人：{present name='address.name'}{$address.name}{/present}</span>
+						<span>{present name='address.phone'}{$address.phone}{/present}</span>
+					</p>
+					<p><i></i>收货地址：{present name='address.province'}{:get_address_name_by_id($address.province)}{/present}{present name='address.city'}{:get_address_name_by_id($address.city)}{/present}{present name='address.area'}{:get_address_name_by_id($address.area)}{/present}{present name='address.address'}{$address.address}{/present}</p>
+				</div>
+			</div>
+			<div class="divide"></div>
+			<ul>
+				{volist name='list' id='vo'}
+				<li>
+					<a href="">
+						<img src="{$vo.product_img}" alt="" />
+						<div>
+							<p class="proName">{$vo.product_name}</p>
+							<span class="level"></span>
+							<p class="other">
+								<span class="goods-price"><span class="yen">￥</span>{$vo.sales_price}</span>
+								<span class="sale">&nbsp;X&nbsp;{$vo.num}</span>
+							</p>
+						</div>
+					</a>
+				</li>
+				{/volist}
+			</ul>
+			<form id="buy" action='{:url("Product/buyNow")}' method='POST'>
+				<div class="divide"></div>
+				<h6>支付方式</h6>
+				<ul id="payContent">
+					<li>
+						<label name="paystyle" for="paystyle" uid="paystyle"></label>
+						<input type="radio" name="paystyleVal" value="1" id="paystyle">线下支付
+					</li>
+					
+					<li>
+						<label id="paystyle_label" for="paystyle_w" name="paystyle_w"></label>
+						<input type="radio" name="paystyleVal" value="2" id="paystyle_w">微信支付
+					</li>
+					
+					{if condition="$stockPay eq 1"}
+						<li>
+							<label  name="paystyle_k" for="paystyle_k" ></label>
+							<input type="radio" name="paystyleVal" value="3" id="paystyle_k">库存提货
+						</li>
+					{/if}
+				</ul>
+				<div class="takeInfo wordColor text-left preOrder">
+					<p><span>商品金额：</span>￥{$product_total_price}</p>
+					{egt name='$trans_expenses' value='0'}<p class="pMargin"><span>运费：</span>￥{$trans_expenses}</p>{/egt}
+					<p><span>代理折扣：</span>￥{$agent_total_price}</p>
+				</div>
+				<h6>买家留言</h6>
+				<div class="textarea">
+					<textarea name="remark" id="remark" cols="30" rows="10"></textarea>
+				</div>
+				<div class="footer">
+					<ol class="tip">
+						<li>
+							<p>
+								实际金额：<span class="goods-price"><span class="yen">￥</span>{$orderTotal}</span>
+							</p>
+						</li>
+						<li {if condition="$trans_expenses gt 0"}style="display:block;"{else/} style="display:none;"{/if}><span>商品:￥{$total}</span><span>运费:￥{$trans_expenses}</span></li>
+					</ol>
+					<input type='hidden' name='addressId' value='{$address.id}' />
+					<input type='hidden' name='productIdStr' value='{$productIdStr}' />
+					<input type='hidden' name='productNumStr' value='{$productNumStr}' />
+					<input type='hidden' name='productType' value='{$productType}' />
+					
+					<button type="button">提交订单</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/layer.js'></script>
+	<script type="text/javascript">
+		function redirect(url){
+			window.location.href = url;
+		}
+
+		$(function(){
+			var _pass = true;
+			{if condition='$trans_expenses lt 0'}
+			_pass = false;
+			{/if}
+
+			var flag = sessionStorage.getItem('flag');
+			if(flag == null){
+				$("#payContent label[name='paystyle_w']").attr('class','checked');
+				$("#payContent input[id='paystyle_w']").attr("checked",true);
+			}
+			$('#payContent input:radio[name="paystyleVal"]').each(function(){
+				var _id=$(this).attr('id');
+				if(_id===flag){
+					$("#payContent label[name='"+_id+"']").attr('class','checked');
+					$("#payContent input[id='"+_id+"']").attr("checked",true);
+				}
+			})
+
+			var address_id = '{$address.id}';
+			if (!address_id) {
+				layer.open({
+					content:'请填写收获地址信息',
+					btn: ['确定'],
+					yes: function(index){
+						layer.close(index);
+						redirect('{:url("Person/addAddress",input("param."))}');
+					}
+				});
+			}
+
+			$("#payContent label").on('click',function(){
+				$("label").attr('class','');$('input').removeAttr('checked');
+				$(this).attr('class','checked');
+				var id=$(this).attr('name');
+				$("#payContent input[id='"+id+"']").attr('checked',true);
+			});
+
+			var _addIsCom = false; // 2018-07-20 CYL 收获地址是否完善
+			{if condition='$addressIsComplete'} _addIsCom = true; {/if}
+
+			// 提交
+			$('button').click(function(){
+				if(!_pass){
+					layer.open({
+						content:'该收货地址无法配送，请重新输入收货地址',
+						btn: ['确定'],
+					});
+					return false;
+				}
+				$('#payContent input:radio[name="paystyleVal"]').each(function(){
+					if($(this).is(":checked")){
+						sessionStorage.setItem('flag',$(this).attr('id'));
+					}
+				})
+				var _add = $('input[name=addressId]').val();
+				var _pid = $('input[name=productIdStr]').val();
+				var _num = $('input[name=productNumStr]').val();
+				if(!_add){
+					layer.open({
+						content:'请添加收货信息',
+					});
+					return false;
+				}
+				// 2018-07-20 CYL 收获地址不完善提醒
+				if(!_addIsCom){
+					layer.open({
+						content:'请完善收货地址信息',
+					});
+					return false;
+				}
+				buy.submit();
+			});
+			//支付方式样式
+			var payLen=$('#payContent>li').length;
+			if(payLen==1){
+				$('#payContent').css('justify-content','flex-start');
+			}
+		});
+	</script>
+</html>

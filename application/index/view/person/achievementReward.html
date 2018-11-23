@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="agencyIncomeLayout" class="reward">
+			<ol class="top">
+				<li>
+					<div class="backArrowRight">
+						<p>业绩奖励： <span>￥{$data.total}</span>元</p>
+						<a href="javascript:void(0);" id="dateTime">{$month}</a>
+					</div>
+				</li>
+				<li>
+					<div>
+						<span>￥{$data.unsettled}元</span>
+						<span class="color_66">待结算</span>
+					</div>
+					<div class="line_left">
+						<span>￥{$data.settled}元</span>
+						<span class="color_66">已结算</span>
+					</div>
+				</li>
+			</ol>
+			{empty name='list'}
+
+			{else/}
+			{volist name='list' id='vo'}
+			<div class="InfoContent">
+				<div>
+					<div class="backArrowRight" onclick='redirect("{:url("Person/achievementRewardDetail","id=$vo[2]")}");'>
+						<ul>
+							<li>{$key}</li>
+							<li>{eq name='$vo[0]' value='1'}待结算{/eq}{eq name='$vo[0]' value='2'}已结算{/eq}</li>
+							<li>￥{$vo[1]}元</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			{/volist}
+			{/empty}
+		</div>
+	{include file='index@common/goBack'}
+	<script type="text/javascript" src="/static/Js/g2.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/static/Js/data-set.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/static/Js/myCalendar.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		// 日期
+		document.getElementById('dateTime').onclick=function(){
+			new myCalendar('dateTime',function(yearResult,monthResult){
+        		window.location.href = '/index/Person/achievementReward/month/'+yearResult+'-'+monthResult;
+			});
+		}
+
+		// 跳转
+		function redirect(url){
+			window.location.href = url;
+		}
+	</script>
+</html>

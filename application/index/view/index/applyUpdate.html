@@ -1,0 +1,118 @@
+{include file='index@common/header'}
+	<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/Css/orderManage.css"/>
+	<script type="text/javascript" src='/static/Js/jquery.js'></script>
+	<script type="text/javascript" src="/static/Js/ajaxfileupload.js"></script>
+	<style type="text/css">
+		html,body{background-color: #F5F5F5;}
+	</style>
+</head>
+<body>
+	<form enctype="multipart/form-data">
+	<div id="upgradeContent">
+		<div>
+			<span>当前身份：</span>{$role_lang[$info['role']]}
+		</div>
+		<div class="application">
+	   		<a href="{:url('Index/applyBox','type=2')}">
+		   		<span>申请升级</span>
+		   		<span>{$role_lang[$apply]}</span>
+			</a>
+			<input type='hidden' name='apply' value='{empty name="$apply"}{$info["role"]+1}{else/}{$apply}{/empty}' />
+		</div>
+		<div style="height:.4rem;background: #F5F5F5;"></div>
+		<div>
+			<input type="number" name="money" value="" class="placeholder_99" placeholder="支付金额"/>
+			<input type="hidden" name="img" value="" />
+		</div>
+		<div style="height:.4rem;background: #F5F5F5;"></div>
+		<div class="perInformation" style="position:relative;">
+		   		<p>上传交易单</p>
+		   		<p>
+					<input type="file" name="screen_img" id="screen_img" onchange="upImg(this)" style="position: absolute; right:-12px; top:0; width: 200px; height:2.5rem; opacity: 0; cursor: pointer;">
+					上传
+				</p>
+		</div>
+		<div style="height:.4rem;background: #F5F5F5;"></div>
+		<p class="apply_BZ">要求500K以下，请上传交易单</p>
+		<button type='button' class="commonButton">提交申请</button>
+	</div>
+	<div class="footer goBack">
+		<a href="javascript:history.back(-1);">返&nbsp;&nbsp;回</a>
+	</div>
+	</form>
+</body>
+<script type="text/javascript">
+	window.onload=function(){
+		var u = navigator.userAgent;
+        var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+        if(isiOS){
+        	document.querySelector("div.goBack").style.display="none";
+        }
+	}
+	$(function(){
+		// 提交
+		$('.commonButton').click(function(){
+			var _apply = $('input[name=apply]').val();
+			var _img   = $("input[name=img]").val();
+			var _url = '';
+			if(!_img){
+				msgTipUrl('请上传交易单');
+				return false;
+			}
+			if(_apply > 0){
+				$.ajax({
+					url:'{:url("Index/saveApply")}',
+					type:'post',
+					data:$('form').serialize(),
+					success:function(e){
+						if(e.error){
+							if(e.error.url){
+								_url = e.error.url;
+							}
+							msgTipUrl(e.error.msg,_url);
+						}else{
+							msgTipUrl(e.msg,e.url);
+						}
+					}
+				});
+			}else{
+				msgTip('请选择正确的目标等级');
+			}
+		});
+	});
+
+	function upImg(obj){
+		var imgPath = $('#screen_img').val();
+		if (imgPath == "") {
+            alert('请选择上传图片！');
+            return;
+        }
+        //判断上传文件的后缀名
+        var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+        strExtension = strExtension.toLowerCase();
+        if (strExtension != 'jpg' && strExtension != 'png' && strExtension != 'bmp' && strExtension != 'jpeg') {
+            alert('上传图片的格式不正确，请上传jpg、bmp、png格式的图片！');
+            return;
+        }
+
+		$.ajaxFileUpload({
+            url: '{:url("Index/uploadImg")}',
+            secureuri: false,
+            fileElementId: 'screen_img', //文件上传域的ID
+            type: 'post',
+            dataType:'json',
+            success: function (e)
+            {
+            	if(e.img){
+            		$("input[name=img]").val(e.img);
+            	}
+            },
+            error: function (err)
+            {
+
+            }
+        });
+	}
+</script>
+</html>

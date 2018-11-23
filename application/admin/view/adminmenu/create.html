@@ -1,0 +1,60 @@
+{include file='header'/}
+<form action="{:url('/admin/Adminmenu/save/')}" method="post" class="definewidth m20">
+<table id="agentorders" class="table table-bordered table-hover m10">
+    <tr>
+        <td width="10%" class="tableleft">上级</td>
+        <td>
+            <select name="parentid"> 
+            	<option value="0" {present name="data.parent_id"} {if condition="$data.parent_id eq 0 "} selected="selected"  {/if} {/present}>顶级菜单</option>
+            	{foreach name="menuList" item="item"}
+	            <option value="{$item.id}" {present name="data.parent_id"} {if condition="$data.parent_id eq $item.id "} selected="selected"  {/if} {/present} >{$item.name}</option>
+	            {/foreach}
+			</select>
+        </td>
+    </tr>
+    <tr>
+        <td class="tableleft">名称</td>
+        <td><input type="text" placeholder="请输入菜单名称" value="{present name="data.name"}{$data.name}{/present}" name="name"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">组</td>
+        <td><input type="text" placeholder="请输入分组模块名称" value="{present name="data.group"}{$data.group}{/present}" name="group"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">模型</td>
+        <td><input type="text" placeholder="请输入模型名称" value="{present name="data.module"}{$data.module}{/present}" name="module"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">方法</td>
+        <td><input type="text" placeholder="请输入方法名称" value="{present name="data.action"}{$data.action}{/present}" name="action"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">排序(数字越大越靠前)</td>
+        <td><input type="text" placeholder="请输入排序" value="{notpresent name="data.order"}1{/notpresent}{present name="data.order"}{$data.order}{/present}" name="order"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">备注</td>
+        <td><input type="text" placeholder="请输入备注" value="{present name="data.remark"}{$data.remark}{/present}" name="remark"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">状态</td>
+        <td>
+        	<label class="radio">
+            <input type="radio" name="status"   {notpresent name="data.status"} checked  {/notpresent} {present name="data.status"} {if condition="$data.status eq 1 "} checked  {/if} {/present}  value="1"/> 启用</label>
+            <label class="radio"><input type="radio" name="status"    {present name="data.status"} {if condition="$data.status eq 2 "} checked  {/if} {/present}   value="2"/> 禁用
+        	</label>
+        </td>
+    </tr>
+    <tr>
+        <td class="tableleft"></td>
+        <td>
+        	<input type="hidden" name="id" id="id" value="{present name="data.id"}{$data.id}{/present}">
+            <button type="submit" class="btn btn-primary" type="button">保存</button> 
+            &nbsp;&nbsp;
+            <a href="{:url('/admin/adminmenu/index')}" class="btn btn-success" >返回</a>
+        </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

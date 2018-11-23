@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+     <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+     <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+        <div id="performance-top">
+                <h5>类目管理</h5>
+           </div>
+
+<form class="form-inline definewidth ml40  search_table" action="{:url('/admin/Productcategory/index')}" method="get">
+    类目名称：
+    <input type="text" name="name" id="name"class="abc input-default width-auto" placeholder="" value="">&nbsp;&nbsp;
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-success" id="addnew">类目添加</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-danger" id="delall" onclick="alldelate()">批量删除</button>&nbsp;&nbsp;
+</form>
+<table class="table table-bordered table-hover definewidth m10" >
+    <thead>
+        <tr>
+            <th width="1%"><input type="checkbox" id="selectall" onclick="selectall()"></th>
+            <th width="5%">id</th>
+            <th>类目名称</th>
+            <th  width="10%">类目图片</th>
+            <th  width="15%">创建时间</th>
+            <th  width="10%">操作</th>
+        </tr>
+    </thead>
+    {foreach name="categoryList" item="item"}
+        <tr>
+            <th width="1%"><input id='{$item["id"]}' onchange='checkId({$item["id"]})' type="checkbox" class="checkbox"   name="ids" value="{$item['id']}"></th>
+            <td>{$item.id}</td>
+            <td class="tl">{$item.category_name}</td>
+            <td>
+                <volist name="item.category_img" id="img" >
+                    <img style="height:50px;" src="{$item.category_img}">
+                </volist>
+
+            </td>
+            <td>{$item.create_time}</td>
+            <td>
+                <a onclick='editClass({$item["id"]})'style="cursor: pointer;" >编辑</a>
+                <a onclick='classDelete({$item["id"]})'style="cursor: pointer;" >删除</a>
+            </td>
+        </tr>
+        {foreach name="item.sendList" item="vo"}
+            <tr>
+                <th width="1%"><input id='{$vo["id"]}' type="checkbox" onchange='checkId({$vo["id"]})' class="checkbox"   name="ids" value="{$vo.id}"></th>
+                <td>{$vo.id}</td>
+                 <td class="tl lti2">∟{$vo.category_name}</td>
+                 <td>
+                     <volist name="item.category_img" id="img" >
+                         <img style="height:50px;" src="{$vo.category_img}">
+                     </volist>
+                 </td>
+                 <td>{$vo.create_time}</td>
+                <td>
+                    <a onclick='editClass({$vo["id"]})'style="cursor: pointer;">编辑</a>
+                    <a onclick='classDelete({$vo["id"]})'style="cursor: pointer;" >删除</a>
+                </td>
+            </tr>
+            {foreach name="vo.classifyThree" item="voo"}
+                <tr>
+                    <th width="1%"><input id='{$voo["id"]}' type="checkbox" onchange='checkId({$voo["id"]})' class="checkbox"  name="ids" value="{$voo.id}"></th>
+                    <td>{$voo.id}</td>
+                    <td class="tl lti4">∟{$voo.category_name}</td>
+                    <td>
+                        <volist name="item.category_img" id="img" >
+                            <img style="height:50px;" src="{$voo.category_img}">
+                        </volist>
+                    </td>
+                    <td>{$voo.create_time}</td>
+                    <td>
+                        <a onclick='editClass({$voo["id"]})'style="cursor: pointer;">编辑</a>
+                        <a onclick='classDelete({$voo["id"]})'style="cursor: pointer;" >删除</a>
+                    </td>
+                </tr>
+                {foreach name="voo.classifyFour" item="vooo"}
+                    <tr>
+                        <th width="1%"><input id='{$vooo["id"]}' type="checkbox" onchange='checkId({$vooo["id"]})' class="checkbox"  name="ids" value="{$vooo.id}"></th>
+                        <td>{$vooo.id}</td>
+                        <td class="tl lti6">∟{$vooo.category_name}</td>
+                        <td>
+                            <volist name="item.category_img" id="img" >
+                                <img style="height:50px;" src="{$vooo.category_img}">
+                            </volist>
+                        </td>
+                        <td>{$vooo.create_time}</td>
+                        <td>
+                            <a onclick='editClass({$vooo["id"]})'style="cursor: pointer;">编辑</a>
+                            <a onclick='classDelete({$vooo["id"]})'style="cursor: pointer;" >删除</a>
+                        </td>
+                    </tr>
+                {/foreach}
+            {/foreach}
+        {/foreach}
+    {/foreach}
+ </table>
+<div class="inline pull-right page">
+        {$categoryList->render()}
+</div>
+<input type="hidden" id="classId"/>
+</body>
+</html>
+
+<script>
+    $(function () {
+		$('#addnew').click(function(){
+                layer.open({
+                    type: 2,
+                    area: ['600px', '500px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    title:'产品类目设置',
+                    content: 'create.html',
+                    end: function () {
+                      //  location.reload();
+                     }
+                    });
+		 });
+    });
+	function editClass(id){
+        $("#classId").val(id);
+        layer.open({
+                    type: 2,
+                    area: ['600px', '500px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    title:'产品类目设置',
+                    content: 'create.html',
+                    end: function () {$("#classId").val("");//location.reload();
+                         }
+                    });
+    }
+    /*全选*/
+    function selectall(){
+
+        var all_box = $("#selectall").is(':checked')
+        if( all_box ){
+            $(".checkbox").prop("checked",true);
+        }else{
+            $(".checkbox").prop("checked",false);
+        }
+    }
+    function classDelete(id){
+
+         layer.confirm("是否要删除该类目？",{btn:['确定','取消']},function(){
+            $.ajax({
+            type : "post",
+            url : '/admin/Productcategory/delete/',
+            dataType : 'json',
+            data: {id:id,},
+            success : function(data) {
+                var jsonData = JSON.parse(data);
+                if (jsonData.code=='1'){
+                    layer.alert("删除成功!",function(){ window.location.reload(); 
+                    });}
+                else if(jsonData.code=='0'){
+                    layer.alert("存在下级类目，请先删除下级类目！");
+                }
+                else {
+                    layer.alert("删除失败！");
+                }
+             },
+            error:function(data){
+                layer.alert("删除失败！");
+             }
+        });
+
+         },function(index){ layer.close(index); });
+
+       
+    }
+    //批量删除
+    function alldelate(){
+        var id=$('input:checkbox[name^=ids]:checked').map(function(){
+            return $(this).val();
+        }).get().join(",");
+        if(!id)
+        {
+            layer.alert("请选择要删除的类目!");
+        }
+        else
+        {
+            layer.confirm("是否要删除该类目？",{btn:['确定','取消']},function(){
+            $.ajax({
+            type : "post",
+            url : '/admin/Productcategory/delete/',
+            dataType : 'json',
+            data: {id:id,},
+            success : function(data) {
+                var jsonData = JSON.parse(data);
+                if (jsonData.code=='1'){
+                    layer.alert("删除成功!",function(){ window.location.reload(); 
+                    });}
+                else if(jsonData.code=='0'){
+                    layer.alert("所选类名存在下级类目，请先删除下级类名！",function(index){
+                        layer.close(index);
+                    });
+                }
+                else {
+                    layer.alert("删除失败！");
+                }
+             },
+            error:function(data){
+                layer.alert("删除失败！");
+             }
+             });
+
+         },function(index){ 
+            $("#selectall").attr("checked", false);
+            $(".checkbox").prop("checked",false);
+            layer.close(index); });
+        }
+    }
+
+    function checkId(id){
+        $.ajax({
+            type : "post",
+            url : '/admin/Productcategory/checkChild/',
+            dataType : 'json',
+            data: {id:id,},
+            success : function(e) {
+                var jsonData = JSON.parse(e);
+				$.each(jsonData, function(index,data) {
+                    if($("#"+data).is(":checked")){
+                       
+                         $("#"+data).prop("checked",false);
+                    }else{
+                         $("#"+data).prop("checked",true);
+                    }
+				}); 
+            },
+            error:function(data){}
+        });  
+    }
+</script>

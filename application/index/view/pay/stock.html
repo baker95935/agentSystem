@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>库存自提</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+			#WechatPayLayout.stockPay li,#WechatPayLayout.stockPay li span{font-size: .6rem!important;}
+			#WechatPayLayout.stockPay>article>aside{margin-right: .4rem;}#WechatPayLayout.stockPay>article{padding: .4rem .6rem;height: auto;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+		<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<div id="WechatPayLayout" class="stockPay">
+			<p><span>订单编号：</span>{$orderInfo.order_number}</p>
+			{foreach name="orderList" item="item"}
+				<article>
+					<img src="/static/Images/cart_03.png" alt="">
+					<aside class="pname">{$item.pname}</aside>
+					<ul>
+						<li>金额：￥<span class="money">{$item.pprice}</span>元</li>
+						<li>数量：<span>{$item.pnumber}</span>个</li>
+					</ul>
+				</article>
+			{/foreach}
+			<ol class="favourable">
+				<li><span>商品金额：</span>￥{$orderInfo.ptotal_price}</li>
+				<li><span>运费：</span>￥{$orderInfo.trans_expenses}</li>
+				<li><span>代理折扣：</span>￥{$orderInfo.agent_total_price}</li>
+			</ol>
+			<div class="pay">
+				<div>可用库存：￥{$agentInfo.stock_money}</div><div>支付总金额：<p><span class="money">￥{$orderInfo.order_amount_pay}</span></p></div>
+			</div>
+			<button onclick="stockpay('{$orderInfo.order_number}')" class="commonButton">立即支付</button>
+		</div>
+	</body>
+</html>
+<script>
+$(function(){
+	var orderHeight=$(".pname").height();
+	if(orderHeight>40){
+		$("#WechatPayLayout>article").css('align-items','flex-start');
+	}
+});
+//订单删除
+function stockpay(id)
+{
+	layer.msg('你确定支付订单吗', {
+		  time: 0 //不自动关闭
+		  ,btn: ['确定', '取消']
+		  ,yes: function(index){
+		    layer.close(index);
+
+		    $.ajax({
+				url:'{:url("/index/Pay/actionStock")}',
+				data:{order_number:id},
+				type:'post',
+				success:function(data){
+					if(data==1){
+						layer.alert('支付成功！');
+						window.location.href='{:url("/index/Order/myOrders")}';
+					}else if(data==2) {
+						layer.alert('支付成功！');
+						window.location.href='{:url("/index/Order/promotionGiftOrders")}';
+					}else{
+						layer.alert('操作失败，请重试');
+						return false;
+					}
+				}
+			});
+		  }
+	});
+}
+</script>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>微信昵称</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<script type="text/javascript" src='/static/Js/jquery.js'></script>
+		<style type="text/css">
+			body{background-color: #F5F5F5;}
+			button{border: 0;}
+		</style>
+		<script type="text/javascript">
+		var docEl = document.documentElement;
+		function getSize() { // 获取屏幕的宽度
+		  var screenWidth = docEl.clientWidth; 
+		  docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+		}
+		getSize();// 页面加载完执行一次
+		window.onresize = function() {
+		  getSize();
+		}
+		</script>
+	</head>
+	<body>
+		<div id="WechatIDContent">
+			<div>
+				<input class="placeholder_99" type="text" name="WechatName" id="WechatName" placeholder="微信昵称" value="{$data.nickname}"  />
+			</div>
+			<button type='button' class='btn_name'>确认</button>
+		</div>
+	</body>
+	<script type="text/javascript">
+        $(function(){
+            $('.btn_name').click(function(){
+                var wechatName = $('input[name=WechatName]').val();
+ 				/* 提交验证 */
+                if(wechatName){
+                    $.ajax({
+                        url:'{:url("Personalinfo/saveAll")}',
+                        data:{wechatName:wechatName},
+                        type:'post',
+                        success:function(e){
+                            if(e.error){
+                                alert(e.error.msg);
+                                return false;
+                            }else{
+                                window.location.href = e.url;
+                            }
+                        }
+                    });
+                }else{
+                    mobileTip('微信昵称不能为空');
+                    return false;
+                }
+            });
+        });
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+
+</html>

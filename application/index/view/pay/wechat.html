@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>微信支付</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+		<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+    	    <script type="text/javascript">
+    		//调用微信JS api 支付
+    		function jsApiCall()
+    		{
+    			WeixinJSBridge.invoke(
+    				'getBrandWCPayRequest',
+    				<?php echo $jsApiParameters; ?>,
+    				function(res){
+    					WeixinJSBridge.log(res.err_msg);
+    					//alert(res.err_code+res.err_desc+res.err_msg);
+    					if(res.err_msg == "get_brand_wcpay_request:ok") {
+    						layer.alert('支付成功！');
+							window.location.href='{$locationUrl}';
+							//支付成功
+						}else if(res.err_msg =="get_brand_wcpay_request:fail"){
+							layer.alert('支付失败！');
+							window.location.href='{$locationUrl}';
+							//支付失败
+						}else{
+							layer.alert('支付取消！');
+							window.location.href='{$locationUrl}';
+							//支付过程中用户取消
+						}
+    				}
+    			);
+    		}
+
+    		function callpay(order_number,order_amount_pay)
+    		{
+    			var _type = 0;
+    			_type = parseInt($('.ptype').val());// CYL 类型
+    			//校验下价格是否变更，如果变更，那么跳转到列表页
+    			if(order_number && order_amount_pay){
+		    		$.ajax({
+		            	type : "post",
+		                url : '/index/Order/checkOrderPriceChange/',
+		                dataType : 'json',
+		                data: {order_number:order_number,order_amount_pay:order_amount_pay,order_type:_type},
+		                success:function(e){
+			                if(e==1){
+								window.location.href='{$locationUrl}';
+			                } else {
+			                	if (typeof WeixinJSBridge == "undefined"){
+			        			    if( document.addEventListener ){
+			        			        document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+			        			    }else if (document.attachEvent){
+			        			        document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+			        			        document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+			        			    }
+			        			}else{
+			        			    jsApiCall();
+			        			}
+			                }
+		                },
+		                error:function(e){
+		                	layer.alert(e);
+		                	return false;
+		                }
+		            });
+    			}
+    		}
+		</script>
+		<style type="text/css">
+			html,
+			body {
+				background-color: #F5F5F5;
+			}
+			#WechatPayLayout.layout .info-conent>aside{width: 65%;margin-right: .4rem;}#WechatPayLayout.layout .info-conent>ul{width: 35%;}
+			#WechatPayLayout>p,#WechatPayLayout.layout article.info-conent{border-bottom: 1px solid #d7d5d1db;}.info-conent li,.info-conent span,.favourable li,.favourable span{font-size: .6rem!important;}
+			#WechatPayLayout.layout .info-conent{height: auto;align-items: flex-start;padding: .4rem .6rem;}
+		</style>
+	</head>
+
+	<body>
+		<div id="WechatPayLayout" class="layout">
+			<p><span>订单编号：</span>{$orderInfo.order_number}</p>
+			{foreach name="orderList" item="item"}
+				<article class="info-conent">
+					<aside>{$item.pname}</aside>
+					<ul>
+						<li>金额：￥<span class="money">{$item.pprice}</span>元</li>
+						<li>数量：<span>{$item.pnumber}</span>个</li>
+					</ul>
+				</article>
+			{/foreach}
+			{if condition="!empty($orderInfo.agent_total_price)"}
+			<ol class="favourable">
+				<li><span>商品金额：</span>￥{$orderInfo.ptotal_price}</li>
+				<li><span>运费：</span>￥{$orderInfo.trans_expenses}</li>
+				<li><span>代理折扣：</span>￥{$orderInfo.agent_total_price}</li>
+			</ol>
+			{/if}
+			<div>
+				支付总金额：<p>￥<span class="money">{$orderInfo.order_amount_pay}</span></p>元
+			</div>
+			<input type="hidden" value="{$ptype}" class="ptype" />
+			<button onclick="callpay('{$orderInfo.order_number}','{$orderInfo.order_amount_pay}')" class="commonButton">立即支付</button>
+		</div>
+	</body>
+</html>

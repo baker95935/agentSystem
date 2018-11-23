@@ -1,0 +1,26 @@
+{include file='index@common/header'}
+	<link rel="stylesheet" type="text/css" href="/static/Css/my-shop.css">
+</head>
+<body style="background-color:rgb(245,245,245)">
+	<div id="PersonalInfoContent" class="storeProduct">
+	    <div>
+			<a href="{:url('Microshop/selectGoods','type=1')}" class="perInformation">
+				<p>商城商品（选择上架商品）</p>
+				<p style="visibility: hidden;"></p>
+			</a>
+	    </div>
+	    <div>
+			<a href="{:url('Microshop/selectGoods','type=2')}" class="perInformation">
+				<p>上架的商品</p>
+				<p>{$data.onsale}</p>
+			</a>
+	    </div>
+	    <div>
+			<a href="{:url('Microshop/selectGoods','type=3')}" class="perInformation">
+				<p>库存商品</p>
+				<p>{$data.unsale}</p>
+			</a>
+	    </div>
+	</div>
+	{include file='index@common/goBack'}
+<script type="text/javascript" src="/static/Js/jquery.js"></script>

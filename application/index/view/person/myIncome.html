@@ -1,0 +1,43 @@
+{include file='index@common/header'}
+	<link rel="stylesheet" type="text/css" href="/static/Css/reset.css" />
+	<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+	<style type="text/css">
+		html,
+		body {
+			background-color: #F5F5F5;
+		}
+	</style>
+</head>
+<body>
+	<div id="myIncomeLayout">
+		<p>总收入：<span>￥{$profit} </span></p>
+		<ul>
+			{present name='$income.invite'}
+			<li><a href="{:url('Person/inviteReward')}" class="backArrowRight">
+				<div>招商奖励</div>
+				<div>￥{$income.invite}</div>
+			</a></li>
+			{/present}
+			<!-- 
+			{present name='$income.agent'}
+			<li><a href="{:url('Person/agentIncome')}" class="backArrowRight">
+				<div>代理收益</div>
+				<div>￥{$income.agent}</div>
+			</a></li>
+			{/present}
+			{present name='$income.gift'}
+			<li><a href="{:url('Person/promotionReward')}" class="backArrowRight">
+				<div>其他奖励</div>
+				<div>￥{$income.gift}</div>
+			</a></li>
+			{/present}
+			{present name='$income.reward'}
+			<li><a href="{:url('Person/achievementReward')}" class="backArrowRight">
+				<div>业绩分红</div>
+				<div>￥{$income.reward}</div>
+			</a></li>
+			{/present}
+			 -->
+		</ul>
+	</div>
+	{include file='index@common/goBack'}

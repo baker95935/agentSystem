@@ -1,0 +1,42 @@
+{include file='promotiongift/header'/}
+		<div id="upPackDetailLayout">
+			<div class="proBanner">
+				<div class="swiper-container">
+			        <div class="swiper-wrapper">
+			            <div class="swiper-slide"><img src="{$giftInfo.pic}"/></div>
+			        </div>
+			        <!-- Add Pagination -->
+			        <div class="swiper-pagination"></div>	
+		   		</div>
+			</div>
+			<div class="detail">
+				<div class="proText">
+					<p class="proName">产品名称：{$giftInfo.name}</p>
+					<p><span class="level gold">{$giftInfo.type|get_reward_levelname}大礼包</span></p>
+					<div class="other">
+						<span class="goods-price"><span class="yen">￥</span>{$giftInfo.price}</span>
+						<span class="sale">销量：{$giftInfo.sale}件</span>
+					</div>
+				</div>
+				<p class="line"></p>
+				<div class="detailContainer">
+					<div class="proTitle">图文详情</div>
+					<div id="instructionsContent">
+							{$giftInfo.description}						
+					</div>
+				</div>
+				
+			</div>
+			<div class="footer"> 
+				<a href="{:url('/index/Promotiongift/order/id/'.$giftInfo.id)}">立即购买</a>
+			</div>
+		</div>
+	</body>
+	<script src="/static/Js/swiper.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var swiper = new Swiper('#upPackDetailLayout .swiper-container', {
+	        pagination: '.swiper-pagination',
+	        spaceBetween: 30,loop: true,autoplay: 2500	
+   		 });
+	</script>
+</html>

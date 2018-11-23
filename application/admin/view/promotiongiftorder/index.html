@@ -1,0 +1,180 @@
+{include file='header'/}
+<link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+ 
+<script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+<style type="text/css">#myScroll,#myScrollContent{width:98%;overflow-x: scroll;}</style>
+<div id="performance-top">
+                <h5>礼包订单</h5>
+ </div>
+<form class="form-inline definewidth" action="{:url('/admin/Promotiongiftorder/index')}" method="get">
+<table class="table-condensed table-hover definewidth m20 search_table">
+<tr>
+  <td class="td_r">订单编号：</td>
+  <td><input type="text" name="order_number" id="order_number" class="abc input-default" placeholder="订单编号" value="{if condition='$order_number gt 0'}{$order_number}{/if}">
+  </td>
+  <td class="td_r"> 订单状态：</td>
+  <td><select name="status" id="status" class="search_input">
+    <option value="0">全部</option>
+    {foreach name="orderStatus" key=key item="item"}
+    <option value="{$key}" {if condition="$status eq $key"} selected="selected" {/if} >{$item}</option>
+    {/foreach}
+    </select>
+  </td>
+  <td class="td_r">礼包名称：</td>
+  <td><input type="text" name="gift_name" id="gift_name"class="abc input-default" placeholder="礼包名称" value="{if condition='$gift_name gt 0'}{$gift_name}{/if}"></td>
+  <td class="td_r">礼包类型：</td>
+ <td><select name="gift_type" id="gift_type" class="search_input">
+       <option value="0">全部</option>
+       {foreach name="listLevel" item="item"}
+       <option value="{$item.id}" {if condition="$gift_type eq $item.id"} selected="selected" {/if}>{$item.name}</option>
+       {/foreach}
+       </select>
+   </td>
+     
+  	</tr>
+  	
+  	<tr>
+           
+             <td class="td_r">下单人：</td>
+             <td><input type="text" name="name" id="name" class="abc input-default" placeholder="下单人姓名" value="{if condition='$name gt 0'}{$name}{/if}"></td>
+             <td class="td_r">下单日期：</td>
+             <td><input type="text" name="stime" id="stime" class="abc input-default datepicker" placeholder="开始时间" value="{if condition='$stime gt 0'}{$stime}{/if}"></td>
+             <td class="td_c">~</td>
+             <td><input type="text" name="etime" id="etime" class="abc input-default datepicker" placeholder="结束时间" value="{if condition='$etime gt 0'}{$etime}{/if}"></td>
+             <td colspan="2"> 
+            	<button type="submit" class="btn btn-primary ml20">查询</button>
+                <button id="excel" type="button" class="btn btn-primary ml10">导出</button>
+            </td>          
+    </tr>
+  	
+
+</form>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th style="widht:10%">订单编号</th>
+        <th style="widht:10%">订单状态</th>      
+        <th style="widht:10%">礼包名称</th>
+        <th style="widht:10%">礼包类型</th>
+        <th style="widht:10%">礼包售价</th>
+        <th style="widht:10%">付款方式</th>
+        <th style="widht:10%">代理ID</th>
+        <th style="widht:10%">下单人姓名</th>
+        <th style="widht:10%">下单日期</th>
+        <th style="widht:10%">操作</th>
+    </tr>
+    </thead>
+    {foreach name="orderList" item="item"}
+	     <tr>
+            <td>{$item.order_number}</td>
+            <td>{$item.status} {present name='item->refund_status'}&nbsp;&nbsp;{$item->refund_status}{/present} </td>
+            <td>{$item->gift->name}</td>
+            <td>{$item->gift->type|get_reward_levelname}</td>
+            <td>￥{$item->gift->price}</td>
+            <td>{$item.paystyle}</td>
+            <td>{$item.agent_id}</td>
+            <td>{$item->agents->name}</td>
+            <td>{$item.create_time}</td>
+           <td>
+                <!--<a  href="{:url('/admin/Promotiongiftinfo/edit/id/'.$item->id)} ">编辑</a>-->
+               <!--{if condition="$item->getData('status') eq 1"}<a onclick="updateStatus('{$item->order_number}',2)" >确认订单</a> <br/>{/if}-->
+               {if condition="$item->getData('status') eq 2"}<a onclick='popOper({$item["id"]},1)' >标记发货</a><br/>{/if}
+               <a href="{:url('/admin/Promotiongiftorder/read/order_number/'.$item->order_number)}">订单详情</a>  <br/>
+               {if condition="$item->getData('status') eq 4"}<a onclick="updateStatus('{$item->order_number}',5)" >关闭</a> <br/>{/if}
+              <input type="hidden" id='{$item["id"]}' value='{$item["order_number"]}'/>
+           	  {if condition="in_array($item->getData('status'),array(3,4))"}
+          	  	<a href="{:url('/admin/Promotiongiftorder/expressInfo/order_number/'.$item->order_number)}">查看物流</a>
+          	  {/if}
+            </td>
+        </tr>	
+     {/foreach}
+</table>
+<div class="inline pull-right page">
+{$orderList->render()}
+</div>
+</body>
+<input type="hidden" id='orderId'/>
+</html>
+<script>
+$(function () {
+  	$('#excel').click(function(){
+			window.location.href="{:url('/admin/Promotiongiftorder/excelIndex/status/'.$status.'/agent_id/'.$agent_id.'/order_number/'.$order_number.'/stime/'.$stime.'/etime/'.$etime.'/consignee_name/'.$consignee_name.'/consignee_phone/'.$consignee_phone.'/name/'.$name.'/phone/'.$phone.'/gift_name/'.$gift_name.'/gift_type/'.$gift_type)}";
+	 	});
+
+  });
+    
+	$('.datepicker').datepicker({
+	    autoclose: true,          //自动关闭
+	    calendarWeeks: false,     //是否显示今年是第几周
+	    clearBtn: true,           //显示清除按钮
+	    daysOfWeekDisabled: [],   //星期几不可选
+	    endDate: Infinity,        //日历结束日期
+	    forceParse: true,         //是否强制转换不符合格式的字符串
+	    format: 'yyyy-mm-dd',     //日期格式
+	    keyboardNavigation: true, //是否显示箭头导航
+	    language: 'zh-CN',        //语言
+	});
+	
+	function updateStatus(order_number,status)
+	{
+		  var yes = confirm("确定执行此操作吗，不可逆?");
+          if(yes && order_number && status)
+          {
+              $.ajax( {
+                  type : "post",
+                  url : '/admin/Promotiongiftorder/update' ,
+                  dataType : 'json',
+                  data: {order_number:order_number,status:status},
+                  success : function(data) {
+                      if (data==1){
+                          alert("操作成功！");
+                          location.reload();
+                      }else {
+                       	alert("执行失败，请重试");
+                      }
+                  },
+              });
+          }
+	}
+	
+	
+	   //弹出操作 
+    function popOper(oId,oType){
+           oId=$("#"+oId).val();
+           $("#orderId").val(oId);
+           var tabId=sessionStorage.getItem('tabId');
+           var linkUrl='';
+           if(tabId!=null){
+               linkUrl='../../';
+           }
+           
+           var linkpage=null;
+           var strTitle='<span style="font-size:14px;font-weight: bolder;">&nbsp;(订单编号'+oId+')<span>';
+           var pWidth=0;
+           var pHeight='300px';
+           switch(oType){
+               case 1://标记发货
+                    linkpage="{:url('/admin/Promotiongiftorder/delivery/')}";
+                    strTitle='<span style="font-size:16px;font-weight: bolder;">发货<span>'+strTitle;
+                    pWidth='400px';
+                   break;
+           }
+           
+           layer.open({
+                   type: 2,
+                   area: [pWidth, pHeight],
+                   fixed: false, //不固定
+                   maxmin: true,
+                   title:strTitle,
+                   content: linkpage,
+                   end: function () {
+                       $("#orderId").val("");
+                     //  location.reload();
+                   }
+           });
+
+           
+       }
+	 
+</script>

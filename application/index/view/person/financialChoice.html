@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<style type="text/css">
+			body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="capitalContent">
+			<ul>
+				<li>
+					<div class="perInformation" style="background: none;    justify-content: space-between;" onclick='redirect(3,"{$data.wechat_set}");'>
+						<a href="javascript:;"><span>微信支付</span></a>
+						{if condition='!$data.wechat_set'}
+						<span style="color: red;">未绑定</span>
+						{else/}
+						<span style="color: green;">已绑定</span>
+						{/if}
+					</div>
+				</li>
+				<li>
+					<div class="perInformation" onclick='redirect(1,"{$data.ali_set}");'>
+						<a href="javascript:;"><span>支付宝账号</span></a>
+					</div>
+				</li>
+				<li>
+					<div class="perInformation" onclick='redirect(2,"{$data.bank_set}");'>
+						<a href="javascript:;"><span>银行卡账号</span></a>
+					</div>
+				</li>
+			</ul>
+			<div>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		// 跳转
+		function redirect(type,bool){
+			if(bool){
+				window.location.href = '/index/Person/appWithdrawals/type/'+type;
+			}else{
+				switch(type){
+					case 1:
+						var url = '{:url("Person/bindAlipay","choice=1")}';
+						break;
+					case 2:
+						var url = '{:url("Person/bindBank","choice=1")}';
+						break;
+					case 3:
+						alert('请先关注公众号并重新登录');
+						return false;
+						break;
+				}
+				window.location.href = url;
+			}
+		}
+	</script>
+</html>

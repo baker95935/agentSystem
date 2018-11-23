@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>首页</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/agentsystem-admin.css" />
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/ckform.js"></script>
+    <script type="text/javascript" src="/static/Js/common.js"></script>
+    <script type="text/javascript" src="/static/Js/g2.min.js"></script>
+    <script type="text/javascript" src="/static/Js/data-set.min.js"></script>
+    <style>
+        html,body{background-color: #E8E9EE;}
+        #myHome .circleChart_text{top:-12px !important;font-weight:600 !important;}
+    </style>
+</head>
+<body>
+    <div class="container" id="myHome">
+        <div class="warn">首页统计数据30分钟更新一次</div>
+        <div class="agencyNumber">
+            <h2>代理商总人数：{$agents.total}</h2>
+            <div>
+                <span>{$levelInfo[5]['name']}：{$levelInfo[5]['count']}</span>
+                <span>{$levelInfo[4]['name']}：{$levelInfo[4]['count']}</span>
+                <span>{$levelInfo[3]['name']}：{$levelInfo[3]['count']}</span>
+                <span>日增代理商：{$agents.plus}</span>
+                <span></span>
+            </div>
+            <ul>
+                <li>{$levelInfo[2]['name']}：{$levelInfo[2]['count']}</li>
+                <li>{$levelInfo[1]['name']}：{$levelInfo[1]['count']}</li>
+                <li>{$levelInfo[0]['name']}：{$levelInfo[0]['count']}</li>
+                <li>待审核代理商：{$agents.reg}</li>
+                <li>申请升级代理商：{$agents.promote}</li>
+            </ul>
+        </div>  
+        
+        <div class="data">
+          <div id="productNum">
+            <div>
+              <h2><span>出售中的商品数：</span>{$products['sale']}</h2>
+            </div>
+            <div>
+              <h2><span>库存中的商品数：</span>{$products['stock']}</h2>
+            </div>
+          </div>
+            <div class="div_table">
+                <p>数据统计</p>
+                <ul>
+                    <li>
+                        <p>总计订单（笔）</p>
+                        <span>{$totals['totalOrders']}</span>
+                    </li>
+                    <li>
+                        <p>总销售额（元）</p>
+                        <span>{$totals['totalAmount']}</span>
+                    </li>
+                    <li>
+                        <p>本月订单（笔）</p>
+                        <span>{$totals['currentOrders']}</span>
+                    </li>
+                    <li class="last">
+                        <p>本月销售额（元）</p>
+                        <span>{$totals['currentAmount']}</span>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <p>待发货订单（笔）</p>
+                        <span>{$totals['waitOrders']}</span>
+                    </li>
+                    <li>
+                        <p>已发货订单（笔）</p>
+                        <span>{$totals['alreadyOrders']}</span>
+                    </li>
+                    <li>
+                        <p>已完成订单（笔）</p>
+                        <span>{$totals['completeOrders']}</span>
+                    </li>
+                    <li class="last">
+                        <p>代理商订单（笔）</p>
+                        <span>{$totals['agentOrders']}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>    
+        <!--chart  -->
+        <div class="chart_div">
+            <div class="line">
+                <h2>订单笔数趋势图</h2>
+                <ol>
+                    <li>
+                        <p>今日订单数（笔）</p>
+                        <span>{$sevens.ordersCount.0.value}</span>
+                    </li>
+                    <li>
+                         <p>昨日订单数（笔）</p>
+                        <span>{$sevens.ordersCount.1.value}</span>
+                    </li>
+                </ol>
+                <div id="line_chart">
+                
+                </div>
+            </div>
+            
+            <div class="circle">
+                <h2>订单金额统计</h2>
+                <div id="circle_div"></div>
+            </div>
+        </div>
+        <div class="chart_reward">
+            <div class="earnings">
+                <h2>总收益：￥<span>{$totalReward.totalProfit}</span>元</h2>
+                <div id="earnings_div" class="earnings_div">
+                    <!-- <div id="expend"></div>
+                    <div id="remain"></div> -->
+                </div>
+            </div>
+            <div class="reward">
+                <h2>奖励：￥<span>{$totalReward.totalProfit}</span>元</h2>
+                <div id="reward_content"></div>
+            </div>
+        </div>
+        <div class="table_div">
+          <div class="recommend">
+            <div>
+              <p>上月推荐排行榜</p>
+              <div class="title">
+                <span>昵称/姓名</span>
+                <span>手机号/微信号</span>
+                <span>数量</span>
+                <span>排名</span>
+              </div>
+              <ul>
+              {foreach name="recommendList" item="item"}
+                <li>
+                  <ul class="table_cell">
+                    <li>{notempty name="item->agents->nickname"} <span>{$item->agents->nickname} </span> {/notempty}
+                        {notempty name="item->agents->name"} <span>{$item->agents->name} </span> {/notempty} 
+                    </li>
+                    <li>
+                        {notempty name="item->agents->phone"} <span>{$item->agents->phone} </span> {/notempty}
+                        {notempty name="item->agents->wechat"} <span>{$item->agents->wechat} </span> {/notempty}
+                    </li>
+                    <li><span>{$item.profit|intval}</span></li>
+                    <li><span>{$item.rank}</span></li>
+                  </ul>
+                </li>
+  			  {/foreach}
+              </ul>
+            </div>
+          </div>
+          <div class="sale">
+            <div>
+              <p>上月销售排行榜</p>
+              <div class="title">
+                <span>昵称/姓名</span>
+                <span>手机号/微信号</span>
+                <span>总销售额</span>
+                <span>排名</span>
+              </div>
+              <ul>
+    		{foreach name="orderAmountList" item="item"}
+                <li>
+                  <ul class="table_cell">
+                    <li>{notempty name="item->agents->nickname"} <span>{$item->agents->nickname} </span> {/notempty}
+                        {notempty name="item->agents->name"} <span>{$item->agents->name} </span> {/notempty} 
+                    </li>
+                    <li>
+                        {notempty name="item->agents->phone"} <span>{$item->agents->phone} </span> {/notempty}
+                        {notempty name="item->agents->wechat"} <span>{$item->agents->wechat} </span> {/notempty}
+                    </li>
+                    <li><span>{$item.profit}</span></li>
+                    <li><span>{$item.rank}</span></li>
+                  </ul>
+                </li>
+        	 {/foreach}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="table_div">
+          <div class="reward_table">
+            <div>
+              <p>上月总奖励排行榜</p>
+              <div class="title">
+                <span>昵称/姓名</span>
+                <span>手机号/微信号</span>
+                <span>金额</span>
+                <span>排名</span>
+              </div>
+              <ul>
+              
+              {foreach name="rankProfitList" item="item"}
+                <li>
+                  <ul class="table_cell">
+                     <li>{notempty name="item->agents->nickname"} <span>{$item->agents->nickname} </span> {/notempty}
+                        {notempty name="item->agents->name"} <span>{$item->agents->name} </span> {/notempty} 
+                    </li>
+                    <li>
+                        {notempty name="item->agents->phone"} <span>{$item->agents->phone} </span> {/notempty}
+                        {notempty name="item->agents->wechat"} <span>{$item->agents->wechat} </span> {/notempty}
+                    </li>
+                    <li><span>{$item.profit}</span></li>
+                    <li><span>{$item.rank}</span></li>
+                  </ul>
+                </li>
+        	 {/foreach}
+              </ul>
+            </div>
+          </div>
+          <div class="performance">
+            <div>
+              <p>上月绩效排行榜</p>
+              <div class="title">
+                <span>昵称/姓名</span>
+                <span>手机号/微信号</span>
+                <span>金额</span>
+                <span>排名</span>
+              </div>
+              <ul>
+              {foreach name="rankPerformanceList" item="item"}
+                <li>
+                  <ul class="table_cell">
+                    <li>{notempty name="item->agents->nickname"} <span>{$item->agents->nickname} </span> {/notempty}
+                        {notempty name="item->agents->name"} <span>{$item->agents->name} </span> {/notempty} 
+                    </li>
+                    <li>
+                        {notempty name="item->agents->phone"} <span>{$item->agents->phone} </span> {/notempty}
+                        {notempty name="item->agents->wechat"} <span>{$item->agents->wechat} </span> {/notempty}
+                    </li>
+                    <li><span>{$item.profit}</span></li>
+                    <li><span>{$item.rank}</span></li>
+                  </ul>
+                </li>
+        	 {/foreach}
+              </ul>
+            </div>
+          </div>
+        </div>
+    </div>
+    <script>
+         const data = [
+     {foreach name="sevens.ordersCount" item="item"}
+        { month: '{$item.month}-{$item.day}', 订单笔数: {$item.value},time: '{$year}-{$item.month}-{$item.day}T00:00:00.000Z' },
+      {/foreach}
+  ];
+  const ds = new DataSet();
+  const dv = ds.createView().source(data);
+  dv.transform({
+    type: 'fold',//以指定字段集为key，展开数据。
+    fields: [ '订单笔数'], // 展开字段集
+    key: 'keyText', // key字段
+    value: 'temperature', // value字段
+  });
+  const chart = new G2.Chart({
+    container: 'line_chart',
+    forceFit: true,
+    height:374,
+    padding:[15,30,70,60]
+  });
+  const defs = {
+  'time': {
+    type: 'time',
+    nice: false,
+    mask: 'MM-DD',
+    tickInterval: 24 * 60 * 60 * 1000 // 对于 linear 类型的数据，可以设置 tickInterval 参数来设定每个刻度之间的间距，time 类型的单位为微秒
+  },
+  value: {
+    tickInterval: 10
+  }
+};
+chart.source(dv,defs);
+  chart.tooltip({
+    crosshairs: {
+      type: 'line'
+    }
+  });
+  chart.axis('temperature', {
+    label: {
+      formatter: val => {
+        return val;
+      }
+    },
+    line: {
+     stroke: '#cccccc'
+    }
+  });                     //x*y轴
+  chart.line().position('time*temperature').color('keyText',['#fe902e','#3bbc7b']);
+  chart.point().position('time*temperature').color('keyText',['#fe902e','#3bbc7b']).size(4).shape('circle').style({
+    stroke: '#fff',
+    lineWidth: 1
+  });
+  chart.render();
+    </script>
+    <script>
+    const dataCircle = [
+    {foreach name="sevens.ordersAmount" item="item"}
+    { time: '{$item.month}-{$item.day}', 当天全部订单金额: {$item.value}},
+    {/foreach}
+    
+  ];
+  const reverse=new DataSet();
+  const reData=reverse.createView().source(dataCircle);
+  reData.transform({  // 把数据行逆序排列
+    type: 'reverse',
+  });
+        const chart_circle= new G2.Chart({
+            container: 'circle_div',
+            forceFit: true,
+            height:440,
+            padding:[30,30,70,60]
+        });
+        chart_circle.source(reData,dataCircle);
+        chart_circle.axis('当天全部订单金额', {
+          line: {
+            lineWidth:1, // 设置线的宽度
+            stroke: '#cccccc' // 设置线的颜色
+          },
+          label: {
+            // 使用 formatter 回调函数
+            formatter: val => {
+              //return val + 'K';
+              	return val;
+            }
+          }
+        });
+        chart_circle.legend({
+         custom:true,
+          items: [
+            { value: '当天全部订单金额', marker: {symbol: 'square', fill: '#5bacfd', radius: 5} }
+          ]})
+        chart_circle.interval().position('time*当天全部订单金额').color('#5bacfd');
+        chart_circle.render();
+    </script>
+    <script>
+    const { DataView } = DataSet;
+  const earnings= [
+    { item: '支出总奖励占比', count:{$totalReward['saleRatio']} },
+    { item: '剩余收益', count:{$totalReward['recommendRatio']}}
+  ];
+  const eaReward = new DataView();
+  eaReward.source(earnings).transform({
+    type: 'percent',
+    field: 'count',
+    dimension: 'item',
+    as: 'percent'
+  });
+  const chart_earnings= new G2.Chart({
+    container: 'earnings_div',
+    forceFit: true,
+    height:320,
+    padding:[0,40,60,0]
+  });
+  chart_earnings.source(eaReward, {
+    percent: {
+      formatter: val => {
+        val = (val * 100).toFixed(2) + '%';
+        return val;
+      }
+    }
+  });
+  chart_earnings.coord('theta', {
+    radius: 0.75,
+    innerRadius: 0.8  // 空心圆的半径，值范围为 0 至 1
+  });
+   chart_earnings.legend({
+    // position: 'right',
+    marker: 'square',
+    offsetY:-15,
+    offsetX:0
+  });
+  chart_earnings.tooltip({
+    showTitle: false,
+    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+  });
+  chart_earnings.intervalStack()
+    .position('percent')
+    .color('item',['#fc46a0','#fdc840'])
+    .label('percent', {
+      formatter: (val, item) => {
+        return val;
+      }
+    })
+    .tooltip('item*percent', (item, percent) => {
+      percent = (percent * 100).toFixed(2) + '%';
+      return {
+        name: item,
+        value: percent
+      };
+    })
+    .style({
+      lineWidth: 1,
+      stroke: '#fff'
+    });
+  chart_earnings.render();
+   /* $("#expend").circleChart({
+            size: 210,
+            value: 30,//value
+            color: "#fc46a0",
+            backgroundColor: "#ebebeb",
+            text: 0,
+             widthRatio:.1,
+            onDraw: function(el, circle) {
+                circle.text(Math.round(circle.value) + "%<span style='display:block;font-size:14px;color:#666666;line-height:0;position:absolute;top:140px;left:32%;font-weight:normal!important;'>支出总奖励</span>");
+            }
+        });
+     $("#remain").circleChart({
+            size: 210,
+            value: 30,//value
+            color: "#fdc840",
+            backgroundColor: "#ebebeb",
+            text: 0,
+            widthRatio:.1,
+            onDraw: function(el, circle) {
+                circle.text(Math.round(circle.value) + "%<span style='display:block;font-size:14px;color:#666666;line-height:0;position:absolute;top:140px;left:36%;font-weight:normal!important;'>剩余收益</span>");
+            }
+        });*/
+    </script>
+    <script>
+  const dataReward= [
+    { item: '绩效奖励占比', count: {$totalReward['performanceRatio']} },
+    { item: '代理收入占比', count: {$totalReward['saleRatio']} },
+    { item: '招商奖励占比', count: {$totalReward['recommendRatio']} },
+    { item: '礼包奖励占比', count: {$totalReward['giftRewardRatio']} },
+  ];
+  const dvReward = new DataView();
+  dvReward.source(dataReward).transform({
+    type: 'percent',
+    field: 'count',
+    dimension: 'item',
+    as: 'percent'
+  });
+  const chart_reward = new G2.Chart({
+    container: 'reward_content',
+    forceFit: true,
+    height:320,
+    padding:[0,40,60,0]
+  });
+  chart_reward.source(dvReward, {
+    percent: {
+      formatter: val => {
+        val = (val * 100).toFixed(2) + '%';
+        return val;
+      }
+    }
+  });
+  chart_reward.coord('theta', {
+    radius: 0.75,
+    innerRadius: 0.8  // 空心圆的半径，值范围为 0 至 1
+  });
+   chart_reward.legend({
+    // position: 'right',
+    marker: 'square',
+    offsetY:-15,
+    offsetX:0
+  });
+  chart_reward.tooltip({
+    showTitle: false,
+    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+  });
+  // 辅助文本
+ /* chart_reward.guide().html({
+    position: [ '50%', '50%' ],
+    html: '<div style="color:#8c8c8c;font-size: 14px;text-align: center;width: 10em;">主机<br><span style="color:#8c8c8c;font-size:20px">200</span>台</div>',
+    alignX: 'middle',
+    alignY: 'middle'
+  });*/
+  chart_reward.intervalStack()
+    .position('percent')
+    .color('item',['#F6637b','#9759e9','#52d072','#2196f3'])
+    .label('percent', {
+      formatter: (val, item) => {
+        return val;
+      }
+    })
+    .tooltip('item*percent', (item, percent) => {
+      percent =(percent * 100).toFixed(2) + '%';
+      return {
+        name: item,
+        value: percent
+      };
+    })
+    .style({
+      lineWidth: 1,
+      stroke: '#fff'
+    });
+  chart_reward.render();
+    </script>
+</body>
+</html>

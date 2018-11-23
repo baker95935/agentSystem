@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>性别</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<script type="text/javascript" src='/static/Js/jquery.js'></script>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+		var docEl = document.documentElement;
+		function getSize() { // 获取屏幕的宽度
+		  var screenWidth = docEl.clientWidth; 
+		  docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+		}
+		getSize();// 页面加载完执行一次
+		window.onresize = function() {
+		  getSize();
+		}
+		</script>
+	</head>
+	<body>
+	<form>
+			<div id="sexContent">
+
+			   <div class="male">
+			   		<span>男</span>
+					<div>
+						<label name="sex_male" {if condition="$data.sex eq 'm'"} class="checked" {/if} for="sex_male"></label>
+			   			<input id="sex_male" name="sex" value="m"  type="radio"  {if condition="$data.sex eq 'm'"} checked="checked" {/if}>
+					</div>
+			   </div>
+				<div class="woman">
+					<span>女</span>
+					<div>
+						<label name="sex_woman" {if condition="$data.sex eq 'w'"} class="checked" {/if} for="sex_woman"></label>
+						<input id="sex_woman" name="sex" value="w"  type="radio" {if condition="$data.sex eq 'w'"}  checked="checked" {/if}>
+					</div>
+				</div>
+
+			   <buttton type='button' class="commonButton" >确认</buttton>
+			</div>
+	</form>
+	</body>
+	<script src="/static/js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$(function(){
+			$("label").click(function(){
+					$("label").attr('class','');$('input').removeAttr('checked');
+					$(this).attr('class','checked');
+					let id=$(this).attr('name');
+					$("#"+id).attr('checked','chedcked');
+				
+			})
+		})
+	</script>
+	<script type="text/javascript">
+        $(function(){
+            $('.commonButton').click(function(){
+                 var sex_m_w = $('#sexContent input[name="sex"]:checked ').val();
+   				/* 提交验证 */
+                if(sex_m_w){
+                    $.ajax({
+                        url:'{:url("Personalinfo/saveAll")}',
+                        data:{sex_m_w:sex_m_w},
+                        type:'post',
+                        success:function(e){
+//                            console.log(e);
+                            if(e.error){
+                                alert(e.error.msg);
+                                return false;
+                            }else{
+                                window.location.href = e.url;
+                            }
+                        }
+                    });
+                }else{
+                    alert('不能为空');
+                    return false;
+                }
+            });
+        });
+	</script>
+
+</html>

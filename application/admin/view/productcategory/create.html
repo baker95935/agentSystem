@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <script type="text/javascript" src="/static/Js/ajaxfileupload.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+<table class="table table-bordered table-hover m10">
+    <tr>
+        <td width="10%" class="tableleft">上级类目</td>
+        <td class="tl">
+            <select id="parentid" name="parentid" style="width:200px;">
+                <option value="0" {present name="data.parent_id"} {if condition="$data.parent_id eq 0 "} selected="selected"  {/if} {/present}>一级菜单</option>
+                {foreach name="categoryList" item="item"}
+                    <option value="{$item.id}" {present name="data.parent_id"} {if condition="$data.parent_id eq $item.id "}   selected="selected"{/if} {/present} >{$item.category_name}</option>
+                        {foreach name="item.categorySecond" item="v"}
+                            <option value="{$v.id}" {present name="data.parent_id"} {if condition="$data.parent_id eq $v.id "}   selected="selected"{/if} {/present} >{$v.category_name}</option>
+                                {foreach name="v.categorythree" item="vv"}
+                                    <option value="{$vv.id}" {present name="data.parent_id"} {if condition="$data.parent_id eq $vv.id "}   selected="selected"{/if} {/present} >{$vv.category_name}</option>
+                                {/foreach}
+                        {/foreach}
+                {/foreach}
+            </select>
+        </td>
+    </tr>
+    <tr>
+            <td class="tableleft">类目名称</td>
+            <td class="tl"><input id="classNametxt" style="width:195px;" type="text" value="{present name="data.category_name"}{$data.category_name}{/present}" name="name"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">类目图片</td>
+        <td style="float:none;" class="tl">
+            <table >
+                <tr>
+                    <td style="border:none;">
+                       <img id="myimg" class="cover-radius"  src="/static/Images/upload_img.png" style="cursor: pointer;width:200px;height:200px" />
+                    </td>
+                    <td style="text-align: left;border:none;">
+                        <input class="up_img" id="up_img" name="up_img" type="file" onchange="setImagePreview(this)"/>
+                        <small class="help-block cover-tips" style="color: #dd4b39;display: none;">请上传照片</small>
+                        <input type=hidden name="default_imgurl" id="default_imgurl"/>
+                        <br>
+                            <span style="color:red;">图片尺寸：330*330</span>
+                        <br>
+                            <span style="color:red;">图片大小：200kb以下</span>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+<div class="layui-layer-btn layui-layer-btn-">
+    <a class="layui-layer-btn0">保存</a>
+    <a class="layui-layer-btn1">关闭</a>
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+		var index = parent.layer.getFrameIndex(window.name);
+        var classId=parent.document.getElementById("classId").value;
+        if(classId){
+           $.ajax({
+            type : "post",
+                    url : '/admin/Productcategory/initCategory/' ,
+                    dataType : 'json',
+                    data: {id:classId},
+                    success : function(e) {
+                       var jsonData = JSON.parse(e);
+                       $("#classNametxt").val(jsonData.category_name);
+                       $("#parentid").find("option[value='"+jsonData.parent_id+"']").attr("selected",true);
+                       $("#parentid").attr("disabled","disabled");
+                       $("#myimg").attr("src",jsonData.category_img);
+                       $("#default_imgurl").val(jsonData.category_img);
+                    }
+           });
+        }
+
+        $('.layui-layer-btn1').click(function(){
+           parent.layer.close(index);
+        });
+        $('.layui-layer-btn0').click(function(){
+
+            var  className=$("#classNametxt").val();
+            var  pClassId=$("#parentid").val();
+            var  imgUrl=$("#default_imgurl").val();
+            var msg=null;
+            if(className){
+                $.ajax( {
+                    type : "post",
+                    url : '/admin/Productcategory/save' ,
+                    dataType : 'json',
+                    data: {parentid:pClassId,id:classId,name:className,imgurl:imgUrl},
+                    success : function(e) {
+                        var jsonData = JSON.parse(e);
+                        switch(jsonData.code){
+                            case -1:layer.alert(jsonData.msg); break;
+                            case 0:
+                                if(classId){
+                                    msg="保存失败，请重新输入！";
+                                }else{
+                                    msg="添加失败，请重新输入！";
+                                }
+                                layer.alert(msg);
+                            break;
+                            case 1:
+                                if(classId){
+                                    msg="保存成功";
+                                }else{
+                                    msg="添加成功";
+                                }
+                                 layer.alert(msg,function(){
+                                      window.parent.location.reload();
+                                      parent.layer.close(index);
+
+                                    });
+                                break;
+                            }
+
+                    },
+                    error:function(e){
+                        if(classId){
+                           msg="保存失败，请重新输入！";
+                        }else{
+                           msg="添加失败，请重新输入！";
+                        }
+                        layer.alert(msg);
+                    }
+                });
+            }else{
+                layer.alert("请输入产品类目名！");
+            }
+
+        });
+    });
+    //上传图片
+    function setImagePreview() {
+        var imgPath = $("#up_img").val();
+        var old_img=$("#default_imgurl").val();
+
+
+        //判断上传文件的后缀名
+        var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+        if (strExtension != 'jpg' && strExtension != 'gif' && strExtension != 'png' && strExtension != 'bmp') {
+            alert('上传图片的格式不正确，请上传jpg、gif、png格式的图片！');
+            return;
+        }
+        $.ajaxFileUpload({
+                url: '/admin/Productcategory/uploads',  //用于文件上传的服务器端请求地址
+                secureuri: false, //是否需要安全协议，一般设置为false
+                fileElementId: 'up_img', //文件上传域的ID
+                type: 'post',
+                dataType: 'json', //返回值类型 一般设置为json
+                async:true,
+                success: function (data)  //服务器成功响应处理函数
+                {
+
+                    if(data.state==1){
+                        $("#myimg").attr('src',data.savedir);
+                        $("#default_imgurl").val(data.savedir);
+                    }
+                },
+                error:function(e){
+                    alert(e.error);
+                }
+            });
+    }
+</script>
+

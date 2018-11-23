@@ -1,0 +1,78 @@
+{include file='header'/}
+<div id="performance-top">
+                <h5>代理商库存低于最低库存记录</h5>
+            </div>
+<form id="agentorders" class="form-inline definewidth search_table" action="{:url('/admin/Agentstock/lowerStockMoneyLog')}" method="get">    
+    代理商ID：
+    <input type="text" name="agent_id" id="agent_id" class="abc input-default" placeholder="代理商ID" value="{if condition='$agent_id gt 0'}{$agent_id}{/if}">
+    &nbsp;&nbsp;  
+    代理商姓名：
+    <input type="text" name="name" id="name" class="abc input-default" placeholder="代理商姓名" value="{if condition='$name gt 0'}{$name}{/if}">
+    &nbsp;&nbsp;  
+    联系方式：
+    <input type="text" name="contact" id="contact" class="abc input-default" placeholder="联系方式" value="{if condition='$contact gt 0'}{$contact}{/if}">
+    &nbsp;&nbsp;  
+    角色： 
+    <select name="role" id="role" class="search_input">
+    <option value="-1">全部</option>
+    {foreach name="roleList" item="item"}
+    	<option value="{$item.id}" {if condition="$role eq $item.id"} selected="selected" {/if} >{$item.name}</option>
+    {/foreach}
+    </select>
+    &nbsp;&nbsp;  
+        状态： 
+    <select name="status" id="status" class="search_input">
+    <option value="0">全部</option>
+    {foreach name="statusList" item="item" key="key"}
+    	<option value="{$key}" {if condition="$key eq $status"} selected="selected" {/if} >{$item}</option>
+    {/foreach}
+    </select>  
+    <br>
+    <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp; 
+    <button type="button" id="excel" class="btn btn-success">导出</button>
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th>代理商ID</th>
+        <th>姓名</th>
+        <th>联系方式</th>
+        <th>当前角色</th>
+        <th>创建时间</th>
+        <th>降级时间</th>
+        <th>降级前角色</th>
+        <th>最低库存金额</th>
+        <th>当前库存余额</th>
+        <th>状态</th>
+    </tr>
+    </thead>
+    {foreach name="stockLogList" item="item"}
+	     <tr>
+            <td>{$item->agents->agent_id}</td>
+            <td class="tl">{$item->agents->name}</td>
+            <td class="tl">手机号：{$item->agents->phone}<br/>微信号：{$item->agents->wechat}</td>
+            <td>{$item->agents->role|get_reward_levelname}</td>
+            <td>{$item.create_time}</td>
+            <td>{$item.down_time|date='Y-m-d H:i:s',###}</td>
+             <td>{$item.role|get_reward_levelname}</td>
+            <td class="tr"><span class="warn">￥{eq name='$item.role' value='0'}0.00{else/}{$item.lowestStock}{/eq}</span></td>
+            <td class="tr"><span class="warn">￥{$item->agents->stock_money}</span></td>
+            <td>
+             {$item.status}
+            </td>
+        </tr>	
+     {/foreach}
+</table>
+<div class="inline pull-right page">
+{$stockLogList->render()}
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+    	$('#excel').click(function(){
+			window.location.href="{:url('/admin/Agentstock/excelLowerStockMoneyLog/agent_id/'.$agent_id.'/name/'.$name.'/contact/'.$contact.'/role/'.$role.'/status/'.$status)}";
+	 	});
+
+    });
+</script>

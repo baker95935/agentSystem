@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加代理商</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <!--S-->
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-datepicker.min.css" />
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <!--S-->
+    <script type="text/javascript" src='/static/Js/bootstrap-datepicker.min.js'></script>
+    <script type="text/javascript" src='/static/Js/bootstrap-datepicker.zh-CN.min.js'></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="performance-top">
+    <h5>
+        {notempty name="info.agent_id"}
+        代理商ID：{$info.agent_id}
+        {else/}
+        添加代理商
+        {/notempty}
+    </h5>
+</div>
+<form action="" onSubmit="return false;" method="post" class="definewidth">
+    <div id="performance-top">
+        <h6>基本信息</h6>
+        <table class="table table-bordered table-hover common_input m10">
+            <tr>
+                <td width="10%" class="tableleft"><span style="color: red;">*</span>微信昵称</td>
+                <td class="tl"><input type="text" name="nickname" value="{present name='info.nickname'}{$info.nickname}{/present}" required /></td>
+            </tr>
+            <tr>
+                <td class="tableleft"><span style="color: red;">*</span>微信号</td>
+                <td class="tl"><input type="text" name="wechat" value="{present name='info.wechat'}{$info.wechat}{/present}" required /></td>
+            </tr>
+            <tr>
+                <td class="tableleft"><span style="color: red;">*</span>登录账号<br/>(联系电话)</td>
+                <td class="tl"><input type="text" name="phone" value="{present name='info.phone'}{$info.phone}{/present}" required pattern="^1[0-9]{10}$" title="请输入手机号" /></td>
+            </tr>
+            <tr>
+                <td class="tableleft">登录密码</td>
+                <td class="tl"><input type="password" name="password" value="" id="password" /></td>
+            </tr>
+            <tr>
+                <td class="tableleft">确认密码</td>
+                <td class="tl"><input type="password" name="repassword" value="" id="repassword" /></td>
+            </tr>
+        </table>
+    </div>
+    <div id="performance-top">
+        <h6>详细信息</h6>
+        <table class="table table-bordered table-hover common_select m10">
+            <tr>
+                <td class="tableleft">姓名</td>
+                <td class="tl"><input type="text" name="name" value="{present name='info.name'}{$info.name}{/present}" style="width:auto;" /></td>
+            </tr>
+            <tr>
+                <td class="tableleft">性别</td>
+                <td class="tl">
+                    <input type="radio" name="sex" value="m" {notpresent name="info.sex"}checked="checked"{else/}{eq name='$info->getData("sex")' value='m'}checked="checked"{/eq}{/notpresent} /> 男
+                    <input type="radio" name="sex" value="w" {present name="info.sex"}{eq name='$info->getData("sex")' value='w'}checked="checked"{/eq}{/present} /> 女
+                </td>
+            </tr>
+            <tr>
+                <td class="tableleft">身份证</td>
+                <td class="tl"><input type="text" name="id_card" value="{present name='info.id_card'}{$info.id_card}{/present}" style="width:auto;" /></td>
+            </tr>
+            <tr>
+                <td width="10%" class="tableleft">地址信息</td>
+                <td class="tl">
+                    <select name="province">
+                        <option value=""{present name="info.province"}{if condition="$info.province eq ''"} selected="selected"{/if}{/present}>省</option>
+                        {foreach name='provinces' item='province_val'}
+                        <option value='{$province_val.id}'{present name='info.province'}{if condition='$province_val.id eq $info.province'} selected='selected'{/if}{/present}>{$province_val.name}</option>
+                        {/foreach}
+                    </select>
+                    <select name="city">
+                        <option value=""{present name="info.city"}{if condition="$info.city eq ''"} selected="selected"{/if}{/present}>市</option>
+                        {present name='cities'}
+                        {foreach name='cities' item='city_val'}
+                        <option value='{$city_val.id}'{present name='info.city'}{if condition='$city_val.id eq $info.city'} selected='selected'{/if}{/present}>{$city_val.name}</option>
+                        {/foreach}
+                        {/present}
+                    </select>
+                    <select name="area">
+                        <option value=""{present name="info.area"}{if condition="$info.area eq ''"} selected="selected"{/if}{/present}>区/县</option>
+                        {present name='areas'}
+                        {foreach name='areas' item='area_val'}
+                        <option value='{$area_val.id}'{present name='info.area'}{if condition='$area_val.id eq $info.area'} selected='selected'{/if}{/present}>{$area_val.name}</option>
+                        {/foreach}
+                        {/present}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableleft">详细地址</td>
+                <td class="tl"><input type="text" name="address" value="{present name='info.address'}{$info.address}{/present}" /></td>
+            </tr>
+        </table>
+    </div>
+    <div id="performance-top">
+        <h6>身份信息</h6>
+        <table class="table table-bordered table-hover common_select m10">
+            <tr>
+                <td class="tableleft">代数</td>
+                <td class="tl">
+                    <input type='text' value='{present name="$info.generation"}{$info.generation}{else/}1{/present}' class='myGeneration' disabled readonly style='width:auto;' />
+                </td>
+            </tr>
+            <tr>
+                <td width="10%" class="tableleft">角色</td>
+                <td class="tl">
+                    <select name="role"{present name='info'}{if condition='in_array($info.status,[1,2]) && $info.agent_id'}disabled{/if}{/present}>
+                        {foreach name='basic.role_arr' item='role_val' key='role_key'}
+                        <option value='{$role_key}'{present name='info.role'}{eq name='$role_key' value='$info.role'} selected='selected'{/eq}{/present}>{$role_val}</option>
+                        {/foreach}
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="performance-top">
+        <h6>关系</h6>
+        <h7>(不能搜索该代理商下级，请慎重操作，以免引起数据混乱！)</h7>
+        <table class="table table-bordered table-hover common_input common_select m10">
+            <tr>
+                <td width="10%" class="tableleft">邀请人</td>
+                <td class="tl">
+                    <select name="inviter">
+                        <option class='g_' value='' data-g='0'>无上级</option>
+                        {notempty name='all_agents'}
+                        {foreach name='all_agents' item='agent_val'}
+                        <option class="g_{$agent_val.a_id}" value='{$agent_val.a_id}' data-g='{$agent_val.generation}'{present name='info.inviter'}{eq name='info.inviter' value='$agent_val.a_id'} selected='selected'{/eq}{/present}>{$agent_val.name}</option>
+                        {/foreach}
+                        {/notempty}
+                    </select>
+                    <input type="text" placeholder='请输入编号/微信号/手机号' id="search_inviter" />
+                    <button type="button" class="btn btn-primary" id='search'>搜索</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="performance-top">
+        <h6>支付账号</h6>
+        <h7>(线上支付功能（支付、提现）只采用微信支付)</h7>
+        <table class="table table-bordered table-hover common_select common_input m10">
+            <tr>
+                <td width="10%" class="tableleft">微信支付</td>
+                <td class="tl">{present name='$wechat_is_bind'}{if condition='$wechat_is_bind'}已绑定{else/}未绑定{/if}{/present}</td>
+                <td width="10%" class="tableleft">支付宝账号</td>
+                <td class="tl"><input type="text" name="ali_account" value="{present name='account[1]'}{$account[1]['account']}{/present}" /></td>
+            </tr>
+            <tr>
+                <td width="10%" class="tableleft">银行账号</td>
+                <td class="tl" colspan="3"><input type="text" name="bank_account" value="{present name='account[2]'}{$account[2]['account']}{/present}" style="width:100%;" /></td>
+            </tr>
+            <tr >
+                <td width="10%" class="tableleft">开户行</td>
+                <td class="tl"><input type="text" name="account_bank" value="{present name='account[2]'}{$account[2]['bank']}{/present}" /></td>
+                <td width="10%" class="tableleft">开户名</td>
+                <td class="tl"><input type="text" name="account_name" value="{present name='account[2]'}{$account[2]['name']}{/present}" /></td>
+            </tr>
+        </table>
+    </div>
+    <div id="performance-top">
+        <h6>身份有效期</h6>
+        <table class="table table-bordered table-hover common_input common_select m10">
+            <tr>
+                <td width="10%" class="tableleft">有效期</td>
+                <td class="tl">
+                    <select class='end_time'>
+                        <option value='-1'{present name='info'}{eq name='info.end_etime' value='-1'} selected='selected'{/eq}{else/} selected='selected'{/present}>永久</option>
+                        <option value='0'{present name='info'}{neq name='info.end_etime' value='-1'} selected='selected'{/neq}{/present}>有效期</option>
+                    </select>
+                </td>
+            </tr>
+            <tr class='{present name="info"}{eq name="info.end_etime" value="-1"}display-none{/eq}{/present}' id="end_time">
+                <td width="10%" class="tableleft">到期日期</td>
+                <td class="tl">
+                    <input type="text" name="end_time"{present name="info"}{neq name="$info.end_etime" value="-1"} value='{$info.end_etime}' data-time='{$info.end_etime}'{/neq}{else/} value="" data-time=""{/present} class="datepicker" />
+                </td>
+            </tr>
+            <input type="hidden" name="__token__" value="{$Request.token}" />
+        </table>
+    </div>
+    <div id="performance-top" class="button-center">
+        <input type="hidden" name="a_id" value="{present name='info.agent_id'}{$info.agent_id}{/present}" />
+        <button type="button" class="btn btn-primary" id='save'>保存</button>&nbsp;&nbsp;
+        <a href="{:url('/admin/Agents/agentsList')}" class="btn btn-success">返回</a>
+    </div>
+</form>
+</body>
+</html>
+<script>
+    $(function () {
+
+        //身份有效期
+        {present name='info.end_etime'}{eq name='info.end_etime' value='-1'}$("#end_time").addClass("display-none");{/eq}{else/}$("#end_time").addClass("display-none");{/present}
+        $('.end_time').change(function(){
+            var eid=$(this).val();
+            if(eid==-1){
+                $('#end_time').addClass("display-none").removeClass("dispaly-table-row");
+                $('input[name=end_time]').val('');// 永久
+            }else{
+                $('input[name=end_time]').val($('input[name=end_time]').data('time'));
+                $('#end_time').addClass("dispaly-table-row").removeClass("dispaly-none");
+            }
+        });
+
+        // 返回
+		$('#backid').click(function(){
+            window.location.href = 'agentsList.html';
+		});
+
+        // 级联省
+        $('select[name=province]').change(function(){
+            var p_id = $(this).val();
+            var data = getAddressList(p_id,$('select[name=city]'));
+            $('select[name=area]').html('<option>请选择</option>');
+        });
+
+        // 级联市
+        $('select[name=city]').change(function(){
+            var c_id = $(this).val();
+            var data = getAddressList(c_id,$('select[name=area]'));
+        });
+
+        // 获取下级城市列表并替换
+        function getAddressList(id,obj){
+            $.ajax({
+                url:"{:url('/admin/Agents/getAddress/')}",
+                type:'post',
+                data:{pid:id},
+                dataType:'json',
+                success:function(e){
+                    var _html = '<option>请选择</option>';
+                    for (var i = 0; i < e.length; i++) {
+                        _html += '<option value="'+e[i]['id']+'">'+e[i]['name']+'</option>';
+                    };
+                    obj.html(_html);
+                }
+            });
+        }
+
+        // 检索邀请人
+        $('#search').click(function(){
+            var search_key = $('#search_inviter').val();
+            var a_id = '{present name="info.agent_id"}{$info.agent_id}{/present}';
+            // if(search_key){
+                $.ajax({
+                    url:'{:url("/admin/Agents/getAllInviterAgents/")}',
+                    data:{key:search_key,id:a_id},
+                    dataType:'json',
+                    type:'post',
+                    success:function(e){
+                        var _html = '<option class="g_" value="" data-g="0">请选择</option>';
+                        if(e.length>0){
+                            for (var i = 0; i < e.length; i++) {
+                                _html += '<option class="g_'+e[i]['a_id']+'" value="'+e[i]['a_id']+'" data-g="'+e[i]['generation']+'">'+e[i]['name']+'</option>';
+                            };
+                        }else{
+                            _html = '<option value="">没有数据</option>';
+                        }
+                        $('select[name=inviter]').html(_html);
+                    }
+                });
+            // }
+        });
+
+        // 变更邀请人
+        $('select[name=inviter]').change(function(){
+            let _g = parseInt($('.g_'+$(this).val()).attr('data-g'));// 代数
+            $('.myGeneration').val(_g+1);
+        });
+
+    });
+</script>
+<script type="text/javascript">
+    var _startDate = new Date();
+    _startDate.setDate(_startDate.getDate() + 1);// 结束时间
+    {present name="info"}
+    {if condition='$info && ($info.create_ctime neq -1)'}
+    _startDate = '{:date("Y-m-d",strtotime($info.create_ctime)+86400)}';
+    {/if}
+    {/present}
+    $('.datepicker').datepicker({
+        autoclose: true,          //自动关闭
+        calendarWeeks: false,     //是否显示今年是第几周
+        clearBtn: true,           //显示清除按钮
+        daysOfWeekDisabled: [],   //星期几不可选
+        endDate: Infinity,        //日历结束日期
+        forceParse: true,         //是否强制转换不符合格式的字符串
+        format: 'yyyy-mm-dd',     //日期格式
+        keyboardNavigation: true, //是否显示箭头导航
+        language: 'zh-CN',        //语言
+        minViewMode: 0,
+        orientation: "auto",      //方向
+        rtl: false,
+        startDate: _startDate,     //日历开始日期
+        startView: 0,             //开始显示
+        todayBtn: false,          //今天按钮
+        todayHighlight: true,     //今天高亮
+        weekStart: 0              //星期几是开始
+    });
+
+    function checkPassword(){
+        var password = $("#password").val();
+        var repassword = $("#repassword").val();
+        if(password != repassword) {
+        	document.getElementById("password").setCustomValidity("两次输入的密码不匹配");
+        	return false;
+        }
+        return true;
+    }
+</script>
+<script type="text/javascript">
+
+    $(function(){
+
+        // 按钮-保存
+        $('#save').click(function(){
+            checkPassword();
+            $.ajax({
+                url: "{:url('/admin/Agents/saveAgentInfo/')}",
+                type: 'POST',
+                dataType: 'json',
+                data: $('form').serialize(),
+                success:function(e){
+                    if (e.error) {
+                        layer.open({
+                            content:e.error.msg
+                        });
+                    } else {
+                        layer.open({
+                            content:e.msg
+                            ,btn: ['确定']
+                            ,yes: function(index){
+                                layer.close(index);
+                                window.location.href = '{:url("Agents/agentsList")}';
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+    });
+</script>

@@ -1,0 +1,98 @@
+{include file='index@common/header'}
+	<style type="text/css">
+		html,
+		body {
+			background-color: #F5F5F5;
+		}
+	</style>
+</head>
+<body>
+	<div id="agencyTeamContent">
+		<div class="top">
+			<div class="ProTop" id="search_btn">
+				<div class="search">
+					<i class="icon_search"></i>
+					<input id="tvKeyword" type="text" name="content" placeholder="微信昵称、微信号、手机号">
+					<button></button>
+				</div>
+				<div class="search_btn">
+					<button type='button' class='btn_search'>搜索</button>
+				</div>
+				</div>
+			<ol>
+				<li class="current">直属代理</li><li>推荐代理</li><li>会员</li>
+			</ol>
+		</div>
+		<div class="agencyLevel">
+			<!--直属代理-->
+			<ul>
+				{foreach $result as $key=>$value }
+				<li>
+						<a href="{:url('/index/Personteam/agencyLevel/role/'.$value.role.'/type/1')}">
+						<div class="perInformation">
+							<p>{$value.role|get_reward_levelname}代理</p>
+							<span>{$value.count}</span>
+						</div>
+					</a>
+					</li>
+				{/foreach}
+
+			</ul>
+			<!--推荐代理-->
+			<ul>
+
+			{volist name='recommend' id='v'}
+				{if condition='$key lt 6'}
+				<li>
+					<a href="{:url('/index/Personteam/agencyLevel/rank/'.$key.'/type/2')}">
+						<div class="perInformation">
+							<p>{$key|get_reward_levelname}代理</p><span>{$v}</span>
+						</div>
+					</a>
+				</li>
+				{/if}
+			{/volist}
+			</ul>
+			<!-- 意向代理 -->
+			<ul>
+				{foreach name="$rolevip" item="item"}
+				<li class="intention">
+					<ol>
+						<li><img src="{$item.head_img}"/></li>
+						<li>{$item.phone}</li>
+						<li>{$item.create_ctime}</li>
+					</ol>
+				</li>
+				{/foreach}
+			</ul>
+		</div>
+	</div>
+	<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$(function(){
+			$("#agencyTeamContent .agencyLevel>ul").hide().eq(0).show();
+			$("#agencyTeamContent .top>ol li").click(function(){
+				let index=$(this).index();
+				$(this).addClass('current').siblings().removeClass('current');
+				$("#agencyTeamContent .agencyLevel>ul").hide().eq(index).show();
+			})
+		})
+	</script>
+	<script type="text/javascript">
+		$(function () {
+            $(".search>button").click(function(){
+                $("#tvKeyword").val("");
+            })
+            $("#search_btn .search_btn").click(function(){
+                let searchText=$("#tvKeyword").val();
+                if(searchText==null||searchText==""){
+                    mobileTip("请输入搜索内容");
+                }else{
+                    window.location.href ="{:url('/index/Personteam/agencyLevel')}?content="+ searchText;
+
+                }
+            })
+        })
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+{include file='index@common/goBack'}

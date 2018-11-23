@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" /> 
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href='/static/Css/agentsystem-admin.css'/>
+    <link rel="stylesheet" type="text/css" href='/static/Js/layer-v3.1.1/theme/default/layer.css'/>
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/layer-v3.1.1/layer.js"></script>
+
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<table class="table table-bordered table-hover common_input m10">
+    <tr>
+        <td width="30%" class="tableleft">上级分类</td>
+        <td class="tl">
+            <select id="parentid" name="parentid" style="width:174px;"> 
+            	<option value="0" {present name="data.parent_id"} {if condition="$data.parent_id eq 0 "} selected="selected"  {/if} {/present}>一级菜单</option>
+                {foreach name="classifyList" item="item"}
+ 	                <option value="{$item.id}" {present name="data.parent_id"} {if condition="$data.parent_id eq $item.id "}  selected="selected"{/if} {/present} > {$item.classify_name}</option>
+                    {foreach name="item.classifySecond" item="v"}
+                        <option value="{$v.id}">{$v.classify_name}</option>
+                    {/foreach}
+                {/foreach}
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td class="tableleft ">分类名称</td>
+        <td  class="tl"><input id="classNametxt" type="text" value="{present name="data.classify_name"}{$data.classify_name}{/present}" name="name"/></td>
+    </tr>
+
+</table>
+<div class="layui-layer-btn layui-layer-btn-">     
+            <a class="layui-layer-btn0">保存</a>
+            <a class="layui-layer-btn1">关闭</a>          
+   </div>
+
+</body>
+</html>
+<script>
+    $(function () {
+        var index = parent.layer.getFrameIndex(window.name); 
+        var classId=parent.document.getElementById("classId").value;
+       
+        if(classId){
+           $.ajax({
+            type : "post",
+                    url : '/admin/Productclassify/initClass/' ,
+                    dataType : 'json',
+                    data: {id:classId},
+                    success : function(e) {
+                       var jsonData = JSON.parse(e); 
+                       $("#classNametxt").val(jsonData.classify_name);
+                       $("#parentid").find("option[value='"+jsonData.parent_id+"']").attr("selected",true);
+                       $("#parentid").attr("disabled","disabled");
+                    }
+           });
+        }
+
+        $('.layui-layer-btn1').click(function(){
+           parent.layer.close(index);
+        });
+        $('.layui-layer-btn0').click(function(){
+            
+            var  className=$("#classNametxt").val();
+
+            var  pClassId=$("#parentid").val();
+            var msg=null;
+            if(className){
+                $.ajax( {
+                    type : "post",
+                    url : '/admin/Productclassify/save/' ,
+                    dataType : 'json',
+                    data: {parentid:pClassId,id:classId,name:className},
+                    success : function(e) {
+                        var jsonData = JSON.parse(e); 
+                        switch(jsonData.code){
+                            case -1:layer.alert(jsonData.msg); break;
+                            case 0:
+                                if(classId){
+                                    msg="编辑失败，请重新输入！";
+                                }else{
+                                    msg="添加失败，请重新输入！";
+                                }
+                                layer.alert(msg);
+                            break;
+                            case 1:
+                                if(classId){
+                                    msg="编辑成功";
+                                }else{
+                                    msg="添加成功";
+                                }
+                                 layer.alert(msg,function(){
+                                      window.parent.location.reload();
+                                      parent.layer.close(index);
+                                      
+                                    });
+                                break;
+                            }  
+                      
+                    },
+                    error:function(e){
+                        if(classId){
+                           msg="编辑失败，请重新输入！";
+                        }else{
+                           msg="添加失败，请重新输入！";
+                        }
+                        layer.alert(msg);
+                    }
+                });
+            }else{
+                layer.alert("请输入产品分类名！");
+            }
+        
+        });
+
+        
+    });
+</script>

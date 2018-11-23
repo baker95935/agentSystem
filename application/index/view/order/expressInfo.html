@@ -1,0 +1,56 @@
+{include file='index@common/header'}
+<style>
+	body{background-color: #fff;}
+	.logistics .perInformation{background: none;}.logistics .PerInfo_portrait{border-radius: 0;}
+	.logistics h5{padding-left: .75rem;line-height: 1.6rem;}
+	.logistics-log{margin: 20px; padding-left: 5px; }
+	.logistics-log li{position: relative; padding: 9px 0 0 25px; line-height: 18px; border-left: 1px solid #d9d9d9; color: #999;}
+	.logistics-log li .circle{position: absolute; left: -6px; top: 50%; width: 11px; height: 11px; background: url(/static/Images/20180710.png)  -22px 0 no-repeat;}
+	.logistics-log li:first-child{color:#aaa2fb; padding-top: 0; border-left-color: #fff;}.logistics-log>li:first-child .circle{background-position:0 0;}
+</style>
+</head>
+<body>
+	<div id="PersonalInfoContent" class="logistics">
+	    <div>
+		   	<div class="perInformation" >
+		   		{if condition="$type eq 2"}
+		   			<img src="{$orderDetail.gift.pic}" class="PerInfo_portrait"/>
+		   		{else /}
+		   			<img src="{$orderDetail.product.product_img}" class="PerInfo_portrait"/>
+		   		{/if}
+		   		
+				<div>
+				{if condition="$type eq 2"}
+					<p>物流公司：{$orderDetail.express_name}</p>
+					<p>快递单号：{$orderDetail.express_number}</p>
+				{else /}
+					<p>物流公司：{$orderDetail.delivery.express_name}</p>
+					<p>快递单号：{$orderDetail.delivery.express_number}</p>
+				{/if}
+		   			
+		   		</div>	
+		   	</div>
+	    </div>
+
+	    
+	    <div style="height:.4rem;background: #F5F5F5;"></div>
+	    {if condition="$expressInfoUrl"}
+	    <h5>物流状态</h5>
+		<ol class="logistics-log">
+		 {foreach name="expressInfoUrl->data" item="item"}
+				<li>
+		   			<span class="circle"></span>
+		   			<p>{$item->context}</p>
+		   			<span>{$item->time}</span>
+		   		</li>
+		  {/foreach}
+		</ol>
+		{/if}
+	</div>
+	{include file='index@common/footer_button'}
+<script type="text/javascript" src="/static/Js/jquery.js"></script>
+<script type="text/javascript">
+	$(function(){
+
+	})
+</script>

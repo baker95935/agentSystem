@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/style.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/bootstrap-datepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/Css/agentsystem-admin.css" />
+    <script type="text/javascript" src="/static/Js/jquery.js"></script>
+    <script type="text/javascript" src="/static/Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="/static/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/Js/ckform.js"></script>
+    <script type="text/javascript" src="/static/Js/common.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<div id="performance-top">
+                <h5>订单详情</h5>
+            </div>
+<table class="table table-bordered table-hover definewidth">
+    <thead>
+    <tr>
+		<th class="tl">订单编号：{$ordersInfo.order_number}</th>
+	</tr>
+    </thead>
+    <tr><td>
+        <div id="progress">
+            <ol class="{if condition="$ordersInfo.delivery_time gt 1 "}delivery_time{/if}">
+                <li></li>
+                <li class="{if condition="$ordersInfo.complete_time gt 1 "}commplete_time{/if}"></li>
+            </ol>
+            <ul>
+                <li>
+                    <span class="circle current">1</span>
+                    <span>创建订单</span>
+                    <span>{$ordersInfo.create_time}</span>
+                </li>
+                <li>
+                    <span class="circle {if condition="$ordersInfo.delivery_time gt 1 "} current{/if}">2</span>
+                    <span>公司订单</span>
+                    <span>{if condition="$ordersInfo.delivery_time gt 1 "} {$ordersInfo.delivery_time|date='Y-m-d H:i:s',###}{/if}</span>
+                </li>
+                <li>
+                    <span class="circle {if condition="$ordersInfo.complete_time gt 1 "} current{/if}">3</span>
+                    <span>确认收货</span>
+                    <span>{if condition="$ordersInfo.complete_time gt 1 "} {$ordersInfo.complete_time|date='Y-m-d H:i:s',###}{/if}</span>
+                </li>
+            </ul>
+        </div>
+    </td></tr>
+</table>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th colspan="4" class="tl">订单详情：</th>
+    </tr>
+    </thead>
+ 
+    <tr><td colspan="4" class="tl">订单状态：{$ordersInfo.status}</td></tr>
+    <tr><td colspan="4" class="tl">支付方式：{$ordersInfo.paystyle} &nbsp;&nbsp; {if condition="$ordersInfo->getData('paystyle') eq 2 && !empty($ordersInfo.wechatAccount)"}{$ordersInfo.wechatAccount}{/if}</td></tr>
+ 	
+ 	<tr><td colspan="4" class="tl">收货信息：姓名：{$ordersInfo.consignee_name} 电话：{$ordersInfo.consignee_phone}  {$ordersInfo.consignee_province|get_address_name_by_id}  {$ordersInfo.consignee_city|get_address_name_by_id}  {$ordersInfo.consignee_area|get_address_name_by_id}  {$ordersInfo.consignee_address}</td></tr>
+ 
+    <tr><td class="tl">代理商ID</td><td class="tl">微信昵称</td><td class="tl">代理商姓名</td> <td class="tl">代理商身份</td></tr>
+    <tr><td class="tl">
+    <a href="{:url('/admin/Agents/agentInfo/a_id/'.$ordersInfo->agents->agent_id)}" >{$ordersInfo->agents->agent_id}</a>
+    </td><td class="tl">{$ordersInfo->agents->wechat}</td><td class="tl">{$ordersInfo->agents->name}</td> <td class="tl">{$ordersInfo->agents->role|get_reward_levelname}</td></tr>
+ 
+    <tr><td colspan="4" class="tl">备注:<span id="order_remark_span"></span>
+    {if condition="!in_array($ordersInfo->getData('status'),array(5))"} 
+    <textarea rows="3" maxlength="60"  name="order_remark" id="order_remark">{present name="ordersInfo.order_remark"}{$ordersInfo.order_remark}{/present}</textarea></td></tr>
+	{else /}
+    {present name="ordersInfo.remark"}{$ordersInfo.remark}{/present}
+    {/if}
+</table>
+<br>
+<div class="inline pull-right page">
+{if condition="!in_array($ordersInfo->getData('status'),array(4,5))"} 
+<button type="button" class="btn btn-success" id="save_order_mark">保存</button>
+<button type="button" class="btn btn-success" id="cancle_order_mark">取消</button>
+{/if}
+</div>
+<br>
+<br>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+		<th class="tl">礼包说明</th>
+		<th class="tl">礼包类型</th>
+		<th class="tl">数量</th>
+		<th class="tl">小计</th>
+	</tr>
+    </thead>
+    <tr>
+        <td class="tl">{$ordersInfo->gift->name}</td>
+        <td class="tl">{$ordersInfo->gift->type|get_reward_levelname}</td>
+        <td class="tl">{$ordersInfo.pnumber}</td>
+        <td class="tl">￥{$ordersInfo.order_price}</td>
+    </tr>
+ 
+</table>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+		<th colspan="8" class="tl">奖励情况：</th>
+	</tr>
+    </thead>
+    <tr>
+        <td class="tl">礼包奖励</td>
+        <td class="tl">奖励人</td>
+        <td class="tl">奖励金额</td>
+    </tr>
+    {foreach name="ordersReward" item="item"}
+    <tr>
+        <td class="tl">{$item.recommend_hierarchy}度奖励</td>
+        <td class="tl">
+        {if condition="$type eq 1"}
+        	{$item.name}({$item.agent_id}) {$item.rolename}
+        {else /}
+        	{$item->agents->name}({$item->agents->agent_id}) {$item->agents->role|get_reward_levelname}
+        {/if}
+        </td>
+        <td class="tl">￥{$item.recommend_reward}</td>
+    </tr>
+    {/foreach}
+</table>
+<form action="{:url('/admin/Promotiongiftorder/express/order_number/'.$ordersInfo->order_number)}" method="post"   >
+<table id="agentorders" class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+		<th colspan="2" class="tl">物流信息：</th>
+	</tr>
+    </thead>
+    <tr><td class="tl">物流公司:</td>
+    <td class="tl">
+    
+         {if condition="$ordersInfo->getData('status') egt 3"}
+        	{if condition="$ordersInfo->express_code gt 0"}
+		        <select name="express_code" id="express_code" {present name='ordersInfo->express_code'}disabled {/present}>
+		        {foreach name="expressComList" item="item" key="key"}
+		        <option value="{$key}" {present name='ordersInfo->express_code'}{if condition="$ordersInfo->express_code eq $key"} selected="selected"  {/if} {/present}>{$item}</option>
+		        {/foreach}	 
+		        </select>
+	        {else /}
+	        	<input required {if condition="$ordersInfo->getData('status') egt 3"} disabled {/if} type="text" name="express_name" id="express_name"  value="{present name='ordersInfo.express_name'}{$ordersInfo.express_name}{/present}">
+        	{/if}
+        {else /}
+        	
+        		<select name="express_code" id="express_code" >
+		        {foreach name="expressComList" item="item" key="key"}
+		        <option value="{$key}" >{$item}</option>
+		        {/foreach}	 
+		        </select>
+        {/if}
+        
+    
+    </td>
+    </tr>
+    
+    <tr><td class="tl">运单编号:</td><td class="tl"><input required {if condition="$ordersInfo->getData('status') egt 3"} disabled {/if} type="text" name="express_number" id="express_number"  value="{present name='ordersInfo.express_number'}{$ordersInfo.express_number}{/present}"></td></tr>
+    <tr><td class="tl">备注说明:</td><td class="tl"><input  {if condition="$ordersInfo->getData('status') egt 3"} disabled {/if} type="text" name="express_remark" id="express_remark"  value="{present name='ordersInfo.express_remark'}{$ordersInfo.express_remark}{/present}"></td></tr>
+</table>
+
+
+
+<div class="inline pull-right page">
+ 商品小计：￥ {$ordersInfo.order_price}<br>
+<br>
+	{if condition="$ordersInfo->getData('status') eq 2"}
+	<button type="submit" class="btn btn-success" >标记发货</button>
+	{else /}
+	<button type="button" id="back" class="btn btn-info" >返回</button>
+	{/if}
+	<br>
+<br>
+</div>
+</form>
+</body>
+</html>
+<script>
+ 
+
+    $(function () {
+        
+    	$('#addnew').click(function(){
+			window.location.href="{:url('/admin/Agentorders/create')}";
+	 	});
+    	
+    	$('#back').click(function(){
+			window.location.href="{:url('/admin/Promotiongiftorder/index')}";
+	 	});
+    	
+    });
+
+
+    //保存备注
+    $('#save_order_mark').click(function(){
+        var order_remark = $('#order_remark').val();
+        var order_number = '{present name="ordersInfo.order_number"}{$ordersInfo.order_number}{/present}';
+        if(order_remark!=''){
+            $.ajax({
+                url:'{:url("/admin/Promotiongiftorder/saveOrderMark/")}',
+                data:{order_remark:order_remark,order_number:order_number},
+                dataType:'json',
+                type:'post',
+                success:function(data){
+                    if(data==1){
+                    	$('#order_remark').hide();
+                    	$('#order_remark_span').html(order_remark);
+                    }
+                }
+            });
+        }
+    });
+    
+    //取消备注
+    $('#cancle_order_mark').click(function(){
+        var order_remark = '{present name="ordersInfo.remark"}{$ordersInfo.remark}{/present}';
+        $('#order_remark').val(order_remark);
+    });
+        
+	 
+</script>

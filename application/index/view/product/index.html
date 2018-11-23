@@ -1,0 +1,118 @@
+{include file="index@common/header"}
+	<style type="text/css">
+		html,
+		body {
+			background-color: #F5F5F5;
+		}
+		.none{
+			visibility:hidden;
+		}
+	</style>
+</head>
+<body>
+	<div class="productListListLayout">
+		<div id="top">
+			<div class="ProTop" id="search_btn">
+				<div class="search">
+					<i class="icon_search"></i>
+					<input type="text" name='search' value='{present name="$search"}{$search}{/present}' id="tvKeyword" placeholder="请输入搜索关键字" onkeydown='if(event.keyCode==13){search();}' />
+					<button class='clear{if condition="!isset($search)"} none{/if}'></button>
+				</div>
+				<div class="search_btn">
+					<button type='button' class='btn_search'>搜索</button>
+				</div>
+			</div>
+			<ol class="proCondition">
+				<li class="go">
+					<a href="{:url('Product/category')}">产品分类</a>
+				</li>
+				<li><a href="javascript:;" class='changeSort' data-val='{eq name="sort" value="3"}4{else/}3{/eq}'>销量</a><img src="/static/Images/{notin name='sort' value='3,4'}arrow.png{else/}{eq name='sort' value='3'}arrow_top.png{/eq}{eq name='sort' value='4'}arrow_down.png{/eq}{/notin}" alt="" /></li>
+				<li style="border:0;"><a href="javascript:;" class='changeSort' data-val='{eq name="sort" value="1"}2{else/}1{/eq}'>价格</a><img src="/static/Images/{notin name='sort' value='1,2'}arrow.png{else/}{eq name='sort' value='1'}arrow_top.png{/eq}{eq name='sort' value='2'}arrow_down.png{/eq}{/notin}" alt="" /></li>
+				<input type='hidden' value='{$sort}' class='sortVal' />
+				<input type='hidden' value='{$cid}' class='categoryVal' />
+			</ol>
+		</div>
+		<div class="ProListContent">
+		{notpresent name='list'}
+		暂无数据
+		{else/}
+			<ul>
+			{volist name='list' id="vo" key="k"}
+				<li>
+					<a href="{:url('Product/detail','id='.$vo['id'])}">
+						<div class="boxImg">
+							<img src="{$vo.product_img}">
+							<div{if condition='$vo.inventory elt 0'} style='visibility: visible;'{/if}>
+								<p>已售完</p>
+							</div>
+						</div>
+						<aside>
+							<p class="proName">{eq name='vo.is_first_order' value='1'}<span class="proFlag">首单商品</span>{/eq}{$vo.product_name}</p>
+							<div class="proSale">
+								<span class="goods-price"><span class="yen">￥</span>{$vo.sales_price}</span>
+								<span class="sale">销量：<span>{$vo.mix_volume}</span>{$vo.unit}</span>
+							</div>
+						</aside>
+					</a>
+				</li>
+			{if condition='($k%2) eq 0'}</ul><ul>{/if}{/*逢二折行*/}
+			{/volist}
+			</ul>
+		{/notpresent}
+		</div>
+		<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+		<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			function search(){
+				var _url = '/index/Product/index/';
+				var _key = $('#tvKeyword').val();
+				window.location.href = _url + 'search/' + _key;
+			}
+
+			$(function(){
+				
+				var role_tip={$role_tip};
+				if(role_tip==1) {
+					layer.alert('您的身份已变更，请重新登录，以免对您的收益造成损失', function(){
+						window.location.href='{:url("index/personalinfo/personalinfolist")}';
+					});
+					return false;
+				}
+				
+				// 搜索
+				$('#tvKeyword').keyup(function(){
+					var _val = $(this).val();
+					if(_val){
+						$('.clear').show();
+					}else{
+						$('.clear').hide();
+					}
+				});
+				$(".btn_search").click(function(){
+					search();
+				});
+				// 清空
+				$('.clear').click(function(){
+					$('#tvKeyword').val('');
+					$(this).hide();
+				});
+
+				// 排序
+				$('.changeSort').click(function(){
+					var _val = parseInt($('.sortVal').val());
+					var _the = parseInt($(this).data('val'));
+					var _key = $('#tvKeyword').val();
+					var _cid = $('.categoryVal').val();
+					var _url = '/index/Product/index/';
+					_val = _the;
+					if(_key){
+						_url = _url+'search/'+_key+'/';
+					}
+					if(_cid){
+						_url = _url+'cid/'+_cid+'/';
+					}
+					window.location.href = _url+'sort/'+_val;
+				});
+			});
+		</script>
+		{include file="index@common/footer_button" /}

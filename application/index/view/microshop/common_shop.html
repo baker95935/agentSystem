@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta content="telephone=no" name="format-detection">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>{$date.shop_name}的店铺</title>
+	<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+	<link rel="stylesheet" type="text/css" href="/static/Css/ripple.css" />
+	<link rel="stylesheet" type="text/css" href="/static/Js/layer_mobile/need/layer.css" />
+	<script type="text/javascript" src="/static/Js/layer_mobile/layer.js"></script>
+	<script type="text/javascript">
+        var docEl = document.documentElement;
+        function getSize() { // 获取屏幕的宽度
+            var screenWidth = docEl.clientWidth;
+            docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+        }
+        getSize(); // 页面加载完执行一次
+        window.onresize = function() {
+            getSize();
+        }
+
+        // 跳转
+        function redirect(url){
+            window.location.href = url;
+        }
+
+        // 会员提示
+        function memberTip(e){
+            if (e == 1) {
+                msgTipUrl('请先申请代理商身份','{:url("Index/applyRegist")}');
+            } else {
+                msgTip('申请正在审核中');
+            }
+        }
+
+        // 自定义提示
+        function msgTip(msg){
+            layer.open({
+                content:msg,
+                skin: 'msg',
+                time: 3, // 3s
+            });
+        }
+
+        // 自定义弹窗
+        function msgAlert(msg){
+            layer.open({
+                content:msg,
+                btn:['确定']
+            });
+        }
+
+        // 自定义提示+跳转
+        function msgTipUrl(msg,url){
+            layer.open({
+                content:msg,
+                btn:['确定'],
+                yes: function(index){
+                    layer.close(index);
+                    if(url){
+                        redirect(url);
+                    }
+                }
+            });
+        }
+	</script>
+	<link rel="stylesheet" type="text/css" href="/static/Css/my-shop.css">
+</head>
+<body style="background-color: #F5F5F5;">
+	<div id="shopHome" class="productListListLayout">
+		<div class="header">
+			{if condition="empty($Request.session.user.head_img)"}
+			<img src="/static/Images/default_head.png" class="PerInfo_portrait" id="myimg" style="cursor: pointer;" />
+			{else /}
+			<img src="{$Request.session.user.head_img}" class="PerInfo_portrait" id='myimg'/>
+			{/if}
+			<div class="erweima">
+				<img src="/static/Images/icon_erweima_black.png" alt="">
+
+			</div>
+	    </div>
+		<div class="ProListContent">
+
+			<ul>
+				{volist name="info" id="vo" key="k" }
+				<li>
+					<a href="{:url('/index/Product/detail/id/'.$vo.product.id.'/agentID/'.$agentID.'/openid/'.$openid)}">
+						<div class="boxImg">
+							<img src="{$vo.product.product_img}">
+						</div>
+						<aside>
+							<p class="proName"><span class="proFlag" style="display:none;">首单商品</span>{$vo.product.product_name}</p>
+							<div class="proSale">
+								<span class="goods-price"><span class="yen">￥</span>{$vo.product.sales_price}</span>
+								<span class="sale">销量：<span>{$vo.product.sales_volume}</span>件</span>
+							</div>
+						</aside>
+					</a>
+				</li>
+				{if condition='($k%2) eq 0'}</ul><ul>{/if}{/*逢二折行*/}
+				{/volist}
+			</ul>
+
+		</div>
+		<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+		<script src="/static/Js/html2canvas.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			$(function(){
+				// 二维码图层
+
+				function layoutFun(){
+					var textNode="<div id='homeBg'><aside style='opacity: 0;'>"+
+									"<div id='inviteAgencyContent'>"+
+										"<div class='layout'><img src='/{$date.qrcode}' alt='' /></div></div></aside>"+
+										"<article id='bgImg'><button></button><img src=''/></div>";
+					$('body').append(textNode);
+					html2canvas(document.getElementById("inviteAgencyContent")).then(function(canvas){
+					    var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+					    $("#bgImg>img").attr('src',image);
+					    $("#inviteAgencyContent").hide();
+					    $('#bgImg>button').css('opacity','1');
+					});
+				}
+				$('.erweima').on('click',layoutFun);
+				// 点击图片外删除图层
+		        $('body').on('click','#bgImg>button',function(){
+		          $("#homeBg").remove();
+		        });
+			});
+		</script>
+		{include file="index@common/footer_button" /}
+		<!--页面背景图调用-->
+		<script>
+            {present name='$date.background'}
+            $(".header").css('background-image','url("{$date.background}")');
+            {/present}
+		</script>

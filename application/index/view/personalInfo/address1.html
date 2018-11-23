@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>地址</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<link rel="stylesheet" type="text/css" href="/static/Css/areachose.css"/>
+		<!-- head 中 -->
+		<link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.min.css">
+		<link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.0/css/jquery-weui.min.css">
+		<!-- 如果使用了某些拓展插件还需要额外的JS -->
+		<script src="/static/Js/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/swiper.min.js"></script>
+		<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/city-picker.min.js"></script>
+	    <script src="/static/Js/areachose.js" type="text/javascript" charset="utf-8"></script>
+
+
+		<style type="text/css">
+			body{background-color: #F5F5F5;}
+			button{border: 0;}
+		</style>
+
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = screenWidth / (750 / 40) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+
+	</head>
+
+	<body>
+		<div id="addressContent">
+			<div class="content">
+				<div>
+					所在地区
+				</div>
+				<input type="text" id='city-picker' name="picker" value="{$data.province|get_address_name_by_id} {$data.city|get_address_name_by_id} {$data.area|get_address_name_by_id}"/>
+			</div>
+			<div class="detailAddress">
+			   <textarea id="reasonContent" name="address" placeholder="详细地址">{$data.address}</textarea>
+			</div>
+			<button type='button' class='btn_address'>确认</button>
+		</div>
+
+	</body>
+	<!-- body 最后 -->
+	<script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/jquery-weui.min.js"></script>
+
+	<script type="text/javascript">
+        $("#city-picker").cityPicker({
+            title: "请选择地址"
+        });
+
+        $(function(){
+            $('.btn_address').click(function(){
+                var citydata  = $('input[name=picker]').val();
+                var address  = $('textarea[name=address]').val();
+				/* 提交验证 */
+                if(citydata && address){
+                    $.ajax({
+                        url:'{:url("Personalinfo/saveAll")}',
+                        data:{citydata:citydata,address:address},
+                        type:'post',
+                        success:function(e){
+                            if(e.error){
+                                alert(e.error.msg);
+                                return false;
+                            }else{
+                                window.location.href = e.url;
+                            }
+                        }
+                    });
+                }else{
+                    alert('不能为空');
+                    return false;
+                }
+            });
+        });
+	</script>
+
+</html>

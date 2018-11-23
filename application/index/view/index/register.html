@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css"/>
+		<script type="text/javascript" src='/static/Js/jquery.js'></script>
+		<script src="/static/Js/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+		<style>
+			body{background-color: #fff;}
+		</style>
+	</head>
+	<body>
+		<div id="registerLayout">
+			<div class="topBg">
+				<div id="background" class="wall"></div>
+		        <div id="midground" class="wall"></div>
+		        <div id="foreground" class="wall"></div>
+			</div>
+			<div class="container">
+				<ul>
+					<li class="phone">
+						<i></i>
+						<input type="text" name="phone" class="inputPlac" id="phone" placeholder="输入手机号" />
+					</li>
+					<li class="weixin">
+						<i></i>
+						<input type="text" name="wechat" value='{$inviter}' class="inputPlac" id="weixin" placeholder="推荐人手机号" />
+					</li>
+				</ul>
+				<input type="hidden" name="openid" id="openid" value="{$openid}">
+				<button type='button' class='reg_btn'>注册</button>
+				<p class="tip">温馨提示：登录密码为手机号码后六位，登录成功后请尽快修改密码！</p>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		$(function(){
+			$('.reg_btn').click(function(){
+				var _phone = $('input[name=phone]').val();
+				var _wechat = $('input[name=wechat]').val();
+				var _openid = $('input[name=_openid]').val();
+				var _redirect_url='{$redirect_url}';
+
+				//推荐人手机号作为必填项校验
+				if(_wechat == ''){
+					mobileTip('推荐人手机号不能为空');
+					return false;
+				}
+				
+				//推荐人手机号校验
+				if(_wechat){
+					var _check = /^1[3,4,5,7,8,9][0-9]{9}$/.test(_wechat);
+					if(!_check){
+						mobileTip('请输入11位有效手机号码');
+						return false;
+					}
+				}
+				
+                /* 提交验证 */
+				if(_phone){
+					var _check = /^1[3,4,5,7,8,9][0-9]{9}$/.test(_phone);
+					if(!_check){
+						mobileTip('请输入11位有效手机号码');
+						return false;
+					}
+					$.ajax({
+						url:'{:url("/index/Index/saveRegister")}',
+						data:{phone:_phone,wechat:_wechat,openid:_openid,redirect_url:_redirect_url},
+						type:'post',
+						success:function(e){
+							if(e.error){
+								mobileAlert(e.error.msg);
+								return false;
+							}else{
+								layer.open({
+								    content:e.msg,
+								    btn: ['确认'],
+								    yes: function(index){
+								    	window.location.href = e.url;
+								    	layer.close(index);
+								    }
+								});
+							}
+						}
+					});
+				}else{
+					mobileTip('手机号不能为空');
+					return false;
+				}
+			});
+		});
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

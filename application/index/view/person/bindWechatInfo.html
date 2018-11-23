@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>绑定微信</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/common.css" />
+		<script type="text/javascript" src='/static/Js/jquery-2.1.0.min.js'></script>
+		<style type="text/css">
+			body{background-color: #F5F5F5;}
+			button{border: 0;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize();// 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="loginPasswordLayout">
+			<p class="text"></p>
+			<input type="hidden" name="openid" id="openid" value="{$openid}">
+			{if condition="$flag eq 1"}
+				<button type='button' class="commonButton">确认绑定</button>
+			{else /}
+				您已绑定微信.
+			{/if}
+		</div>
+	</body>
+	<script type="text/javascript">
+		$(function(){
+			var openid=$("#openid").val();
+			// 确认
+			$('button').click(function(){
+			 
+				$.ajax({
+					url:'{:url("Person/saveBindWechatInfo")}',
+					type:'post',
+					data:{openid:openid},
+					success:function(e){
+						if(e.error){
+							mobileTip(e.error.msg);
+						}else{
+							mobileTip(e.msg);
+						}
+					}
+				});
+			});
+		})
+	</script>
+	<script type="text/javascript" src='/static/Js/layer_mobile/set_LayerMobile.js'></script>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<meta content="telephone=no" name="format-detection">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{$spider.title}</title>
+		<link rel="stylesheet" type="text/css" href="/static/Css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="/static/Css/store.css"/>
+		<style type="text/css">
+			html,body{background-color: #F5F5F5;}
+		</style>
+		<script type="text/javascript">
+			var docEl = document.documentElement;
+			function getSize() { // 获取屏幕的宽度
+				var screenWidth = docEl.clientWidth;
+				docEl.style.fontSize = (screenWidth / (750 / 40)) + 'px';
+			}
+			getSize(); // 页面加载完执行一次
+			window.onresize = function() {
+				getSize();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="myStoreLayout">
+			<div class="remaining">
+				<div>
+					<ul>
+						<li>库存余额：<span>￥{$data.stock}</span></li>
+						<li class="btn">
+							<div id="progress_row">
+								<div class="progress">
+									<div class="progress-bar progress-bar-info active" style="width: {$data.percent}%;background-color:{$data.color};"></div>
+								</div>
+							</div>
+						</li>
+					</ul>
+					<!-- <button onclick='redirect("{:url("Person/rechargeStock")}");'>充值库存</button> -->
+				</div>
+			</div>
+			<p style="height:.4rem;"></p>
+			<!--<p class="store"><a href='{:url("Person/profitToStock")}' class="backArrowRight">销售额转库存</a></p>-->
+			<section class="bottom">
+				<h2>库存明细</h2>
+				<div class="order-detail">
+					{if condition="!empty($allList)"}
+					{foreach name="$allList" item="item"}
+					<ul>
+						<li>{if condition="$item.change_type eq 3"}订单编号：{$item.order_number}{else /}编号：{$item.id}{/if}</li>
+						<li>{if condition="$item.change_type eq 3"}交易{else /}变动{/if}金额：￥{$item.money}</li>
+						<li>库存余额：￥{$item.change_after}</li>
+						<li>{if condition="$item.change_type eq 3"}下单{else /}操作{/if}时间：{$item.create_time}</li>
+						<li>备注：{$item.remark}</li>
+					</ul>
+					{/foreach}
+					{/if}
+				</div>
+			</section>
+		 
+		</div>
+	{include file='index@common/goBack'}
+	<script type="text/javascript" src="/static/Js/g2.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/static/Js/data-set.min.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		function redirect(url){
+			window.location.href = url;
+		};
+	</script>
+</html>
